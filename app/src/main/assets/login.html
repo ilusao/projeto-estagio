@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+<div class="login-container text-center">
+    <h3 class="mb-4 text-center">Entrar</h3>
+    <form id="loginForm" class="d-flex flex-column gap-3">
+        <input type="text" class="form-control" id="usuario" placeholder="Usuário" required>
+        <input type="password" class="form-control" id="senha" placeholder="Senha" required>
+        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+    </form>
+</div>
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Login realizado com sucesso!');
+      window.location.href = 'faixa.html';
+    });
+</script>
+<script src="Bootstrap/js/bootstrap.bundle.js"></script>
+</body>
+</html>
