@@ -6,9 +6,14 @@
     <link rel="stylesheet" href="Bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="login.css">
 </head>
+
 <body>
 <div class="login-container text-center">
     <h3 class="mb-4 text-center">Entrar</h3>
+
+    <div id="mensagemErro" class="alert alert-danger d-none" role="alert">
+    </div>
+
     <form id="loginForm" class="d-flex flex-column gap-3">
         <input type="text" class="form-control" id="usuario" placeholder="Usuário" required>
         <input type="password" class="form-control" id="senha" placeholder="Senha" required>
@@ -17,10 +22,21 @@
 </div>
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert('Login realizado com sucesso!');
-      window.location.href = 'faixa.html';
-    });
+    e.preventDefault();
+
+    const usuario = document.getElementById('usuario').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+
+    const mensagemErro = document.getElementById('mensagemErro');
+
+    if (usuario === '5013' && senha === 'loja.292929') {
+        alert('Login realizado com sucesso!');
+        window.location.href = 'menu.html';
+    } else {
+        mensagemErro.classList.remove('d-none'); // Mostra o alert do Bootstrap
+        mensagemErro.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Usuário ou senha incorretos! (Dica: usuário 5013, senha loja.292929)';
+    }
+});
 </script>
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 </body>
