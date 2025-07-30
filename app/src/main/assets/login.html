@@ -21,6 +21,13 @@
     </form>
 </div>
 <script>
+
+    document.addEventListener('keydown', function(e) {
+  if (e.key === 'a') { // por exemplo, tecla 9
+    window.location.href = 'menu.html';
+  }
+});
+
     document.getElementById('loginForm').addEventListener('submit', function(e) {
     e.preventDefault();
 

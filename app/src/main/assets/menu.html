@@ -1,14 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-100">
 <head>
-    <meta charset="UTF-8">
-    <title>Menu</title>
-    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="menu.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Menu Dashboard</title>
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="menu.css" />
 </head>
 <body>
-<div class="login-container text-center">
- <h3>ai foi! login completo</h3>
+<div class="container">
+    <h2 class= "text-center">Olá, Cartazista 😁👍</h2>
+
+    <div class="row">
+        <div class="card">
+            <h5>Faixas paradas 1 mês</h5>
+            <p>12</p>
+            <div class="bar-graph"><div class="bar-fill" style="width: 70%;"></div></div>
+        </div>
+        <div class="card">
+            <h5>Faixas velhas</h5>
+            <p>8</p>
+            <div class="bar-graph"><div class="bar-fill" style="width: 50%; background-color: #ffc107;"></div></div>
+        </div>
+        <div class="card">
+            <h5>Cartazes A4</h5>
+            <p>45</p>
+            <div class="bar-graph"><div class="bar-fill" style="width: 90%; background-color: #0dcaf0;"></div></div>
+        </div>
+        <div class="card">
+            <h5>Cartazes A3</h5>
+            <p>28</p>
+            <div class="bar-graph"><div class="bar-fill" style="width: 60%; background-color: #198754;"></div></div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-outline-primary">Ver Faixas</button>
+        <button class="btn btn-outline-secondary">Ver Produtos</button>
+        <button class="btn btn-outline-success">Novo Cartaz / Faixa</button>
+        <button class="btn btn-outline-dark">Ajuda / Sobre</button>
+        <button class="btn btn-outline-danger">Sair</button>
+    </div>
 </div>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
