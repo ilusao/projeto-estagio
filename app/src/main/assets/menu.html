@@ -5,13 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Menu Dashboard</title>
     <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="Bootstrap/bootstrap-icons.css" />
     <link rel="stylesheet" href="menu.css" />
 </head>
 <body>
-<div class="container">
-    <h2 class= "text-center">Olá, Cartazista 😁👍</h2>
 
-    <div class="row">
+<div class="menu-header">
+    <i class="bi-brush"  style="font-size: 2rem; color: white;"></i>
+    <div class="welcome-text">
+        <h2>Olá, Cartazista</h2>
+        <p>Lembre-se: o importante é estar certo, não belo</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- BOTÕES AGORA EM CIMA -->
+    <div class="btn-group">
+        <button class="btn-custom">
+            <i class="bi bi-collection" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
+            Ver Faixas
+        </button>
+        <button class="btn-custom">
+            <i class="bi bi-box-seam" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
+            Ver Produtos
+        </button>
+        <button class="btn-custom">
+            <i class="bi bi-plus-circle" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
+            Novo Cartaz / Faixa
+        </button>
+        <button class="btn-custom">
+            <i class="bi bi-question-circle" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
+            Ajuda / Sobre
+        </button>
+        <button class="btn-custom">
+            <i class="bi bi-box-arrow-right" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
+            Sair
+        </button>
+    </div>
+
+    <!-- CARDS GRÁFICOS AGORA EMBAIXO -->
+    <div class="cards-grid" style="margin-top: 2rem;">
         <div class="card">
             <h5>Faixas paradas 1 mês</h5>
             <p>12</p>
@@ -33,15 +66,8 @@
             <div class="bar-graph"><div class="bar-fill" style="width: 60%; background-color: #198754;"></div></div>
         </div>
     </div>
-
-    <div class="btn-group">
-        <button class="btn btn-outline-primary">Ver Faixas</button>
-        <button class="btn btn-outline-secondary">Ver Produtos</button>
-        <button class="btn btn-outline-success">Novo Cartaz / Faixa</button>
-        <button class="btn btn-outline-dark">Ajuda / Sobre</button>
-        <button class="btn btn-outline-danger">Sair</button>
-    </div>
 </div>
+
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 </body>
