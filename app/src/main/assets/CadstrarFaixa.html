@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-100">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Menu Dashboard</title>
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="Bootstrap/bootstrap-icons.css" />
+    <link rel="stylesheet" href="CadastrarFaixa.css" />
+</head>
+
+<body class="bg-light p-4">
+
+<div class="container">
+    <div class="card-cadastro">
+        <h2>Cadastro de Faixa</h2>
+        <form>
+            <div class="mb-3">
+                <label for="produto" class="form-label">Nome do Produto</label>
+                <input type="text" class="form-control" id="produto" placeholder="Ex: Arroz 5kg">
+            </div>
+
+            <div class="mb-3">
+                <label for="tipoOferta" class="form-label">Tipo de Oferta</label>
+                <select class="form-select" id="tipoOferta">
+                    <option selected disabled>Escolha...</option>
+                    <option value="sv">SV</option>
+                    <option value="oferta">Oferta</option>
+                    <option value="cartao">Cartão</option>
+                </select>
+            </div>
+
+            <div class="mb-3" id="precoOfertaDiv">
+                <label for="precoOferta" class="form-label">Preço da Oferta</label>
+                <input type="number" class="form-control" id="precoOferta" placeholder="R$ 0,00">
+            </div>
+
+            <div class="mb-3" id="precoNormalDiv">
+                <label for="precoNormal" class="form-label">Preço Normal</label>
+                <input type="number" class="form-control" id="precoNormal" placeholder="R$ 0,00">
+            </div>
+
+            <div class="mb-3">
+                <label for="estadoFaixa" class="form-label">Estado da Faixa</label>
+                <select class="form-select" id="estadoFaixa">
+                    <option selected disabled>Escolha...</option>
+                    <option value="nova">Nova</option>
+                    <option value="velha">Velha</option>
+                    <option value="intermediaria">Nem nova nem velha</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="condicaoFaixa" class="form-label">Condição da Faixa</label>
+                <select class="form-select" id="condicaoFaixa">
+                    <option selected disabled>Escolha...</option>
+                    <option value="boa">Boa</option>
+                    <option value="maisomenos">Mais ou menos</option>
+                    <option value="ruim">Ruim</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="comentario" class="form-label">Comentário (opcional)</label>
+                <textarea class="form-control" id="comentario" rows="2" placeholder="Observações extras..."></textarea>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="limiteCpf">
+                <label class="form-check-label" for="limiteCpf">Limite por CPF</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const tipoOferta = document.getElementById('tipoOferta');
+    const precoOfertaDiv = document.getElementById('precoOfertaDiv');
+    const precoNormalDiv = document.getElementById('precoNormalDiv');
+
+    tipoOferta.addEventListener('change', () => {
+      const tipo = tipoOferta.value;
+
+      if (tipo === 'sv' || tipo === 'cartao') {
+        precoOfertaDiv.classList.remove('d-none');
+        precoNormalDiv.classList.remove('d-none');
+      } else if (tipo === 'oferta') {
+        precoOfertaDiv.classList.remove('d-none');
+        precoNormalDiv.classList.add('d-none');
+      } else {
+        precoOfertaDiv.classList.add('d-none');
+        precoNormalDiv.classList.add('d-none');
+      }
+    });
+</script>
+
+    <script src="Bootstrap/js/bootstrap.bundle.js"></script>
+</body>
+</html>

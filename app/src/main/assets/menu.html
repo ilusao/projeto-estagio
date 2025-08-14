@@ -21,7 +21,7 @@
 <div class="container">
     <!-- BOTÕES AGORA EM CIMA -->
     <div class="btn-group">
-        <button class="btn-custom">
+        <button class="btn-custom" id="btnVerFaixas">
             <i class="bi bi-collection" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
             Ver Faixas
         </button>
@@ -29,9 +29,9 @@
             <i class="bi bi-box-seam" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
             Ver Produtos
         </button>
-        <button class="btn-custom">
+        <button class="btn-custom" id="btnCadastrarFaixas">
             <i class="bi bi-plus-circle" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
-            Novo Cartaz / Faixa
+            Cadastrar Faixa
         </button>
         <button class="btn-custom">
             <i class="bi bi-question-circle" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
@@ -68,6 +68,15 @@
     </div>
 </div>
 
+<script>
+    document.getElementById("btnVerFaixas").addEventListener("click", function () {
+        window.location.href = "VerFaixa.html";
+    });
+
+    document.getElementById("btnCadastrarFaixas").addEventListener("click", function () {
+        window.location.href = "CadstrarFaixa.html";
+    });
+</script>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 </body>

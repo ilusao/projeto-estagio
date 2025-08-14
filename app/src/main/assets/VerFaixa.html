@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-100">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Menu Dashboard</title>
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="Bootstrap/bootstrap-icons.css" />
+    <link rel="stylesheet" href="Verfaixa.css" />
+</head>
+<body class="bg-light text-dark">
+
+<div class="container py-4">
+    <!-- Cabeçalho -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-collection fs-1 text-primary me-3"></i>
+        <div>
+            <h2 class="m-0">Suas Faixas</h2>
+            <p class="text-muted mb-0">Veja abaixo a lista de faixas cadastradas.</p>
+        </div>
+    </div>
+
+    <!-- Pesquisa -->
+    <div class="d-flex mb-4 align-items-center gap-2">
+        <input type="text" class="form-control" placeholder="Pesquisar faixa...">
+        <button class="btn btn-outline-secondary btn-filtrar">
+            <i class="bi bi-filter"></i> Filtrar
+        </button>
+    </div>
+
+    <!-- Lista de faixas -->
+    <div id="faixa-lista" class="row g-3"></div>
+
+    <!-- Modal de edição -->
+    <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Faixa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarFaixa">
+                        <input type="hidden" id="editarId">
+                        <div class="mb-3">
+                            <label for="editarNome" class="form-label">Nome do Produto</label>
+                            <input type="text" class="form-control" id="editarNome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editarTipo" class="form-label">Tipo de Oferta</label>
+                            <select class="form-select" id="editarTipo">
+                                <option value="SV">SV</option>
+                                <option value="Oferta">Oferta</option>
+                                <option value="Cartão">Cartão</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editarPrecoOferta" class="form-label">Preço Oferta</label>
+                            <input type="number" class="form-control" id="editarPrecoOferta" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editarPrecoNormal" class="form-label">Preço Normal</label>
+                            <input type="number" class="form-control" id="editarPrecoNormal" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editarComentario" class="form-label">Comentário</label>
+                            <textarea class="form-control" id="editarComentario" rows="2"></textarea>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="editarLimiteCPF">
+                            <label class="form-check-label" for="editarLimiteCPF">Limite por CPF</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="salvarEditar">Salvar alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação -->
+    <div id="confirmModal" style="display:none; position:fixed; top:0; left:0;
+     width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:8px; text-align:center;">
+            <p id="confirmText"></p>
+            <button id="confirmYes">Sim</button>
+            <button id="confirmNo">Não</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="Bootstrap/js/bootstrap.bundle.js"></script>
+<script>
+    let faixaIdParaExcluir = null;
+    let faixaAtualParaEditar = null;
+
+    // Instancia o modal do Bootstrap
+    const editarModalEl = document.getElementById("editarModal");
+    const editarBootstrapModal = new bootstrap.Modal(editarModalEl);
+
+    function carregarFaixas(faixas) {
+        const container = document.getElementById('faixa-lista');
+        container.innerHTML = '';
+
+        faixas.forEach(faixa => {
+            const div = document.createElement('div');
+            div.className = 'faixa-item';
+            div.innerHTML = `
+                <div class="faixa-header">
+                    <h3>${faixa.nome_produto}</h3>
+                    <span class="faixa-status">Estado: ${faixa.estado_faixa}</span>
+                </div>
+                <div class="faixa-info">
+                    <p><strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}</p>
+                    <p><strong>Preço Oferta:</strong> ${faixa.preco_oferta !== null ? faixa.preco_oferta.toFixed(2) : '-'}</p>
+                    <p><strong>Preço Normal:</strong> ${faixa.preco_normal !== null ? faixa.preco_normal.toFixed(2) : '-'}</p>
+                    <p><strong>Condição:</strong> ${faixa.condicao_faixa}</p>
+                    <p><strong>Comentário:</strong> ${faixa.comentario || '-'}</p>
+                    <p><strong>Limite CPF:</strong> ${faixa.limite_cpf === 1 ? 'Sim' : 'Não'}</p>
+                    <p><strong>Vezes usada:</strong> ${faixa.vezes_usada}</p>
+                    <p><strong>Anos da faixa:</strong> ${faixa.anos_faixa}</p>
+                </div>
+                <div class="faixa-actions">
+                    <button class="btn btn-warning" onclick='abrirEditarFaixa(${JSON.stringify(faixa)})'>Editar</button>
+                    <button class="btn btn-success">Usar</button>
+                    <button class="btn btn-danger" onclick="excluirFaixa(${faixa.id}, '${faixa.nome_produto}')">Excluir</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function excluirFaixa(id, nome) {
+        faixaIdParaExcluir = id;
+        document.getElementById("confirmText").innerText = `Deseja realmente excluir a faixa "${nome}"?`;
+        document.getElementById("confirmModal").style.display = "flex";
+    }
+
+    document.getElementById("confirmYes").addEventListener("click", () => {
+        Android.excluirFaixa(faixaIdParaExcluir);
+        document.getElementById("confirmModal").style.display = "none";
+    });
+
+    document.getElementById("confirmNo").addEventListener("click", () => {
+        document.getElementById("confirmModal").style.display = "none";
+    });
+
+    const editarTipo = document.getElementById('editarTipo');
+const editarPrecoNormalDiv = document.getElementById('editarPrecoNormal').parentElement;
+
+// Função para atualizar visibilidade do Preço Normal
+function atualizarPrecoNormal() {
+    if (editarTipo.value === 'Oferta') {
+        editarPrecoNormalDiv.style.display = 'none';
+    } else {
+        editarPrecoNormalDiv.style.display = 'block';
+    }
+}
+
+// Dispara quando muda o tipo
+editarTipo.addEventListener('change', atualizarPrecoNormal);
+
+// Também dispara ao abrir o modal
+function abrirEditarFaixa(faixa) {
+    faixaAtualParaEditar = faixa;
+    document.getElementById('editarId').value = faixa.id;
+    document.getElementById('editarNome').value = faixa.nome_produto;
+    document.getElementById('editarTipo').value = faixa.tipo_oferta;
+    document.getElementById('editarPrecoOferta').value = faixa.preco_oferta !== null ? faixa.preco_oferta : '';
+    document.getElementById('editarPrecoNormal').value = faixa.preco_normal !== null ? faixa.preco_normal : '';
+    document.getElementById('editarComentario').value = faixa.comentario || '';
+    document.getElementById('editarLimiteCPF').checked = faixa.limite_cpf === 1;
+
+    atualizarPrecoNormal();
+    editarBootstrapModal.show();
+}
+
+    document.getElementById('salvarEditar').addEventListener('click', () => {
+        if (!faixaAtualParaEditar) return;
+
+        const dadosAtualizados = {
+            id: faixaAtualParaEditar.id,
+            nome_produto: document.getElementById('editarNome').value,
+            tipo_oferta: document.getElementById('editarTipo').value,
+            preco_oferta: document.getElementById('editarPrecoOferta').value,
+            preco_normal: document.getElementById('editarPrecoNormal').value,
+            comentario: document.getElementById('editarComentario').value,
+            limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
+        };
+
+        Android.atualizarFaixa(
+            dadosAtualizados.id,
+            dadosAtualizados.nome_produto,
+            dadosAtualizados.tipo_oferta,
+            dadosAtualizados.preco_oferta,
+            dadosAtualizados.preco_normal,
+            dadosAtualizados.comentario,
+            dadosAtualizados.limite_cpf
+        );
+
+        editarBootstrapModal.hide();
+    });
+</script>
+
+</body>
+</html>
