@@ -12,18 +12,35 @@
 
 <div class="container py-4">
     <!-- Cabeçalho -->
-    <div class="d-flex align-items-center mb-4">
-        <i class="bi bi-collection fs-1 text-primary me-3"></i>
-        <div>
-            <h2 class="m-0">Suas Faixas</h2>
-            <p class="text-muted mb-0">Veja abaixo a lista de faixas cadastradas.</p>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <a href="menu.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-palette"></i> Estilo
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" onclick="mudarEstiloFaixa('original')">Original</a></li>
+                <li><a class="dropdown-item" href="#" onclick="mudarEstiloFaixa('bizarro')">Bizarro</a></li>
+                <li><a class="dropdown-item" href="#" onclick="mudarEstiloFaixa('aleatorio')">Aleatório</a></li>
+                <li><a class="dropdown-item" href="#" onclick="mudarEstiloFaixa('normal')">Normal</a></li>
+            </ul>
         </div>
     </div>
 
+    <!-- Título centralizado -->
+    <div class="text-center mb-4">
+        <i class="bi bi-collection fs-1 text-primary"></i>
+        <h2 class="mt-2">Suas Faixas</h2>
+        <p class="text-muted">Veja abaixo a lista de faixas cadastradas.</p>
+    </div>
+
     <!-- Pesquisa -->
-    <div class="d-flex mb-4 align-items-center gap-2">
+    <div class="d-flex mb-4 gap-2">
         <input type="text" class="form-control" placeholder="Pesquisar faixa...">
-        <button class="btn btn-outline-secondary btn-filtrar">
+        <button class="btn btn-outline-secondary">
             <i class="bi bi-filter"></i> Filtrar
         </button>
     </div>
@@ -35,17 +52,27 @@
     <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header d-flex justify-content-between align-items-center">
                     <h5 class="modal-title" id="editarModalLabel">Editar Faixa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <div class="dropdown">
+                        <i class="bi bi-gear dropdown-toggle" id="estiloDropdown" data-bs-toggle="dropdown" style="cursor:pointer;"></i>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="estiloDropdown">
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); mudarEstiloModal('estilo1')">Estilo 1</a>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); mudarEstiloModal('bizarro')">Estilo 2</a>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); mudarEstiloModal('aleatorio')">Estilo 3</a>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); mudarEstiloModal('normal')">Estilo 4</a>
+                        </ul>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <form id="formEditarFaixa">
                         <input type="hidden" id="editarId">
+
                         <div class="mb-3">
                             <label for="editarNome" class="form-label">Nome do Produto</label>
                             <input type="text" class="form-control" id="editarNome" required>
                         </div>
+
                         <div class="mb-3">
                             <label for="editarTipo" class="form-label">Tipo de Oferta</label>
                             <select class="form-select" id="editarTipo">
@@ -54,18 +81,40 @@
                                 <option value="Cartão">Cartão</option>
                             </select>
                         </div>
+
                         <div class="mb-3">
                             <label for="editarPrecoOferta" class="form-label">Preço Oferta</label>
                             <input type="number" class="form-control" id="editarPrecoOferta" step="0.01">
                         </div>
+
                         <div class="mb-3">
                             <label for="editarPrecoNormal" class="form-label">Preço Normal</label>
                             <input type="number" class="form-control" id="editarPrecoNormal" step="0.01">
                         </div>
+
+                        <div class="mb-3">
+                            <label for="editarIdadeFaixa" class="form-label">Idade da Faixa</label>
+                            <select class="form-select" id="editarIdadeFaixa">
+                                <option value="Nova">Nova</option>
+                                <option value="Usada">Usada</option>
+                                <option value="Antiga">Antiga</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editarCondicao" class="form-label">Condição da Faixa</label>
+                            <select class="form-select" id="editarCondicao">
+                                <option value="Boa">Boa</option>
+                                <option value="Mais ou Menos">Mais ou Menos</option>
+                                <option value="Ruim">Ruim</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label for="editarComentario" class="form-label">Comentário</label>
                             <textarea class="form-control" id="editarComentario" rows="2"></textarea>
                         </div>
+
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="editarLimiteCPF">
                             <label class="form-check-label" for="editarLimiteCPF">Limite por CPF</label>
@@ -80,6 +129,7 @@
         </div>
     </div>
 
+
     <!-- Modal de confirmação -->
     <div id="confirmModal" style="display:none; position:fixed; top:0; left:0;
      width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
@@ -90,48 +140,101 @@
         </div>
     </div>
 
+    <!-- Modal de uso da faixa -->
+    <div class="modal fade" id="usarModal" tabindex="-1" aria-labelledby="usarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="usarModalLabel">Usar Faixa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Informe por quantos dias deseja usar esta faixa:</p>
+                    <input type="number" class="form-control" id="diasUsoInput" min="1" value="1">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmarUsarBtn">Usar Faixa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 <script>
     let faixaIdParaExcluir = null;
     let faixaAtualParaEditar = null;
+    let estiloAtual = 'original';
+    let faixaIdParaUsar = null;
+
 
     // Instancia o modal do Bootstrap
     const editarModalEl = document.getElementById("editarModal");
     const editarBootstrapModal = new bootstrap.Modal(editarModalEl);
+    const usarModalEl = document.getElementById("usarModal");
+    const usarBootstrapModal = new bootstrap.Modal(usarModalEl);
 
     function carregarFaixas(faixas) {
-        const container = document.getElementById('faixa-lista');
-        container.innerHTML = '';
+    const container = document.getElementById('faixa-lista');
+    container.innerHTML = '';
 
-        faixas.forEach(faixa => {
-            const div = document.createElement('div');
-            div.className = 'faixa-item';
-            div.innerHTML = `
-                <div class="faixa-header">
-                    <h3>${faixa.nome_produto}</h3>
-                    <span class="faixa-status">Estado: ${faixa.estado_faixa}</span>
-                </div>
-                <div class="faixa-info">
-                    <p><strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}</p>
-                    <p><strong>Preço Oferta:</strong> ${faixa.preco_oferta !== null ? faixa.preco_oferta.toFixed(2) : '-'}</p>
-                    <p><strong>Preço Normal:</strong> ${faixa.preco_normal !== null ? faixa.preco_normal.toFixed(2) : '-'}</p>
-                    <p><strong>Condição:</strong> ${faixa.condicao_faixa}</p>
-                    <p><strong>Comentário:</strong> ${faixa.comentario || '-'}</p>
-                    <p><strong>Limite CPF:</strong> ${faixa.limite_cpf === 1 ? 'Sim' : 'Não'}</p>
-                    <p><strong>Vezes usada:</strong> ${faixa.vezes_usada}</p>
-                    <p><strong>Anos da faixa:</strong> ${faixa.anos_faixa}</p>
-                </div>
-                <div class="faixa-actions">
-                    <button class="btn btn-warning" onclick='abrirEditarFaixa(${JSON.stringify(faixa)})'>Editar</button>
-                    <button class="btn btn-success">Usar</button>
-                    <button class="btn btn-danger" onclick="excluirFaixa(${faixa.id}, '${faixa.nome_produto}')">Excluir</button>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    }
+    faixas.forEach(faixa => {
+        const div = document.createElement('div');
+        div.className = 'faixa-item';
+        if(estiloAtual !== 'original') {
+            div.classList.add(estiloAtual);
+        }
+
+        // Se estiver sendo usada, adiciona classe especial
+        let statusUso = '';
+        let btnUsar = `<button class="btn btn-success" onclick="usarFaixaPrompt(${faixa.id})">Usar</button>`;
+        if (faixa.usando === 1) {
+            div.classList.add('usando'); // você pode definir no CSS cor azul
+            statusUso = `<p><strong>Status:</strong> Sendo usada (${faixa.dias_restantes} dias restantes)</p>`;
+            btnUsar = `<button class="btn btn-secondary" onclick='cancelarUso(${faixa.id})'>Cancelar</button>`;
+        }
+
+        div.innerHTML = `
+        <div class="faixa-header">
+            <h3>${faixa.nome_produto}</h3>
+        </div>
+
+        <div class="faixa-info tipo-oferta text-center mb-2">
+            <strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}
+        </div>
+
+        <div class="faixa-precos d-flex justify-content-center gap-4 mb-2">
+            <div><strong>Preço Oferta:</strong> ${faixa.preco_oferta !== null ? faixa.preco_oferta.toFixed(2) : '-'}</div>
+            <div><strong>Preço Normal:</strong> ${faixa.preco_normal !== null ? faixa.preco_normal.toFixed(2) : '-'}</div>
+        </div>
+
+        <hr class="faixa-separator">
+
+        <div class="faixa-info-extra d-flex justify-content-center gap-4 mb-2">
+            <div><strong>Estado:</strong> ${faixa.estado_faixa}</div>
+            <div><strong>Condição:</strong> ${faixa.condicao_faixa}</div>
+        </div>
+
+        <div class="faixa-info mb-2">
+            <p><strong>Comentário:</strong> ${faixa.comentario || '-'}</p>
+            <p><strong>Limite CPF:</strong> ${faixa.limite_cpf === 1 ? 'Sim' : 'Não'}</p>
+            <p><strong>Vezes usada:</strong> ${faixa.vezes_usada}</p>
+            <div><strong>Tempo:</strong> ${faixa.tempo_faixa}</div>
+            ${statusUso}
+        </div>
+
+        <div class="faixa-actions">
+            <button class="btn btn-warning" onclick='abrirEditarFaixa(${JSON.stringify(faixa)})'>Editar</button>
+            ${btnUsar}
+            <button class="btn btn-danger" onclick="excluirFaixa(${faixa.id}, '${faixa.nome_produto}')">Excluir</button>
+        </div>
+        `;
+
+        container.appendChild(div);
+    });
+}
 
     function excluirFaixa(id, nome) {
         faixaIdParaExcluir = id;
@@ -181,28 +284,84 @@ function abrirEditarFaixa(faixa) {
     document.getElementById('salvarEditar').addEventListener('click', () => {
         if (!faixaAtualParaEditar) return;
 
-        const dadosAtualizados = {
-            id: faixaAtualParaEditar.id,
-            nome_produto: document.getElementById('editarNome').value,
-            tipo_oferta: document.getElementById('editarTipo').value,
-            preco_oferta: document.getElementById('editarPrecoOferta').value,
-            preco_normal: document.getElementById('editarPrecoNormal').value,
-            comentario: document.getElementById('editarComentario').value,
-            limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
-        };
+       const dadosAtualizados = {
+    id: faixaAtualParaEditar.id,
+    nome_produto: document.getElementById('editarNome').value,
+    tipo_oferta: document.getElementById('editarTipo').value,
+    preco_oferta: document.getElementById('editarPrecoOferta').value,
+    preco_normal: document.getElementById('editarPrecoNormal').value,
+    idade_faixa: document.getElementById('editarIdadeFaixa').value,
+    condicao: document.getElementById('editarCondicao').value,
+    comentario: document.getElementById('editarComentario').value,
+    limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
+};
 
-        Android.atualizarFaixa(
-            dadosAtualizados.id,
-            dadosAtualizados.nome_produto,
-            dadosAtualizados.tipo_oferta,
-            dadosAtualizados.preco_oferta,
-            dadosAtualizados.preco_normal,
-            dadosAtualizados.comentario,
-            dadosAtualizados.limite_cpf
-        );
+       Android.editarFaixa(
+    dadosAtualizados.id,
+    dadosAtualizados.nome_produto,
+    dadosAtualizados.tipo_oferta,
+    parseFloat(dadosAtualizados.preco_oferta || 0),
+    parseFloat(dadosAtualizados.preco_normal || 0),
+    dadosAtualizados.idade_faixa,
+    dadosAtualizados.condicao,
+    dadosAtualizados.comentario,
+    dadosAtualizados.limite_cpf
+);
 
         editarBootstrapModal.hide();
     });
+editarModalEl.classList.add('estilo1');
+
+    function mudarEstiloModal(estilo) {
+    const classes = ['estilo1', 'bizarro', 'aleatorio', 'normal'];
+    // Remove todas as classes de estilo
+    classes.forEach(c => editarModalEl.classList.remove(c));
+    // Adiciona a escolhida
+    editarModalEl.classList.add(estilo);
+}
+
+function mudarEstiloFaixa(estilo) {
+    const faixas = document.querySelectorAll('.faixa-item');
+    const classes = ['original','bizarro','aleatorio']; // só 3 estilos
+
+    faixas.forEach(faixa => {
+        classes.forEach(c => faixa.classList.remove(c));
+        if(estilo !== 'original') { // 'original' já é o base
+            faixa.classList.add(estilo);
+        }
+    });
+
+    estiloAtual = estilo;
+}
+
+    function usarFaixaPrompt(id) {
+    faixaIdParaUsar = id; // guarda o id da faixa
+    document.getElementById("diasUsoInput").value = 1; // valor padrão
+    usarBootstrapModal.show(); // abre o modal
+}
+
+// Evento do botão confirmar do modal
+document.getElementById("confirmarUsarBtn").addEventListener("click", () => {
+    const dias = parseInt(document.getElementById("diasUsoInput").value) || 0;
+    console.log("Tentando usar faixa:", faixaIdParaUsar, "por dias:", dias); // LOG
+    if (faixaIdParaUsar !== null && dias > 0) {
+        try {
+            Android.usarFaixa(faixaIdParaUsar, dias);
+            usarBootstrapModal.hide();
+        } catch(e) {
+            console.error("Erro ao chamar usarFaixa:", e);
+            alert("Não foi possível usar a faixa.");
+        }
+    } else {
+        alert("Informe um número de dias válido.");
+    }
+});
+
+function cancelarUso(id) {
+    if (confirm("Deseja cancelar o uso desta faixa?")) {
+        Android.cancelarUsoFaixa(id);
+    }
+}
 </script>
 
 </body>

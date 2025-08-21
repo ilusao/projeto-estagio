@@ -1,93 +1,70 @@
-@font-face {
-    font-family: 'Permanent Marker';
-    src: url('../fonts/PermanentMarker-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+/* --- Fontes --- */
+@font-face { font-family: 'Permanent Marker'; src: url('../fonts/PermanentMarker-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Luckiest Guy'; src: url('../fonts/LuckiestGuy-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Roboto'; src: url('../fonts/Roboto-VariableFont_wdth,wght.ttf') format('truetype'); }
+@font-face { font-family: 'Roboto Italic'; src: url('../fonts/Roboto-Italic-VariableFont_wdth,wght.ttf') format('truetype'); }
+@font-face { font-family: 'Press Start 2P'; src: url('../fonts/PressStart2P-Regular.ttf') format('truetype'); }
 
+/* --- Body --- */
 body {
-  background: url('./img/menufundo.jpg') no-repeat center center fixed;
-  background-size: cover;
-  min-height: 100vh;
-  color: #fff;
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('./img/menufundo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    color: #fff;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.faixa-card {
-    border-left: 5px solid #0d6efd;
-    transition: transform 0.2s ease-in-out;
-}
-
-.faixa-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
+/* --- Faixas --- */
 .faixa-item {
     text-align: center;
-    letter-spacing: 1px;
-}
-
-.faixa-header h3 {
-    font-size: 2.2rem;
-    letter-spacing: 2px;
-    color: #c51b1b;
-}
-
-.card-title {
-    color: #0d6efd;
-}
-
-.btn-outline-primary {
-    border-radius: 20px;
-    font-weight: 500;
-}
-
-input[type="text"] {
-    flex: 1;
-}
-
-.btn-filtrar {
-    height: 100%;
-    white-space: nowrap;
-}
-
-.faixa-item {
-    background: linear-gradient(#fffbe6, #fff3b0);
-    border: 3px dashed #cfa700;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border: 3px solid #ff8c00;
+    border-radius: 15px;
     margin: 20px auto;
-    padding: 20px;
+    padding: 25px;
     max-width: 700px;
     font-family: 'Permanent Marker', 'Segoe UI', cursive;
-    box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+    color: #333;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.15);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
+.faixa-item:hover { transform: scale(1.03); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
 
-.faixa-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px dotted #cfa700;
+/* --- Cabeçalho da faixa --- */
+.faixa-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dotted #cfa700; margin-bottom: 10px; padding-bottom: 5px; }
+.faixa-header h3 { font-size: 2.2rem; letter-spacing: 2px; color: #c51b1b; }
+
+/* --- Tipo de oferta e preços --- */
+.faixa-info {
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.3);
     margin-bottom: 10px;
-    padding-bottom: 5px;
 }
-
-.faixa-status {
-    font-size: 0.9em;
-    color: green;
-}
-
-.faixa-info p {
-    margin: 5px 0;
-}
-
-.faixa-alerta {
-    color: red;
+.faixa-info.tipo-oferta { font-size: 1.4rem; font-weight: bold; color: #0d6efd; margin-bottom: 10px; }
+.faixa-precos { display: flex; justify-content: center; gap: 30px; }
+.faixa-precos div {
+    min-width: 150px;
+    text-align: center;
     font-weight: bold;
-    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.3);
 }
 
+/* --- Idade e condição --- */
+.faixa-info-extra { display: flex; justify-content: center; gap: 30px; font-size: 1.2rem; font-weight: bold; color: green; margin-bottom: 10px; }
+
+/* --- Linha separadora --- */
+.faixa-separator { border: 2px dashed #cfa700; margin: 15px 0; }
+
+/* --- Comentários e limites --- */
+.faixa-info p { margin: 5px 0; font-size: 1.1rem; }
+.faixa-alerta { color: red; font-weight: bold; margin-top: 10px; }
+
+/* --- Botões --- */
 .faixa-actions {
     margin-top: 15px;
     display: flex;
@@ -96,64 +73,51 @@ input[type="text"] {
     flex-wrap: wrap;
     font-family: Arial, sans-serif;
 }
+.faixa-actions .btn { border-radius: 15px; padding: 8px 15px; font-weight: 500; }
 
-/* Modal */
-#editarModal .modal-content {
-    border-radius: 1rem; /* bordas arredondadas */
-    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2); /* sombra suave */
-    padding: 0;
-}
-
-/* Cabeçalho do modal */
-#editarModal .modal-header {
-    background-color: #0d6efd; /* azul do bootstrap */
+/* --- Estilos de faixas diferentes --- */
+.faixa-item.bizarro {
+    background: repeating-linear-gradient(135deg, #ff00ff 0 15px, #00ffff 0 30px);
+    border: 4px dotted #000;
+    font-family: 'Luckiest Guy', cursive;
     color: #fff;
-    border-bottom: none;
-    justify-content: center; /* título centralizado */
-    padding: 1rem 1.5rem;
+    text-shadow: 2px 2px #000;
+    transform: rotate(-1deg);
+    box-shadow: 0 0 15px #ff00ff, 0 0 25px #00ffff;
+}
+.faixa-item.aleatorio {
+    background: linear-gradient(45deg, #ff6347, #ffa500, #40e0d0, #8a2be2);
+    border: 3px double #fff;
+    font-family: 'Press Start 2P', monospace;
+    color: #000;
+    transform: rotate(1deg);
+    box-shadow: 0 0 10px #ff0, 0 0 15px #0ff;
+}
+.faixa-item.normal {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    font-family: 'Roboto', sans-serif;
+    color: #000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-#editarModal .modal-header .btn-close {
-    filter: brightness(0) invert(1); /* botão de fechar branco */
-}
+/* --- Modais --- */
+#editarModal .modal-content { transition: all 0.3s ease-in-out; }
+#editarModal.estilo1 .modal-content { border-radius: 1rem; background: linear-gradient(#fffbe6, #fff3b0); color:#333; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
+#editarModal.bizarro .modal-content { border-radius: 2rem 0 2rem 0; background:#0f0f0f; color:#ff00ff; box-shadow:0 1rem 3rem rgba(255,0,255,0.5); transform: rotate(-1deg); }
+#editarModal.aleatorio .modal-content { border-radius:50% 1rem 50% 1rem; background: radial-gradient(circle at top left, #ff6347,#ffa500,#40e0d0); color:#000; transform:rotate(2deg); }
+#editarModal.normal .modal-content { border-radius:0.5rem; background:#fff; color:#000; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
 
-/* Título do modal */
-#editarModal .modal-title {
-    font-weight: 600;
-    font-size: 1.5rem;
-}
-
-/* Corpo do modal */
-#editarModal .modal-body {
-    padding: 1.5rem;
-}
-
-/* Inputs e selects com bordas arredondadas */
-#editarModal .form-control,
-#editarModal .form-select,
-#editarModal textarea {
+/* --- Inputs/Selects/Textarea --- */
+#editarModal .form-control, #editarModal .form-select, #editarModal textarea {
     border-radius: 0.5rem;
-    transition: all 0.2s ease-in-out;
+    border: 2px solid #cfa700;
+    background-color: #fffde0;
+    color: #333;
 }
+#editarModal .modal-footer .btn { border-radius: 1rem; background-color: #0d6efd; color: #fff; border:none; }
 
-#editarModal .form-control:focus,
-#editarModal .form-select:focus,
-#editarModal textarea:focus {
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-/* Botões */
-#editarModal .modal-footer .btn {
-    border-radius: 0.5rem;
-    transition: all 0.2s ease-in-out;
-}
-
-#editarModal .modal-footer .btn-primary:hover {
-    background-color: #0b5ed7;
-    border-color: #0a58ca;
-}
-
-#editarModal .modal-footer .btn-secondary:hover {
-    background-color: #6c757d;
-    border-color: #5c636a;
+.usando {
+    background-color: #cce5ff; /* azul clarinho */
+    border-left: 5px solid #007bff;
 }

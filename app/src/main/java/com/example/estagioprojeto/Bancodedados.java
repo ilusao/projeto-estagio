@@ -30,9 +30,14 @@ public class Bancodedados extends SQLiteOpenHelper {
                 "comentario TEXT, " +
                 "limite_cpf INTEGER NOT NULL DEFAULT 0, " +
                 "data_criacao DATE DEFAULT CURRENT_DATE, " +
-                "vezes_usada INTEGER DEFAULT 0" +
+                "vezes_usada INTEGER DEFAULT 0," +
+                "usando INTEGER DEFAULT 0, " +
+                "dias_uso INTEGER DEFAULT 0, " +
+                "data_inicio_uso DATE" +
                 ")";
         db.execSQL(createTable);
+
+
     }
 
     @Override
@@ -89,4 +94,86 @@ public class Bancodedados extends SQLiteOpenHelper {
         int linhasAfetadas = db.delete("faixas", "id=?", new String[]{String.valueOf(id)});
         return linhasAfetadas > 0;
     }
+
+    public boolean editarFaixa(int id, String produto, String tipoOferta,
+                               Double precoOferta, Double precoNormal,
+                               String estado, String condicao,
+                               String comentario, int limiteCpf) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("produto", produto);
+        values.put("tipo_oferta", tipoOferta);
+
+        if (precoOferta != null) {
+            values.put("preco_oferta", precoOferta);
+        } else {
+            values.putNull("preco_oferta");
+        }
+
+        if (precoNormal != null) {
+            values.put("preco_normal", precoNormal);
+        } else {
+            values.putNull("preco_normal");
+        }
+
+        values.put("estado", estado);
+        values.put("condicao", condicao);
+        values.put("comentario", comentario);
+        values.put("limite_cpf", limiteCpf);
+
+        int linhasAfetadas = db.update("faixas", values, "id = ?", new String[]{String.valueOf(id)});
+        return linhasAfetadas > 0;
+    }
+
+    // Iniciar uso da faixa
+    public boolean iniciarUso(int id, int dias) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("usando", 1);
+        values.put("dias_uso", dias);
+        values.put("data_inicio_uso", java.time.LocalDate.now().toString());
+        int linhas = db.update(TABLE_FAIXAS, values, "id=?", new String[]{String.valueOf(id)});
+        return linhas > 0;
+    }
+
+    // Cancelar uso da faixa
+    public boolean cancelarUso(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("usando", 0);
+        values.put("dias_uso", 0);
+        values.putNull("data_inicio_uso");
+        int linhas = db.update(TABLE_FAIXAS, values, "id=?", new String[]{String.valueOf(id)});
+        return linhas > 0;
+    }
+
+    // Atualizar uso automático (verifica se dias de uso acabaram)
+    public void atualizarUsoAutomatico() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT id, data_inicio_uso, dias_uso FROM " + TABLE_FAIXAS + " WHERE usando=1";
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String dataInicio = cursor.getString(cursor.getColumnIndex("data_inicio_uso"));
+                int diasUso = cursor.getInt(cursor.getColumnIndex("dias_uso"));
+                if (dataInicio != null) {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        java.util.Date inicio = sdf.parse(dataInicio);
+                        java.util.Date hoje = new java.util.Date();
+                        long diff = hoje.getTime() - inicio.getTime();
+                        long diasPassados = diff / (1000L * 60 * 60 * 24);
+                        if (diasPassados >= diasUso) {
+                            cancelarUso(cursor.getInt(cursor.getColumnIndex("id")));
+                        }
+                    } catch (java.text.ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
 }
