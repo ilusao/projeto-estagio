@@ -3,6 +3,7 @@ package com.example.estagioprojeto;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -30,14 +31,12 @@ public class Bancodedados extends SQLiteOpenHelper {
                 "comentario TEXT, " +
                 "limite_cpf INTEGER NOT NULL DEFAULT 0, " +
                 "data_criacao DATE DEFAULT CURRENT_DATE, " +
-                "vezes_usada INTEGER DEFAULT 0," +
+                "vezes_usada INTEGER DEFAULT 0, " +
                 "usando INTEGER DEFAULT 0, " +
                 "dias_uso INTEGER DEFAULT 0, " +
                 "data_inicio_uso DATE" +
                 ")";
         db.execSQL(createTable);
-
-
     }
 
     @Override
@@ -46,26 +45,80 @@ public class Bancodedados extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // Inserir nova faixa
-    public boolean inserirFaixa(String produto, String tipo_oferta, Double preco_oferta,
-                                Double preco_normal, String estado, String condicao,
-                                String comentario, boolean limite_cpf) {
+    public int inserirFaixaComDuplicataOpcional(String produto, String tipo_oferta, String preco_oferta_str,
+                                                String preco_normal_str, String estado, String condicao,
+                                                String comentario, boolean limite_cpf, boolean permitirDuplicata) {
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
 
-        values.put("produto", produto);
-        values.put("tipo_oferta", tipo_oferta);
-        values.put("preco_oferta", preco_oferta);
-        values.put("preco_normal", preco_normal);
-        values.put("estado", estado);
-        values.put("condicao", condicao);
-        values.put("comentario", comentario);
-        values.put("limite_cpf", limite_cpf ? 1 : 0);
+            // Converter preços para double, tratando valores nulos ou inválidos
+            Double precoOferta = null;
+            Double precoNormal = null;
 
-        long result = db.insert(TABLE_FAIXAS, null, values);
-        return result != -1;
+            if (preco_oferta_str != null && !preco_oferta_str.trim().isEmpty()) {
+                try {
+                    precoOferta = Double.parseDouble(preco_oferta_str.replace(",", "."));
+                } catch (NumberFormatException e) {
+                    Log.e("DEBUG_DB", "Preço oferta inválido: " + preco_oferta_str);
+                    return 0; // preço inválido
+                }
+            }
+
+            if (preco_normal_str != null && !preco_normal_str.trim().isEmpty()) {
+                try {
+                    precoNormal = Double.parseDouble(preco_normal_str.replace(",", "."));
+                } catch (NumberFormatException e) {
+                    Log.e("DEBUG_DB", "Preço normal inválido: " + preco_normal_str);
+                    return 0; // preço inválido
+                }
+            }
+
+            // Checagem de duplicata
+            if (!permitirDuplicata) {
+                Cursor cursor = db.rawQuery(
+                        "SELECT id FROM " + TABLE_FAIXAS + " WHERE produto=? AND tipo_oferta=? AND preco_oferta=? AND preco_normal=? " +
+                                "AND estado=? AND condicao=? AND limite_cpf=?",
+                        new String[]{
+                                produto,
+                                tipo_oferta,
+                                precoOferta == null ? "0" : precoOferta.toString(),
+                                precoNormal == null ? "0" : precoNormal.toString(),
+                                estado,
+                                condicao,
+                                limite_cpf ? "1" : "0"
+                        });
+                boolean existe = cursor.moveToFirst();
+                cursor.close();
+                if (existe) {
+                    return -2; // duplicata encontrada
+                }
+            }
+
+            // Inserção no banco
+            ContentValues values = new ContentValues();
+            values.put("produto", produto);
+            values.put("tipo_oferta", tipo_oferta);
+            values.put("preco_oferta", precoOferta);
+            values.put("preco_normal", precoNormal);
+            values.put("estado", estado);
+            values.put("condicao", condicao);
+            values.put("comentario", comentario);
+            values.put("limite_cpf", limite_cpf ? 1 : 0);
+
+            long id = db.insert(TABLE_FAIXAS, null, values);
+            Log.d("DEBUG_DB", "Insert result: " + id);
+
+            return id != -1 ? 1 : 0; // sucesso ou erro
+
+        } catch (Exception e) {
+            Log.e("DEBUG_DB", "Erro ao inserir faixa", e);
+            return 0;
+        }
     }
+
+
+
 
     // Buscar todas as faixas
     public Cursor listarFaixas() {
@@ -91,7 +144,7 @@ public class Bancodedados extends SQLiteOpenHelper {
 
     public boolean deletarFaixa(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int linhasAfetadas = db.delete("faixas", "id=?", new String[]{String.valueOf(id)});
+        int linhasAfetadas = db.delete(TABLE_FAIXAS, "id=?", new String[]{String.valueOf(id)});
         return linhasAfetadas > 0;
     }
 
@@ -121,7 +174,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         values.put("comentario", comentario);
         values.put("limite_cpf", limiteCpf);
 
-        int linhasAfetadas = db.update("faixas", values, "id = ?", new String[]{String.valueOf(id)});
+        int linhasAfetadas = db.update(TABLE_FAIXAS, values, "id = ?", new String[]{String.valueOf(id)});
         return linhasAfetadas > 0;
     }
 
@@ -155,8 +208,8 @@ public class Bancodedados extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                String dataInicio = cursor.getString(cursor.getColumnIndex("data_inicio_uso"));
-                int diasUso = cursor.getInt(cursor.getColumnIndex("dias_uso"));
+                String dataInicio = cursor.getString(cursor.getColumnIndexOrThrow("data_inicio_uso"));
+                int diasUso = cursor.getInt(cursor.getColumnIndexOrThrow("dias_uso"));
                 if (dataInicio != null) {
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
                     try {
@@ -165,7 +218,7 @@ public class Bancodedados extends SQLiteOpenHelper {
                         long diff = hoje.getTime() - inicio.getTime();
                         long diasPassados = diff / (1000L * 60 * 60 * 24);
                         if (diasPassados >= diasUso) {
-                            cancelarUso(cursor.getInt(cursor.getColumnIndex("id")));
+                            cancelarUso(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
                         }
                     } catch (java.text.ParseException e) {
                         e.printStackTrace();

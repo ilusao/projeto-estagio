@@ -12,17 +12,20 @@
 <body class="bg-light p-4">
 
 <div class="container">
+    <a href="menu.html" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
     <div class="card-cadastro">
         <h2>Cadastro de Faixa</h2>
-        <form>
+        <form id="formCadastro">
             <div class="mb-3">
                 <label for="produto" class="form-label">Nome do Produto</label>
-                <input type="text" class="form-control" id="produto" placeholder="Ex: Arroz 5kg">
+                <input type="text" class="form-control" id="produto" placeholder="Ex: Arroz 5kg" required>
             </div>
 
             <div class="mb-3">
                 <label for="tipoOferta" class="form-label">Tipo de Oferta</label>
-                <select class="form-select" id="tipoOferta">
+                <select class="form-select" id="tipoOferta" required>
                     <option selected disabled>Escolha...</option>
                     <option value="sv">SV</option>
                     <option value="oferta">Oferta</option>
@@ -30,19 +33,19 @@
                 </select>
             </div>
 
-            <div class="mb-3" id="precoOfertaDiv">
+            <div class="mb-3 d-none" id="precoOfertaDiv">
                 <label for="precoOferta" class="form-label">Preço da Oferta</label>
-                <input type="number" class="form-control" id="precoOferta" placeholder="R$ 0,00">
+                <input type="text" class="form-control" id="precoOferta" placeholder="R$ 0,00">
             </div>
 
-            <div class="mb-3" id="precoNormalDiv">
+            <div class="mb-3 d-none" id="precoNormalDiv">
                 <label for="precoNormal" class="form-label">Preço Normal</label>
-                <input type="number" class="form-control" id="precoNormal" placeholder="R$ 0,00">
+                <input type="text" class="form-control" id="precoNormal" placeholder="R$ 0,00">
             </div>
 
             <div class="mb-3">
                 <label for="estadoFaixa" class="form-label">Estado da Faixa</label>
-                <select class="form-select" id="estadoFaixa">
+                <select class="form-select" id="estadoFaixa" required>
                     <option selected disabled>Escolha...</option>
                     <option value="nova">Nova</option>
                     <option value="velha">Velha</option>
@@ -52,7 +55,7 @@
 
             <div class="mb-3">
                 <label for="condicaoFaixa" class="form-label">Condição da Faixa</label>
-                <select class="form-select" id="condicaoFaixa">
+                <select class="form-select" id="condicaoFaixa" required>
                     <option selected disabled>Escolha...</option>
                     <option value="boa">Boa</option>
                     <option value="maisomenos">Mais ou menos</option>
@@ -77,23 +80,51 @@
 
 <script>
     const tipoOferta = document.getElementById('tipoOferta');
-    const precoOfertaDiv = document.getElementById('precoOfertaDiv');
-    const precoNormalDiv = document.getElementById('precoNormalDiv');
+const precoOfertaDiv = document.getElementById('precoOfertaDiv');
+const precoNormalDiv = document.getElementById('precoNormalDiv');
+const form = document.getElementById('formCadastro');
 
-    tipoOferta.addEventListener('change', () => {
-      const tipo = tipoOferta.value;
-
-      if (tipo === 'sv' || tipo === 'cartao') {
+// Controla a visibilidade dos preços
+tipoOferta.addEventListener('change', () => {
+    const tipo = tipoOferta.value;
+    if (tipo === 'sv' || tipo === 'cartao') {
         precoOfertaDiv.classList.remove('d-none');
         precoNormalDiv.classList.remove('d-none');
-      } else if (tipo === 'oferta') {
+    } else if (tipo === 'oferta') {
         precoOfertaDiv.classList.remove('d-none');
         precoNormalDiv.classList.add('d-none');
-      } else {
+    } else {
         precoOfertaDiv.classList.add('d-none');
         precoNormalDiv.classList.add('d-none');
-      }
-    });
+    }
+});
+
+// Envia os dados para o Android
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const produto = document.getElementById('produto').value.trim();
+    const tipo = tipoOferta.value;
+    const precoOferta = document.getElementById('precoOferta').value.trim();
+    const precoNormal = document.getElementById('precoNormal').value.trim();
+    const estado = document.getElementById('estadoFaixa').value;
+    const condicao = document.getElementById('condicaoFaixa').value;
+    const comentario = document.getElementById('comentario').value.trim();
+    const limiteCpf = document.getElementById('limiteCpf').checked;
+
+    console.log("DEBUG_JS: Tentando cadastrar faixa");
+    console.log({ produto, tipo, precoOferta, precoNormal, estado, condicao, comentario, limiteCpf });
+
+    if (window.Android && window.Android.cadastrarFaixa) {
+        console.log("DEBUG_JS: Interface Android encontrada!");
+        window.Android.cadastrarFaixa(produto, tipo, precoOferta, precoNormal, estado, condicao, comentario, limiteCpf);
+    } else {
+        console.error("DEBUG_JS: Interface Android NÃO encontrada!");
+        alert("Erro: interface Android não encontrada!");
+    }
+
+    form.reset();
+});
 </script>
 
     <script src="Bootstrap/js/bootstrap.bundle.js"></script>
