@@ -3,19 +3,33 @@ package com.example.estagioprojeto;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebViewClient;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.database.Cursor;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.webkit.JavascriptInterface;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private Bancodedados dbHelper;
+    private long backPressedTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,89 +38,143 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new Bancodedados(this);
 
-        webView = findViewById(R.id.webview);
-        if (webView == null) {
-            Log.e("DEBUG", "WebView está null!");
-        } else {
-            Log.d("DEBUG", "WebView inicializada corretamente.");
+        // Popular banco se vazio
+        if (dbHelper.listarFaixas().getCount() == 0) {
+            dbHelper.popularBancoDeFaixas();
+            Log.d("DEBUG_DB", "Cadastro inicial das faixas concluído!");
         }
 
+        configurarWebView();
+        atualizarEstados();
+        enviarFaixasVelhasParaJS(); // gráfico inicial
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                super.onBackPressed();
+            } else {
+                Toast.makeText(this, "Pressione novamente para sair", Toast.LENGTH_SHORT).show();
+            }
+            backPressedTime = System.currentTimeMillis();
+        }
+    }
+
+    // ----------------------------- CONFIG WEBVIEW ----------------------------- //
+    private void configurarWebView() {
+        webView = findViewById(R.id.webview);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
 
-        // Liga a interface JS -> Android
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
 
-        carregarPaginaFaixas();
-    }
-
-    private void carregarPaginaFaixas() {
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+
+            @Override
             public void onPageFinished(WebView view, String url) {
-                // Sempre tenta enviar faixas, mas JS só executa se função existir
-                enviarFaixasParaJS();
+                super.onPageFinished(view, url);
+
+                if (url.contains("menu.html")) {
+                    enviarFaixasVelhasParaJS();
+                } else if (url.contains("login.html")) {
+                    enviarFaixasParaJS();
+                } else if (url.contains("VerFaixa.html")) {
+                    enviarFaixasPesquisaParaJS("");
+                }
             }
         });
-        webView.setWebChromeClient(new android.webkit.WebChromeClient());
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                Log.d("WEBVIEW_LOG", consoleMessage.message() + " -- " + consoleMessage.sourceId() + ":" + consoleMessage.lineNumber());
+                return true;
+            }
+        });
+
         webView.loadUrl("file:///android_asset/login.html");
     }
 
-    private void enviarFaixasParaJS() {
+    // ----------------------------- ATUALIZA ESTADOS ----------------------------- //
+    private void atualizarEstados() {
         Cursor cursor = dbHelper.listarFaixas();
-        JSONArray faixasArray = new JSONArray();
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex("id"));
+            String dataCadastro = cursor.getString(cursor.getColumnIndex("data_criacao"));
+            String estadoAtual = cursor.getString(cursor.getColumnIndex("estado"));
 
-        if (cursor.moveToFirst()) {
-            do {
-                try {
-                    JSONObject faixaObj = new JSONObject();
-                    faixaObj.put("id", cursor.getInt(cursor.getColumnIndex("id")));
-                    faixaObj.put("nome_produto", cursor.getString(cursor.getColumnIndex("produto")));
-                    faixaObj.put("tipo_oferta", cursor.getString(cursor.getColumnIndex("tipo_oferta")));
-                    faixaObj.put("preco_oferta", cursor.isNull(cursor.getColumnIndex("preco_oferta")) ? JSONObject.NULL : cursor.getDouble(cursor.getColumnIndex("preco_oferta")));
-                    faixaObj.put("preco_normal", cursor.isNull(cursor.getColumnIndex("preco_normal")) ? JSONObject.NULL : cursor.getDouble(cursor.getColumnIndex("preco_normal")));
-                    faixaObj.put("estado_faixa", cursor.getString(cursor.getColumnIndex("estado")));
-                    faixaObj.put("condicao_faixa", cursor.getString(cursor.getColumnIndex("condicao")));
-                    faixaObj.put("comentario", cursor.getString(cursor.getColumnIndex("comentario")));
-                    faixaObj.put("limite_cpf", cursor.getInt(cursor.getColumnIndex("limite_cpf")));
-                    faixaObj.put("vezes_usada", cursor.getInt(cursor.getColumnIndex("vezes_usada")));
+            // Calcula novo estado com base na data
+            String novoEstado = calcularEstado(dataCadastro, estadoAtual);
 
-                    String dataCriacao = cursor.getString(cursor.getColumnIndex("data_criacao"));
-                    faixaObj.put("tempo_faixa", calcularTempoFaixa(dataCriacao));
-
-                    faixasArray.put(faixaObj);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } while (cursor.moveToNext());
+            // Atualiza apenas se houver mudança e não retroceder
+            if (!novoEstado.equals(estadoAtual)) {
+                dbHelper.atualizarEstado(id, novoEstado);
+            }
         }
         cursor.close();
-
-        // JS só executa se função carregarFaixas existir
-        String jsCommand = "if (typeof carregarFaixas === 'function') { carregarFaixas(" + faixasArray.toString() + "); }";
-        webView.evaluateJavascript(jsCommand, null);
     }
 
-    private String calcularTempoFaixa(String dataCriacao) {
-        if (dataCriacao == null) return "0 dias";
-
+    // ----------------------------- CÁLCULOS ----------------------------- //
+    public String calcularEstado(String dataCadastro, String estadoAtual) {
         try {
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date inicio = sdf.parse(dataCriacao);
-            java.util.Date hoje = new java.util.Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date data = sdf.parse(dataCadastro);
+            Date hoje = new Date();
+            long diff = hoje.getTime() - data.getTime();
+            long dias = TimeUnit.MILLISECONDS.toDays(diff);
+            long meses = dias / 30; // meses aproximados
 
+            // Nova faixa (estado null) inicia como Nova
+            if (estadoAtual == null) {
+                if (meses < 1) return "Nova";
+                if (meses < 3) return "Nem nova nem velha";
+                return "Velha";
+            }
+
+            // Mantém estado existente, só evoluindo
+            switch (estadoAtual) {
+                case "Nova":
+                    if (meses >= 1 && meses < 3) return "Nem nova nem velha";
+                    if (meses >= 3) return "Velha";
+                    return "Nova"; // menos de 1 mês continua Nova
+                case "Nem nova nem velha":
+                    if (meses >= 3) return "Velha";
+                    return "Nem nova nem velha";
+                case "Velha":
+                    return "Velha"; // nunca retrocede
+                default:
+                    return estadoAtual; // qualquer outro valor mantém
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return estadoAtual != null ? estadoAtual : "Nova";
+        }
+    }
+
+    public String calcularTempoFaixa(String dataCriacao) {
+        if (dataCriacao == null) return "0 dias";
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date inicio = sdf.parse(dataCriacao);
+            Date hoje = new Date();
             long diff = hoje.getTime() - inicio.getTime();
             long dias = diff / (1000L * 60 * 60 * 24);
 
             long anos = dias / 360;
             dias %= 360;
-
             long meses = dias / 30;
             dias %= 30;
-
             long semanas = dias / 7;
             dias %= 7;
 
@@ -121,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
             if (partes.length > 4) {
                 resultado = partes[0] + " " + partes[1] + " e " + partes[2] + " " + partes[3];
             }
-
             return resultado.isEmpty() ? "0 dias" : resultado;
 
         } catch (Exception e) {
@@ -129,70 +196,150 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class WebAppInterface {
-        @android.webkit.JavascriptInterface
-        public void cadastrarFaixa(String produto, String tipo_oferta, String preco_oferta_str, String preco_normal_str,
-                                   String estado, String condicao, String comentario, boolean limite_cpf) {
+    // ----------------------------- GERAR JSON ----------------------------- //
+    private JSONArray gerarJSONArray(Cursor cursor) {
+        JSONArray array = new JSONArray();
+        if (cursor.moveToFirst()) {
+            do {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("id", cursor.getInt(cursor.getColumnIndex("id")));
+                    obj.put("nome_produto", cursor.getString(cursor.getColumnIndex("produto")));
+                    obj.put("tipo_oferta", cursor.getString(cursor.getColumnIndex("tipo_oferta")));
+                    obj.put("preco_oferta", cursor.isNull(cursor.getColumnIndex("preco_oferta")) ? JSONObject.NULL : cursor.getDouble(cursor.getColumnIndex("preco_oferta")));
+                    obj.put("preco_normal", cursor.isNull(cursor.getColumnIndex("preco_normal")) ? JSONObject.NULL : cursor.getDouble(cursor.getColumnIndex("preco_normal")));
+                    obj.put("estado_faixa", cursor.getString(cursor.getColumnIndex("estado")));
+                    obj.put("condicao_faixa", cursor.getString(cursor.getColumnIndex("condicao")));
+                    obj.put("comentario", cursor.getString(cursor.getColumnIndex("comentario")));
+                    obj.put("limite_cpf", cursor.getInt(cursor.getColumnIndex("limite_cpf")));
+                    obj.put("vezes_usada", cursor.getInt(cursor.getColumnIndex("vezes_usada")));
+                    obj.put("usando", cursor.getInt(cursor.getColumnIndexOrThrow("usando")));
+                    obj.put("dias_uso", cursor.getInt(cursor.getColumnIndexOrThrow("dias_uso")));
+                    obj.put("data_inicio_uso", cursor.getString(cursor.getColumnIndexOrThrow("data_inicio_uso")));
+                    obj.put("tempo_faixa", calcularTempoFaixa(cursor.getString(cursor.getColumnIndex("data_criacao"))));
 
+                    // Cálculo dias restantes
+                    String dataInicioUso = cursor.getString(cursor.getColumnIndexOrThrow("data_inicio_uso"));
+                    int diasUso = cursor.getInt(cursor.getColumnIndexOrThrow("dias_uso"));
+                    long diasRestantes = 0;
+                    if (dataInicioUso != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        Date inicio = sdf.parse(dataInicioUso);
+                        long diff = new Date().getTime() - inicio.getTime();
+                        long diasPassados = diff / (1000L * 60 * 60 * 24);
+                        diasRestantes = Math.max(diasUso - diasPassados, 0);
+                    }
+                    obj.put("dias_restantes", diasRestantes);
+
+                    array.put(obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return array;
+    }
+
+    // ----------------------------- ENVIAR PARA JS ----------------------------- //
+    private void enviarFaixasParaJS() {
+        Cursor cursor = dbHelper.listarFaixas();
+        JSONArray array = gerarJSONArray(cursor);
+        webView.evaluateJavascript("if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }", null);
+    }
+
+    private void enviarFaixasPesquisaParaJS(String texto) {
+        Cursor cursor = dbHelper.pesquisarFaixas(texto);
+        JSONArray array = gerarJSONArray(cursor);
+        webView.evaluateJavascript("if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }", null);
+    }
+
+    private void enviarFaixasVelhasParaJS() {
+        List<Faixa> faixas = dbHelper.getFaixasVelhas();
+        JSONArray array = new JSONArray();
+        for (Faixa f : faixas) {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("produto", f.getProduto());
+                obj.put("estado", f.getEstado());
+                obj.put("data_criacao", f.getDataCadastro());
+                array.put(obj);
+            } catch (JSONException e) { e.printStackTrace(); }
+        }
+
+        // Apenas armazena os dados em JS, não abre modal
+        String jsCode = "window.dadosFaixasVelhas = " + array.toString() + ";";
+        webView.evaluateJavascript(jsCode, null);
+    }
+
+    // ----------------------------- WEBAPPINTERFACE ----------------------------- //
+    private class WebAppInterface {
+
+        @JavascriptInterface
+        public void cadastrarFaixa(String produto, String tipo_oferta, String preco_oferta_str,
+                                   String preco_normal_str, String estado, String condicao,
+                                   String comentario, boolean limite_cpf) {
             runOnUiThread(() -> {
-                // Validação de preços
+                // 🔹 Valida preços obrigatórios
                 if ((preco_oferta_str == null || preco_oferta_str.trim().isEmpty()) &&
-                        (tipo_oferta.equals("sv") || tipo_oferta.equals("cartao") || tipo_oferta.equals("oferta"))) {
+                        (tipo_oferta.equalsIgnoreCase("sv") ||
+                                tipo_oferta.equalsIgnoreCase("Cartão") ||
+                                tipo_oferta.equalsIgnoreCase("oferta"))) {
                     Toast.makeText(MainActivity.this, "Preço de oferta obrigatório!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if ((preco_normal_str == null || preco_normal_str.trim().isEmpty()) &&
-                        (tipo_oferta.equals("sv") || tipo_oferta.equals("cartao"))) {
+                        (tipo_oferta.equalsIgnoreCase("sv") ||
+                                tipo_oferta.equalsIgnoreCase("Cartão"))) {
                     Toast.makeText(MainActivity.this, "Preço normal obrigatório!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Checar se os valores são realmente números
+                // 🔹 Valida números
                 try {
-                    if (!preco_oferta_str.isEmpty()) Double.parseDouble(preco_oferta_str.replace(",", "."));
-                    if (!preco_normal_str.isEmpty()) Double.parseDouble(preco_normal_str.replace(",", "."));
+                    if (preco_oferta_str != null && !preco_oferta_str.trim().isEmpty()) {
+                        Double.parseDouble(preco_oferta_str.replace(",", "."));
+                    }
+                    if (preco_normal_str != null && !preco_normal_str.trim().isEmpty()) {
+                        Double.parseDouble(preco_normal_str.replace(",", "."));
+                    }
                 } catch (NumberFormatException e) {
                     Toast.makeText(MainActivity.this, "Preços devem ser números válidos!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Inserir no banco com checagem de duplicata
+                // 🔹 Define o estado final:
+                // Se não vier nada → é cadastro manual → começa como "Nova"
+                // Se já vier algo (ex: faixa.txt) → mantém
+                String estadoFinal;
+                if (estado == null || estado.trim().isEmpty()) {
+                    estadoFinal = "Nova";
+                } else {
+                    estadoFinal = normalizarEstado(estado);
+                }
+
+                // 🔹 Insere no banco (checa duplicata)
                 int resultado = dbHelper.inserirFaixaComDuplicataOpcional(
-                        produto,
-                        tipo_oferta,
-                        preco_oferta_str,
-                        preco_normal_str,
-                        estado,
-                        condicao,
-                        comentario,
-                        limite_cpf,
-                        false // não permitir duplicata inicialmente
+                        produto, tipo_oferta, preco_oferta_str, preco_normal_str,
+                        estadoFinal, condicao, comentario, limite_cpf, false
                 );
 
-                // Tratamento de duplicata
                 if (resultado == -2) {
+                    // Já existe → pergunta se quer cadastrar mesmo assim
                     new AlertDialog.Builder(MainActivity.this)
                             .setTitle("Faixa duplicada")
                             .setMessage("Já existe uma faixa igual. Deseja cadastrar mesmo assim?")
                             .setPositiveButton("Sim", (dialog, which) -> {
                                 dbHelper.inserirFaixaComDuplicataOpcional(
-                                        produto,
-                                        tipo_oferta,
-                                        preco_oferta_str,
-                                        preco_normal_str,
-                                        estado,
-                                        condicao,
-                                        comentario,
-                                        limite_cpf,
-                                        true // forçar duplicata
+                                        produto, tipo_oferta, preco_oferta_str, preco_normal_str,
+                                        estadoFinal, condicao, comentario, limite_cpf, true
                                 );
                                 Toast.makeText(MainActivity.this, "Faixa duplicada cadastrada!", Toast.LENGTH_SHORT).show();
                                 enviarFaixasParaJS();
                             })
-                            .setNegativeButton("Não", (dialog, which) -> {
-                                Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show();
-                            })
+                            .setNegativeButton("Não", (dialog, which) ->
+                                    Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show())
                             .show();
                 } else if (resultado == 1) {
                     Toast.makeText(MainActivity.this, "Faixa cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
@@ -204,65 +351,222 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-        @android.webkit.JavascriptInterface
+        @JavascriptInterface
         public void excluirFaixa(int id) {
             runOnUiThread(() -> {
                 boolean sucesso = dbHelper.deletarFaixa(id);
-                if (sucesso) {
-                    Toast.makeText(MainActivity.this, "Faixa excluída!", Toast.LENGTH_SHORT).show();
-                    enviarFaixasParaJS();
-                } else {
-                    Toast.makeText(MainActivity.this, "Erro ao excluir faixa.", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(MainActivity.this, sucesso ? "Faixa excluída!" : "Erro ao excluir faixa.", Toast.LENGTH_SHORT).show();
+                enviarFaixasParaJS();
             });
         }
 
-        @android.webkit.JavascriptInterface
+        @JavascriptInterface
         public void editarFaixa(int id, String produto, String tipoOferta,
                                 double precoOferta, double precoNormal,
                                 String estado, String condicao,
                                 String comentario, int limiteCpf) {
             runOnUiThread(() -> {
-                boolean sucesso = dbHelper.editarFaixa(id, produto, tipoOferta,
-                        precoOferta, precoNormal, estado, condicao, comentario, limiteCpf);
-                if (sucesso) {
-                    Toast.makeText(MainActivity.this, "Faixa atualizada!", Toast.LENGTH_SHORT).show();
-                    enviarFaixasParaJS();
-                } else {
-                    Toast.makeText(MainActivity.this, "Erro ao atualizar faixa.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        @android.webkit.JavascriptInterface
-        public void usarFaixa(int id, int dias) {
-            runOnUiThread(() -> {
-                if (dias <= 0) {
-                    Toast.makeText(MainActivity.this, "Número de dias inválido!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                boolean sucesso = dbHelper.iniciarUso(id, dias);
-                if (sucesso) {
-                    Toast.makeText(MainActivity.this, "Faixa em uso por " + dias + " dias!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "Erro: faixa não encontrada.", Toast.LENGTH_SHORT).show();
-                }
+                boolean sucesso = dbHelper.editarFaixa(id, produto, tipoOferta, precoOferta, precoNormal, estado, condicao, comentario, limiteCpf);
+                Toast.makeText(MainActivity.this, sucesso ? "Faixa atualizada!" : "Erro ao atualizar faixa.", Toast.LENGTH_SHORT).show();
                 enviarFaixasParaJS();
             });
         }
 
-        @android.webkit.JavascriptInterface
+        @JavascriptInterface
+        public void usarFaixa(int id, int dias) {
+            runOnUiThread(() -> {
+                if (dias <= 0) { Toast.makeText(MainActivity.this, "Número de dias inválido!", Toast.LENGTH_SHORT).show(); return; }
+                boolean sucesso = dbHelper.iniciarUso(id, dias);
+                if (sucesso) dbHelper.incrementarUso(id);
+                Toast.makeText(MainActivity.this, sucesso ? "Faixa em uso por " + dias + " dias!" : "Erro: faixa não encontrada.", Toast.LENGTH_SHORT).show();
+                enviarFaixasParaJS();
+            });
+        }
+
+        @JavascriptInterface
         public void cancelarUsoFaixa(int id) {
             runOnUiThread(() -> {
                 boolean sucesso = dbHelper.cancelarUso(id);
-                if (sucesso) {
-                    Toast.makeText(MainActivity.this, "Uso da faixa cancelado!", Toast.LENGTH_SHORT).show();
-                    enviarFaixasParaJS();
-                } else {
-                    Toast.makeText(MainActivity.this, "Erro ao cancelar uso.", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(MainActivity.this, sucesso ? "Uso da faixa cancelado!" : "Erro ao cancelar uso.", Toast.LENGTH_SHORT).show();
+                enviarFaixasParaJS();
             });
         }
+
+        @JavascriptInterface
+        public void pesquisarFaixa(String texto) {
+            runOnUiThread(() -> enviarFaixasPesquisaParaJS(texto));
+        }
+
+        @JavascriptInterface
+        public void filtrarFaixas(String filtroJson) {
+            runOnUiThread(() -> {
+                try {
+                    JSONObject filtro = new JSONObject(filtroJson);
+                    Cursor cursor = dbHelper.filtrarFaixas(
+                            filtro.optString("tipo", ""),
+                            filtro.optString("estado", ""),
+                            filtro.optString("condicao", ""),
+                            filtro.optString("limite_cpf", ""),
+                            filtro.optString("em_uso", "")
+                    );
+                    JSONArray array = gerarJSONArray(cursor);
+                    webView.evaluateJavascript("if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }", null);
+                } catch (Exception e) { e.printStackTrace(); }
+            });
+        }
+
+        @JavascriptInterface
+        public void navegarPara(String pagina) {
+            runOnUiThread(() -> webView.loadUrl("file:///android_asset/" + pagina));
+        }
+
+        // ----------------------------- NORMALIZAR ESTADO ----------------------------- //
+        private String normalizarEstado(String estado) {
+            if (estado == null) return "Nova"; // padrão se não vier nada
+
+            String e = estado.trim().toLowerCase();
+
+            switch (e) {
+                case "nova":
+                case "novo":
+                case "n":
+                    return "Nova";
+
+                case "velha":
+                case "velho":
+                case "antiga":
+                case "antigo":
+                case "v":
+                    return "Velha";
+
+                case "nem nova nem velha":
+                case "medio":
+                case "regular":
+                case "mais ou menos":
+                case "nvv":
+                    return "Nem nova nem velha";
+
+                default:
+                    return "Nova"; // fallback de segurança
+            }
+        }
+
+        // ----------------------------- GRÁFICOS ----------------------------- //
+        @JavascriptInterface
+        public int getFaixasParadas1Mes() {
+            return dbHelper.contarFaixasParadasUltimoMes();
+        }
+
+        @JavascriptInterface
+        public String getFaixasParadasDetalhes() {
+            List<Faixa> faixas = dbHelper.getFaixasParadasUltimoMes();
+            JSONArray array = new JSONArray();
+            for (Faixa f : faixas) {
+                try { JSONObject obj = new JSONObject(); obj.put("produto", f.getProduto()); obj.put("vezes_usada", f.getVezesUsada()); array.put(obj); }
+                catch (JSONException e) { e.printStackTrace(); }
+            }
+            return array.toString();
+        }
+
+        @JavascriptInterface
+        public String getFaixasVelhas() {
+            List<Faixa> faixas = dbHelper.getFaixasVelhas();
+            JSONArray array = new JSONArray();
+
+            // Pega a data de hoje
+            LocalDate hoje = LocalDate.now();
+
+            for (Faixa f : faixas) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("produto", f.getProduto());
+                    obj.put("estado", f.getEstado());
+                    obj.put("data_criacao", f.getDataCadastro());
+
+                    // Converte a data do banco para LocalDate (formato YYYY-MM-DD)
+                    String dataCriacaoStr = f.getDataCadastro();
+                    if (dataCriacaoStr != null && !dataCriacaoStr.isEmpty()) {
+                        LocalDate dataCriacao = LocalDate.parse(dataCriacaoStr);
+                        long dias = ChronoUnit.DAYS.between(dataCriacao, hoje);
+                        obj.put("dias_uso", dias); // <-- adiciona no JSON
+                    } else {
+                        obj.put("dias_uso", JSONObject.NULL);
+                    }
+
+                    array.put(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            return array.toString();
+        }
+
+        @JavascriptInterface
+        public String getTop10Faixas() {
+            List<Faixa> faixas = dbHelper.getTop10Faixas();
+            JSONArray jsonArray = new JSONArray();
+
+            try {
+                for (Faixa f : faixas) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("produto", f.getProduto());
+                    obj.put("estado", f.getEstado());
+                    obj.put("vezes_usada", f.getVezesUsada());
+                    obj.put("data_criacao", f.getDataCadastro());
+                    obj.put("condicao", f.getCondicao()); // necessário para filtro JS
+                    jsonArray.put(obj);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return jsonArray.toString();
+        }
+
+        @JavascriptInterface
+        public String getFaixasParaLixo() {
+            List<Faixa> faixas = dbHelper.getFaixasParaLixo();
+            JSONArray jsonArray = new JSONArray();
+
+            try {
+                for (Faixa f : faixas) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("produto", f.getProduto());
+                    obj.put("estado", f.getEstado());
+                    obj.put("vezes_usada", f.getVezesUsada());
+                    obj.put("data_criacao", f.getDataCadastro());
+                    obj.put("condicao", f.getCondicao()); // necessário
+                    jsonArray.put(obj);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return jsonArray.toString();
+        }
+
+        @JavascriptInterface
+        public String getFaixasCadastradasSemana() {
+            // usa o novo método que retorna faixas da semana atual e passada
+            List<Faixa> faixas = dbHelper.getFaixasPorSemana();
+            JSONArray jsonArray = new JSONArray();
+
+            try {
+                for (Faixa f : faixas) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("produto", f.getProduto());
+                    obj.put("estado", f.getEstado() != null ? f.getEstado() : ""); // algumas faixas podem não ter estado
+                    obj.put("vezes_usada", f.getVezesUsada());
+                    obj.put("data_criacao", f.getDataCadastro());
+                    obj.put("condicao", f.getCondicao() != null ? f.getCondicao() : "");
+                    jsonArray.put(obj);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return jsonArray.toString();
+        }
+
     }
 }

@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" />
     <link rel="stylesheet" href="Bootstrap/bootstrap-icons.css" />
     <link rel="stylesheet" href="Verfaixa.css" />
+    <style>
+        /* Destaque visual para faixas em uso */
+        .usando {
+            border: 2px solid #0d6efd;
+            background-color: #e7f1ff;
+        }
+    </style>
 </head>
 <body class="bg-light text-dark">
 
@@ -16,7 +23,6 @@
         <a href="menu.html" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Voltar
         </a>
-
         <div class="dropdown">
             <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 <i class="bi bi-palette"></i> Estilo
@@ -39,8 +45,8 @@
 
     <!-- Pesquisa -->
     <div class="d-flex mb-4 gap-2">
-        <input type="text" class="form-control" placeholder="Pesquisar faixa...">
-        <button class="btn btn-outline-secondary">
+        <input type="text" class="form-control" id="barraPesquisa" placeholder="Pesquisar faixa...">
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#filtroModal" id="botaoPesquisar">
             <i class="bi bi-filter"></i> Filtrar
         </button>
     </div>
@@ -67,12 +73,10 @@
                 <div class="modal-body">
                     <form id="formEditarFaixa">
                         <input type="hidden" id="editarId">
-
                         <div class="mb-3">
                             <label for="editarNome" class="form-label">Nome do Produto</label>
                             <input type="text" class="form-control" id="editarNome" required>
                         </div>
-
                         <div class="mb-3">
                             <label for="editarTipo" class="form-label">Tipo de Oferta</label>
                             <select class="form-select" id="editarTipo">
@@ -81,17 +85,14 @@
                                 <option value="Cartão">Cartão</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label for="editarPrecoOferta" class="form-label">Preço Oferta</label>
                             <input type="number" class="form-control" id="editarPrecoOferta" step="0.01">
                         </div>
-
                         <div class="mb-3">
                             <label for="editarPrecoNormal" class="form-label">Preço Normal</label>
                             <input type="number" class="form-control" id="editarPrecoNormal" step="0.01">
                         </div>
-
                         <div class="mb-3">
                             <label for="editarIdadeFaixa" class="form-label">Idade da Faixa</label>
                             <select class="form-select" id="editarIdadeFaixa">
@@ -100,7 +101,6 @@
                                 <option value="Antiga">Antiga</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label for="editarCondicao" class="form-label">Condição da Faixa</label>
                             <select class="form-select" id="editarCondicao">
@@ -109,12 +109,10 @@
                                 <option value="Ruim">Ruim</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label for="editarComentario" class="form-label">Comentário</label>
                             <textarea class="form-control" id="editarComentario" rows="2"></textarea>
                         </div>
-
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="editarLimiteCPF">
                             <label class="form-check-label" for="editarLimiteCPF">Limite por CPF</label>
@@ -128,7 +126,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Modal de confirmação -->
     <div id="confirmModal" style="display:none; position:fixed; top:0; left:0;
@@ -160,6 +157,85 @@
         </div>
     </div>
 
+    <!-- Modal Confirmar Cancelamento -->
+    <div class="modal fade" id="cancelarUsoModal" tabindex="-1" aria-labelledby="cancelarUsoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelarUsoModalLabel">Cancelar Uso da Faixa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Deseja realmente cancelar o uso desta faixa?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+                    <button type="button" class="btn btn-danger" id="confirmarCancelarUso">Sim, cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Filtro -->
+    <div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filtroModalLabel">Filtrar Faixas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="filtroTipo" class="form-label">Tipo de Oferta</label>
+                        <select id="filtroTipo" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="SV">SV</option>
+                            <option value="Oferta">Oferta</option>
+                            <option value="Cartão">Cartão</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filtroEstado" class="form-label">Estado da Faixa</label>
+                        <select id="filtroEstado" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="Nova">Nova</option>
+                            <option value="Velha">Velha</option>
+                            <option value="Nem Nova Nem Velha">Nem Nova Nem Velha</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filtroCondicao" class="form-label">Condição da Faixa</label>
+                        <select id="filtroCondicao" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="Boa">Boa</option>
+                            <option value="Mais ou Menos">Mais ou Menos</option>
+                            <option value="Ruim">Ruim</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filtroLimiteCPF" class="form-label">Limite por CPF</label>
+                        <select id="filtroLimiteCPF" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="1">Sim</option>
+                            <option value="0">Não</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="filtroUso" class="form-label">Faixa em Uso</label>
+                        <select id="filtroUso" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="1">Sim</option>
+                            <option value="0">Não</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="aplicarFiltroBtn">Aplicar Filtro</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
@@ -168,74 +244,167 @@
     let faixaAtualParaEditar = null;
     let estiloAtual = 'original';
     let faixaIdParaUsar = null;
+    let faixaIdParaCancelar = null;
 
-
-    // Instancia o modal do Bootstrap
     const editarModalEl = document.getElementById("editarModal");
     const editarBootstrapModal = new bootstrap.Modal(editarModalEl);
     const usarModalEl = document.getElementById("usarModal");
     const usarBootstrapModal = new bootstrap.Modal(usarModalEl);
+    const cancelarUsoModalEl = document.getElementById("cancelarUsoModal");
+    const cancelarUsoBootstrapModal = new bootstrap.Modal(cancelarUsoModalEl);
+    const editarTipo = document.getElementById('editarTipo');
+    const editarPrecoNormalDiv = document.getElementById('editarPrecoNormal').parentElement;
 
+    // Atualiza visibilidade do Preço Normal
+    function atualizarPrecoNormal() {
+        editarPrecoNormalDiv.style.display = editarTipo.value === 'Oferta' ? 'none' : 'block';
+    }
+    editarTipo.addEventListener('change', atualizarPrecoNormal);
+
+    // Função para carregar e exibir as faixas
     function carregarFaixas(faixas) {
-    const container = document.getElementById('faixa-lista');
-    container.innerHTML = '';
+        const container = document.getElementById('faixa-lista');
+        container.innerHTML = '';
 
-    faixas.forEach(faixa => {
-        const div = document.createElement('div');
-        div.className = 'faixa-item';
-        if(estiloAtual !== 'original') {
-            div.classList.add(estiloAtual);
+        if (!faixas || faixas.length === 0) {
+            container.innerHTML = '<p>Nenhuma faixa encontrada.</p>';
+            return;
         }
 
-        // Se estiver sendo usada, adiciona classe especial
-        let statusUso = '';
-        let btnUsar = `<button class="btn btn-success" onclick="usarFaixaPrompt(${faixa.id})">Usar</button>`;
+        faixas.forEach(faixa => {
+            const div = document.createElement('div');
+            div.className = 'faixa-item';
+            if (estiloAtual !== 'original') div.classList.add(estiloAtual);
+            if (faixa.usando === 1) div.classList.add('usando');
+
+            let statusUso = faixa.usando === 1 ? `<p><strong>Usando</strong></p>` : '';
+            let btnUsar = criarBotaoUsar(faixa);
+
+            div.innerHTML = `
+                <div class="faixa-header"><h3>${faixa.nome_produto}</h3></div>
+                <div class="faixa-info tipo-oferta text-center mb-2"><strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}</div>
+                <div class="faixa-precos d-flex justify-content-center gap-4 mb-2">
+                    <div><strong>Preço Oferta:</strong> ${typeof faixa.preco_oferta === 'number' ? faixa.preco_oferta.toFixed(2) : '-'}</div>
+<div><strong>Preço Normal:</strong> ${typeof faixa.preco_normal === 'number' ? faixa.preco_normal.toFixed(2) : '-'}</div>
+
+                </div>
+                <hr class="faixa-separator">
+                <div class="faixa-info-extra d-flex justify-content-center gap-4 mb-2">
+                    <div><strong>Estado:</strong> ${faixa.estado_faixa}</div>
+                    <div><strong>Condição:</strong> ${faixa.condicao_faixa}</div>
+                </div>
+                <div class="faixa-info mb-2">
+                    <p><strong>Comentário:</strong> ${faixa.comentario || '-'}</p>
+                    <p><strong>Limite CPF:</strong> ${faixa.limite_cpf === 1 ? 'Sim' : 'Não'}</p>
+                    <p><strong>Vezes usada:</strong> ${faixa.vezes_usada}</p>
+                    <div><strong>Tempo:</strong> ${faixa.tempo_faixa || '-'}</div>
+                    ${statusUso}
+                </div>
+                <hr class="faixa-separator">
+                ${faixa.usando === 1 ? `
+                    <h6 class="text-danger fw-bold">FAIXA SENDO USADA</h6>
+                    <div class="text-center mt-2 faixa-info">
+                        <p>Início: ${faixa.data_inicio_uso || '-'}</p>
+                        <p>Dias de uso: ${faixa.dias_uso || 0}</p>
+                        <p>Dias restantes: ${faixa.dias_restantes || 0}</p>
+                    </div>
+                ` : ''}
+                <div class="faixa-actions">
+                    <button class="btn btn-warning" onclick='abrirEditarFaixa(${JSON.stringify(faixa)})'>Editar</button>
+                    ${btnUsar}
+                    <button class="btn btn-danger" onclick="excluirFaixa(${faixa.id}, '${faixa.nome_produto}')">Excluir</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Botão Usar ou Cancelar
+    function criarBotaoUsar(faixa) {
         if (faixa.usando === 1) {
-            div.classList.add('usando'); // você pode definir no CSS cor azul
-            statusUso = `<p><strong>Status:</strong> Sendo usada (${faixa.dias_restantes} dias restantes)</p>`;
-            btnUsar = `<button class="btn btn-secondary" onclick='cancelarUso(${faixa.id})'>Cancelar</button>`;
+            return `<button class="btn btn-secondary" onclick='cancelarUso(${faixa.id})'>Cancelar Uso</button>`;
+        } else {
+            return `<button class="btn btn-success" onclick='usarFaixaPrompt(${faixa.id})'>Usar Faixa</button>`;
         }
+    }
 
-        div.innerHTML = `
-        <div class="faixa-header">
-            <h3>${faixa.nome_produto}</h3>
-        </div>
+    // Editar faixa
+    function abrirEditarFaixa(faixa) {
+        faixaAtualParaEditar = faixa;
+        document.getElementById('editarId').value = faixa.id;
+        document.getElementById('editarNome').value = faixa.nome_produto;
+        document.getElementById('editarTipo').value = faixa.tipo_oferta;
+        document.getElementById('editarPrecoOferta').value = faixa.preco_oferta || '';
+        document.getElementById('editarPrecoNormal').value = faixa.preco_normal || '';
+        document.getElementById('editarComentario').value = faixa.comentario || '';
+        document.getElementById('editarLimiteCPF').checked = faixa.limite_cpf === 1;
+        atualizarPrecoNormal();
+        editarBootstrapModal.show();
+    }
 
-        <div class="faixa-info tipo-oferta text-center mb-2">
-            <strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}
-        </div>
-
-        <div class="faixa-precos d-flex justify-content-center gap-4 mb-2">
-            <div><strong>Preço Oferta:</strong> ${faixa.preco_oferta !== null ? faixa.preco_oferta.toFixed(2) : '-'}</div>
-            <div><strong>Preço Normal:</strong> ${faixa.preco_normal !== null ? faixa.preco_normal.toFixed(2) : '-'}</div>
-        </div>
-
-        <hr class="faixa-separator">
-
-        <div class="faixa-info-extra d-flex justify-content-center gap-4 mb-2">
-            <div><strong>Estado:</strong> ${faixa.estado_faixa}</div>
-            <div><strong>Condição:</strong> ${faixa.condicao_faixa}</div>
-        </div>
-
-        <div class="faixa-info mb-2">
-            <p><strong>Comentário:</strong> ${faixa.comentario || '-'}</p>
-            <p><strong>Limite CPF:</strong> ${faixa.limite_cpf === 1 ? 'Sim' : 'Não'}</p>
-            <p><strong>Vezes usada:</strong> ${faixa.vezes_usada}</p>
-            <div><strong>Tempo:</strong> ${faixa.tempo_faixa}</div>
-            ${statusUso}
-        </div>
-
-        <div class="faixa-actions">
-            <button class="btn btn-warning" onclick='abrirEditarFaixa(${JSON.stringify(faixa)})'>Editar</button>
-            ${btnUsar}
-            <button class="btn btn-danger" onclick="excluirFaixa(${faixa.id}, '${faixa.nome_produto}')">Excluir</button>
-        </div>
-        `;
-
-        container.appendChild(div);
+    document.getElementById('salvarEditar').addEventListener('click', () => {
+        if (!faixaAtualParaEditar) return;
+        const dadosAtualizados = {
+            id: faixaAtualParaEditar.id,
+            nome_produto: document.getElementById('editarNome').value,
+            tipo_oferta: document.getElementById('editarTipo').value,
+            preco_oferta: parseFloat(document.getElementById('editarPrecoOferta').value || 0),
+            preco_normal: parseFloat(document.getElementById('editarPrecoNormal').value || 0),
+            comentario: document.getElementById('editarComentario').value,
+            limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
+        };
+        Android.editarFaixa(
+            dadosAtualizados.id,
+            dadosAtualizados.nome_produto,
+            dadosAtualizados.tipo_oferta,
+            dadosAtualizados.preco_oferta,
+            dadosAtualizados.preco_normal,
+            '', // idade_faixa, se houver
+            '', // condicao, se houver
+            dadosAtualizados.comentario,
+            dadosAtualizados.limite_cpf
+        );
+        editarBootstrapModal.hide();
     });
-}
 
+    // Mudar estilo das faixas
+    function mudarEstiloFaixa(estilo) {
+        const faixas = document.querySelectorAll('.faixa-item');
+        ['original', 'bizarro', 'aleatorio'].forEach(c => faixas.forEach(faixa => faixa.classList.remove(c)));
+        if (estilo !== 'original') faixas.forEach(faixa => faixa.classList.add(estilo));
+        estiloAtual = estilo;
+    }
+
+    // Usar faixa
+    function usarFaixaPrompt(id) {
+        faixaIdParaUsar = id;
+        document.getElementById("diasUsoInput").value = 1;
+        usarBootstrapModal.show();
+    }
+
+    document.getElementById("confirmarUsarBtn").addEventListener("click", () => {
+        const dias = parseInt(document.getElementById("diasUsoInput").value) || 0;
+        if (faixaIdParaUsar !== null && dias > 0) {
+            Android.usarFaixa(faixaIdParaUsar, dias);
+            usarBootstrapModal.hide();
+        } else alert("Informe um número de dias válido.");
+    });
+
+    // Cancelar uso
+    function cancelarUso(id) {
+        faixaIdParaCancelar = id;
+        cancelarUsoBootstrapModal.show();
+    }
+
+    document.getElementById("confirmarCancelarUso").addEventListener("click", () => {
+        if (faixaIdParaCancelar !== null) {
+            Android.cancelarUsoFaixa(faixaIdParaCancelar);
+            faixaIdParaCancelar = null;
+            cancelarUsoBootstrapModal.hide();
+        }
+    });
+
+    // Excluir faixa
     function excluirFaixa(id, nome) {
         faixaIdParaExcluir = id;
         document.getElementById("confirmText").innerText = `Deseja realmente excluir a faixa "${nome}"?`;
@@ -246,122 +415,57 @@
         Android.excluirFaixa(faixaIdParaExcluir);
         document.getElementById("confirmModal").style.display = "none";
     });
-
     document.getElementById("confirmNo").addEventListener("click", () => {
         document.getElementById("confirmModal").style.display = "none";
     });
 
-    const editarTipo = document.getElementById('editarTipo');
-const editarPrecoNormalDiv = document.getElementById('editarPrecoNormal').parentElement;
-
-// Função para atualizar visibilidade do Preço Normal
-function atualizarPrecoNormal() {
-    if (editarTipo.value === 'Oferta') {
-        editarPrecoNormalDiv.style.display = 'none';
-    } else {
-        editarPrecoNormalDiv.style.display = 'block';
-    }
-}
-
-// Dispara quando muda o tipo
-editarTipo.addEventListener('change', atualizarPrecoNormal);
-
-// Também dispara ao abrir o modal
-function abrirEditarFaixa(faixa) {
-    faixaAtualParaEditar = faixa;
-    document.getElementById('editarId').value = faixa.id;
-    document.getElementById('editarNome').value = faixa.nome_produto;
-    document.getElementById('editarTipo').value = faixa.tipo_oferta;
-    document.getElementById('editarPrecoOferta').value = faixa.preco_oferta !== null ? faixa.preco_oferta : '';
-    document.getElementById('editarPrecoNormal').value = faixa.preco_normal !== null ? faixa.preco_normal : '';
-    document.getElementById('editarComentario').value = faixa.comentario || '';
-    document.getElementById('editarLimiteCPF').checked = faixa.limite_cpf === 1;
-
-    atualizarPrecoNormal();
-    editarBootstrapModal.show();
-}
-
-    document.getElementById('salvarEditar').addEventListener('click', () => {
-        if (!faixaAtualParaEditar) return;
-
-       const dadosAtualizados = {
-    id: faixaAtualParaEditar.id,
-    nome_produto: document.getElementById('editarNome').value,
-    tipo_oferta: document.getElementById('editarTipo').value,
-    preco_oferta: document.getElementById('editarPrecoOferta').value,
-    preco_normal: document.getElementById('editarPrecoNormal').value,
-    idade_faixa: document.getElementById('editarIdadeFaixa').value,
-    condicao: document.getElementById('editarCondicao').value,
-    comentario: document.getElementById('editarComentario').value,
-    limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
-};
-
-       Android.editarFaixa(
-    dadosAtualizados.id,
-    dadosAtualizados.nome_produto,
-    dadosAtualizados.tipo_oferta,
-    parseFloat(dadosAtualizados.preco_oferta || 0),
-    parseFloat(dadosAtualizados.preco_normal || 0),
-    dadosAtualizados.idade_faixa,
-    dadosAtualizados.condicao,
-    dadosAtualizados.comentario,
-    dadosAtualizados.limite_cpf
-);
-
-        editarBootstrapModal.hide();
-    });
-editarModalEl.classList.add('estilo1');
-
-    function mudarEstiloModal(estilo) {
-    const classes = ['estilo1', 'bizarro', 'aleatorio', 'normal'];
-    // Remove todas as classes de estilo
-    classes.forEach(c => editarModalEl.classList.remove(c));
-    // Adiciona a escolhida
-    editarModalEl.classList.add(estilo);
-}
-
-function mudarEstiloFaixa(estilo) {
-    const faixas = document.querySelectorAll('.faixa-item');
-    const classes = ['original','bizarro','aleatorio']; // só 3 estilos
-
-    faixas.forEach(faixa => {
-        classes.forEach(c => faixa.classList.remove(c));
-        if(estilo !== 'original') { // 'original' já é o base
-            faixa.classList.add(estilo);
+    // Pesquisa
+    function pesquisar() {
+        const texto = document.getElementById('barraPesquisa').value;
+        if (window.Android && window.Android.pesquisarFaixa) {
+            window.Android.pesquisarFaixa(texto);
         }
+    }
+    document.getElementById('botaoPesquisar').addEventListener('click', pesquisar);
+    document.getElementById('barraPesquisa').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') pesquisar();
     });
 
-    estiloAtual = estilo;
-}
-
-    function usarFaixaPrompt(id) {
-    faixaIdParaUsar = id; // guarda o id da faixa
-    document.getElementById("diasUsoInput").value = 1; // valor padrão
-    usarBootstrapModal.show(); // abre o modal
-}
-
-// Evento do botão confirmar do modal
-document.getElementById("confirmarUsarBtn").addEventListener("click", () => {
-    const dias = parseInt(document.getElementById("diasUsoInput").value) || 0;
-    console.log("Tentando usar faixa:", faixaIdParaUsar, "por dias:", dias); // LOG
-    if (faixaIdParaUsar !== null && dias > 0) {
-        try {
-            Android.usarFaixa(faixaIdParaUsar, dias);
-            usarBootstrapModal.hide();
-        } catch(e) {
-            console.error("Erro ao chamar usarFaixa:", e);
-            alert("Não foi possível usar a faixa.");
+    // Ao carregar a página, busca todas as faixas
+    window.onload = function() {
+        if (window.Android && window.Android.pesquisarFaixa) {
+            window.Android.pesquisarFaixa('');
         }
-    } else {
-        alert("Informe um número de dias válido.");
+    };
+
+    document.getElementById('aplicarFiltroBtn').addEventListener('click', () => {
+    const filtro = {
+        tipo: document.getElementById('filtroTipo').value,
+        estado: document.getElementById('filtroEstado').value,
+        condicao: document.getElementById('filtroCondicao').value,
+        limite_cpf: document.getElementById('filtroLimiteCPF').value,
+        em_uso: document.getElementById('filtroUso').value
+    };
+
+    if (window.Android && window.Android.filtrarFaixas) {
+        window.Android.filtrarFaixas(JSON.stringify(filtro));
     }
+
+    const filtroModal = bootstrap.Modal.getInstance(document.getElementById('filtroModal'));
+    filtroModal.hide();
 });
 
-function cancelarUso(id) {
-    if (confirm("Deseja cancelar o uso desta faixa?")) {
-        Android.cancelarUsoFaixa(id);
-    }
-}
+    const filtroModalEl = document.getElementById('filtroModal');
+const filtroBootstrapModal = bootstrap.Modal.getInstance(filtroModalEl) || new bootstrap.Modal(filtroModalEl);
+
+// Reseta o modal ao fechar
+filtroModalEl.addEventListener('hidden.bs.modal', () => {
+    document.getElementById('filtroTipo').value = '';
+    document.getElementById('filtroEstado').value = '';
+    document.getElementById('filtroCondicao').value = '';
+    document.getElementById('filtroLimiteCPF').value = '';
+    document.getElementById('filtroUso').value = '';
+});
 </script>
 
 </body>

@@ -44,16 +44,6 @@
             </div>
 
             <div class="mb-3">
-                <label for="estadoFaixa" class="form-label">Estado da Faixa</label>
-                <select class="form-select" id="estadoFaixa" required>
-                    <option selected disabled>Escolha...</option>
-                    <option value="nova">Nova</option>
-                    <option value="velha">Velha</option>
-                    <option value="intermediaria">Nem nova nem velha</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
                 <label for="condicaoFaixa" class="form-label">Condição da Faixa</label>
                 <select class="form-select" id="condicaoFaixa" required>
                     <option selected disabled>Escolha...</option>
@@ -107,7 +97,10 @@ form.addEventListener('submit', (e) => {
     const tipo = tipoOferta.value;
     const precoOferta = document.getElementById('precoOferta').value.trim();
     const precoNormal = document.getElementById('precoNormal').value.trim();
-    const estado = document.getElementById('estadoFaixa').value;
+
+    // Sempre "nova"
+    const estado = null;
+
     const condicao = document.getElementById('condicaoFaixa').value;
     const comentario = document.getElementById('comentario').value.trim();
     const limiteCpf = document.getElementById('limiteCpf').checked;

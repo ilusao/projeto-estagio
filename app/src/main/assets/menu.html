@@ -11,7 +11,7 @@
 <body>
 
 <div class="menu-header">
-    <i class="bi-brush"  style="font-size: 2rem; color: white;"></i>
+    <i class="bi-brush" style="font-size: 2rem; color: white;"></i>
     <div class="welcome-text">
         <h2>Olá, Cartazista</h2>
         <p>Lembre-se: o importante é estar certo, não belo</p>
@@ -19,7 +19,6 @@
 </div>
 
 <div class="container">
-    <!-- BOTÕES AGORA EM CIMA -->
     <div class="btn-group">
         <button class="btn-custom" id="btnVerFaixas">
             <i class="bi bi-collection" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
@@ -43,7 +42,6 @@
         </button>
     </div>
 
-    <!-- CARDS GRÁFICOS AGORA EMBAIXO -->
     <div class="cards-grid" style="margin-top: 2rem;">
         <div class="card">
             <h5>Faixas paradas 1 mês</h5>
@@ -53,7 +51,30 @@
         <div class="card">
             <h5>Faixas velhas</h5>
             <p>8</p>
-            <div class="bar-graph"><div class="bar-fill" style="width: 50%; background-color: #ffc107;"></div></div>
+            <div class="bar-graph">
+                <div id="barFaixasVelhas" class="bar-fill" style="width: 0%; background-color: #ffc107;"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h5>Top 10 Faixas Usadas</h5>
+            <p id="top10Count">0</p>
+            <div class="bar-graph">
+                <div id="barTop10" class="bar-fill" style="width: 0%; background-color: #6610f2;"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h5>Faixas Para Jogar Fora</h5>
+            <p id="faixasLixoCount">0</p>
+            <div class="bar-graph">
+                <div id="barFaixasLixo" class="bar-fill" style="width: 0%; background-color: #dc3545;"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h5>Faixas Cadastradas (Semana)</h5>
+            <p id="faixasSemanaCount">0 / 0</p>
+            <div class="bar-graph">
+                <div id="barFaixasSemana" class="bar-fill" style="width: 50%; background-color: #20c997;"></div>
+            </div>
         </div>
         <div class="card">
             <h5>Cartazes A4</h5>
@@ -68,14 +89,349 @@
     </div>
 </div>
 
+<!-- Modal Faixas Paradas -->
+<div class="modal fade" id="modalFaixasParadas" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Faixas paradas 1 mês ou mais</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="listaFaixasParadas" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Faixas Velhas -->
+<div class="modal fade" id="modalFaixasVelhas" tabindex="-1" aria-labelledby="modalFaixasVelhasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalFaixasVelhasLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Faixas Velhas
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <ul id="listaFaixasVelhas" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTop10" tabindex="-1" aria-labelledby="modalTop10Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalTop10Label">Top 10 Faixas Mais Usadas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="listaTop10" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalFaixasLixo" tabindex="-1" aria-labelledby="modalFaixasLixoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalFaixasLixoLabel">Faixas Para Jogar Fora</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="listaFaixasLixo" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalFaixasSemana" tabindex="-1" aria-labelledby="modalFaixasSemanaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalFaixasSemanaLabel">Faixas Cadastradas</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="listaFaixasSemana" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    document.getElementById("btnVerFaixas").addEventListener("click", function () {
-        window.location.href = "VerFaixa.html";
+    const btnVer = document.getElementById("btnVerFaixas");
+    const btnCad = document.getElementById("btnCadastrarFaixas");
+
+    // Navegação
+    btnVer.addEventListener("click", () => {
+        if (typeof Android !== "undefined") Android.navegarPara("VerFaixa.html");
+        else window.location.href = "VerFaixa.html";
     });
 
-    document.getElementById("btnCadastrarFaixas").addEventListener("click", function () {
-        window.location.href = "CadastrarFaixa.html";
+    btnCad.addEventListener("click", () => {
+        if (typeof Android !== "undefined") Android.navegarPara("CadastrarFaixa.html");
+        else window.location.href = "CadastrarFaixa.html";
     });
+
+    // Atualiza barras
+    function atualizarGraficos() {
+    // Faixas paradas
+    let faixasParadas = 0;
+    if (typeof Android !== "undefined" && Android.getFaixasParadas1Mes) {
+        faixasParadas = Android.getFaixasParadas1Mes();
+    }
+    document.querySelector(".cards-grid .card:nth-child(1) p").textContent = faixasParadas;
+    document.querySelector(".cards-grid .card:nth-child(1) .bar-fill").style.width = Math.min(faixasParadas * 5, 100) + "%";
+
+    // Faixas velhas
+    let faixasVelhas = [];
+    if (typeof Android !== "undefined" && Android.getFaixasVelhas) {
+        faixasVelhas = JSON.parse(Android.getFaixasVelhas());
+    }
+    faixasVelhas.sort((a,b) => new Date(a.dataCadastro) - new Date(b.dataCadastro));
+    const velhas = faixasVelhas.length;
+    document.getElementById("barFaixasVelhas").style.width = Math.min((velhas / 200) * 100, 100) + "%";
+    document.querySelector(".cards-grid .card:nth-child(2) p").textContent = velhas;
+
+    // Top 10
+    let top10 = [];
+    if (typeof Android !== "undefined" && Android.getTop10Faixas) {
+        top10 = JSON.parse(Android.getTop10Faixas());
+    }
+    const top1Count = top10.length > 0 ? top10[0].vezes_usada : 0;
+    document.getElementById("top10Count").textContent = top1Count;
+    document.getElementById("barTop10").style.width = Math.min((top1Count / 20) * 100, 100) + "%";
+
+    // Faixas para jogar fora
+    let faixasLixo = [];
+    if (typeof Android !== "undefined" && Android.getFaixasParaLixo) {
+    console.log("Android.getFaixasParaLixo:", Android.getFaixasParaLixo);
+        faixasLixo = JSON.parse(Android.getFaixasParaLixo());
+    }
+    const faixasParaLixoCount = faixasLixo.length;
+    document.getElementById("faixasLixoCount").textContent = faixasParaLixoCount;
+    document.getElementById("barFaixasLixo").style.width = Math.min((faixasParaLixoCount / 10) * 100, 100) + "%";
+
+    // Faixas cadastradas semana
+    let faixasSemana = [];
+    if (typeof Android !== "undefined" && Android.getFaixasCadastradasSemana) {
+        try {
+            faixasSemana = JSON.parse(Android.getFaixasCadastradasSemana());
+        } catch (e) {
+            console.error("Erro ao parsear faixasSemana:", e);
+        }
+    }
+
+    // Contar quantas são da semana atual e da semana passada
+    const hoje = new Date();
+    const diaSemana = hoje.getDay(); // 0=domingo, 1=segunda...
+    const segundaAtual = new Date(hoje);
+    segundaAtual.setDate(hoje.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1));
+
+    const segundaPassada = new Date(segundaAtual);
+    segundaPassada.setDate(segundaAtual.getDate() - 7);
+    const domingoPassado = new Date(segundaAtual);
+    domingoPassado.setDate(segundaAtual.getDate() - 1);
+
+    let countAtual = 0, countPassada = 0;
+    faixasSemana.forEach(f => {
+        const data = new Date(f.data_criacao);
+        if (data >= segundaAtual) countAtual++;
+        else if (data >= segundaPassada && data <= domingoPassado) countPassada++;
+    });
+
+    const totalSemana = countAtual + countPassada;
+    const texto = `${countAtual} / ${countPassada}`;
+    document.getElementById("faixasSemanaCount").textContent = texto;
+
+    const bar = document.getElementById("barFaixasSemana");
+    // Preenche a barra proporcional: se semana passada 0, barra cheia só com semana atual
+    let percent = countPassada > 0 ? (countAtual / countPassada) * 100 : 100;
+    bar.style.width = Math.min(percent, 100) + "%";
+}
+
+
+    // Modal faixas paradas
+    const graficoFaixasParadas = document.querySelector(".cards-grid .card:nth-child(1)");
+    graficoFaixasParadas.addEventListener("click", () => {
+        const lista = document.getElementById("listaFaixasParadas");
+        lista.innerHTML = "";
+
+        let faixas = [];
+        if (typeof Android !== "undefined" && Android.getFaixasParadasDetalhes) {
+            faixas = JSON.parse(Android.getFaixasParadasDetalhes());
+        }
+
+        if (faixas.length === 0) lista.innerHTML = '<li class="list-group-item">Nenhuma faixa parada.</li>';
+        else {
+            faixas.forEach(f => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = f.produto + " (Usos: " + f.vezes_usada + ")";
+                lista.appendChild(li);
+            });
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("modalFaixasParadas"));
+        modal.show();
+    });
+
+    // Modal faixas velhas
+   const graficoFaixasVelhas = document.querySelector(".cards-grid .card:nth-child(2)");
+
+graficoFaixasVelhas.addEventListener("click", () => {
+    console.log("Clique em Faixas Velhas detectado");
+
+    let faixas = [];
+    if (typeof Android !== "undefined" && Android.getFaixasVelhas) {
+        faixas = JSON.parse(Android.getFaixasVelhas());
+    }
+    console.log("Dados de faixas velhas:", faixas);
+
+    const lista = document.getElementById("listaFaixasVelhas");
+    lista.innerHTML = "";
+
+    if (faixas.length === 0) {
+        console.log("Nenhuma faixa velha encontrada.");
+        lista.innerHTML = `
+          <li class="list-group-item text-center text-muted">
+            Nenhuma faixa velha encontrada.
+          </li>`;
+        return;
+    }
+
+    // Ordena por data
+    faixas.sort((a, b) => new Date(a.data_criacao + "T00:00:00") - new Date(b.data_criacao + "T00:00:00"));
+
+    // Preenche lista
+    faixas.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-start flex-column flex-md-row";
+
+        li.innerHTML = `
+            <div class="fw-bold text-dark mb-2 mb-md-0">${f.produto}</div>
+            <div>
+                <span class="badge bg-danger me-2">
+                    ${f.dias_uso} dias
+                </span>
+                <span class="badge bg-secondary">
+                    ${f.data_criacao}
+                </span>
+            </div>
+        `;
+
+        lista.appendChild(li);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById("modalFaixasVelhas"));
+    modal.show();
+    console.log("Modal aberto com sucesso!");
+});
+
+const cardTop10 = document.querySelector(".cards-grid .card:nth-child(3)"); // ajuste se for a 5ª card
+cardTop10.addEventListener("click", () => {
+    let faixas = [];
+    if (typeof Android !== "undefined" && Android.getTop10Faixas) {
+        faixas = JSON.parse(Android.getTop10Faixas());
+    }
+
+    const lista = document.getElementById("listaTop10");
+    lista.innerHTML = "";
+
+    if (faixas.length === 0) {
+        lista.innerHTML = '<li class="list-group-item text-center text-muted">Nenhuma faixa encontrada.</li>';
+        return;
+    }
+
+    faixas.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between";
+        li.innerHTML = `<span>${f.produto}</span><span>Usos: ${f.vezes_usada}</span>`;
+        lista.appendChild(li);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById("modalTop10"));
+    modal.show();
+});
+
+const cardFaixasLixo = document.querySelector(".cards-grid .card:nth-child(4)");
+cardFaixasLixo.addEventListener("click", () => {
+    let faixas = [];
+    if (typeof Android !== "undefined" && Android.getFaixasParaLixo) {
+        try {
+            faixas = JSON.parse(Android.getFaixasParaLixo());
+        } catch(e) {
+            console.error("Erro ao parsear faixasLixo:", e);
+        }
+    }
+
+    const lista = document.getElementById("listaFaixasLixo");
+    lista.innerHTML = "";
+
+    if (faixas.length === 0) {
+        lista.innerHTML = '<li class="list-group-item text-center text-muted">Nenhuma faixa para jogar fora.</li>';
+        return;
+    }
+
+    const lixoReal = faixas.filter(f => f.condicao && f.condicao.toLowerCase() === "ruim");
+    const sugestao = faixas.filter(f => !f.condicao || f.condicao.toLowerCase() !== "ruim");
+
+    if (lixoReal.length > 0) {
+        lista.innerHTML += '<li class="list-group-item bg-danger text-white"><strong>Faixas para jogar fora:</strong></li>';
+        lixoReal.forEach(f => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between";
+            li.innerHTML = `<span>${f.produto}</span><span>Cadastro: ${f.data_criacao}</span>`;
+            lista.appendChild(li);
+        });
+    }
+
+    if (sugestao.length > 0) {
+        lista.innerHTML += '<li class="list-group-item bg-warning"><strong>Sugestões para jogar fora:</strong></li>';
+        sugestao.forEach(f => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between";
+            li.innerHTML = `<span>${f.produto}</span><span>Cadastro: ${f.data_criacao}</span>`;
+            lista.appendChild(li);
+        });
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById("modalFaixasLixo"));
+    modal.show();
+});
+
+const cardFaixasSemana = document.querySelector(".cards-grid .card:nth-child(5)"); // ajuste se necessário
+cardFaixasSemana.addEventListener("click", () => {
+    let faixas = [];
+    if (typeof Android !== "undefined" && Android.getFaixasCadastradasSemana) {
+        faixas = JSON.parse(Android.getFaixasCadastradasSemana());
+    }
+
+    const lista = document.getElementById("listaFaixasSemana");
+    lista.innerHTML = "";
+
+    if (faixas.length === 0) {
+        lista.innerHTML = '<li class="list-group-item text-center text-muted">Nenhuma faixa cadastrada nesta semana.</li>';
+        return;
+    }
+
+    faixas.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between";
+        li.innerHTML = `<span>${f.produto}</span><span>Data: ${f.data_criacao}</span>`;
+        lista.appendChild(li);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById("modalFaixasSemana"));
+    modal.show();
+});
+
+    window.onload = atualizarGraficos;
 </script>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>

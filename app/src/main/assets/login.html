@@ -9,10 +9,10 @@
 
 <body>
 <div class="login-container text-center">
-    <h3 class="mb-4 text-center">Entrar</h3>
+    <!-- Clique no h3 já entra direto -->
+    <h3 class="mb-4 text-center" id="loginH3" style="cursor:pointer;">Entrar</h3>
 
-    <div id="mensagemErro" class="alert alert-danger d-none" role="alert">
-    </div>
+    <div id="mensagemErro" class="alert alert-danger d-none" role="alert"></div>
 
     <form id="loginForm" class="d-flex flex-column gap-3">
         <input type="text" class="form-control" id="usuario" placeholder="Usuário" required>
@@ -20,30 +20,29 @@
         <button type="submit" class="btn btn-primary w-100">Entrar</button>
     </form>
 </div>
+
 <script>
-
-    document.addEventListener('keydown', function(e) {
-  if (e.key === 'a') { // por exemplo, tecla 9
-    window.location.href = 'menu.html';
-  }
-});
-
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const usuario = document.getElementById('usuario').value.trim();
-    const senha = document.getElementById('senha').value.trim();
-
-    const mensagemErro = document.getElementById('mensagemErro');
-
-    if (usuario === '5013' && senha === 'loja.292929') {
-        alert('Login realizado com sucesso!');
+    // Clique no h3 pula login direto
+    document.getElementById('loginH3').addEventListener('click', function() {
         window.location.href = 'menu.html';
-    } else {
-        mensagemErro.classList.remove('d-none'); // Mostra o alert do Bootstrap
-        mensagemErro.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Usuário ou senha incorretos! (Dica: usuário 5013, senha loja.292929)';
-    }
-});
+    });
+
+    // Login normal
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const usuario = document.getElementById('usuario').value.trim();
+        const senha = document.getElementById('senha').value.trim();
+        const mensagemErro = document.getElementById('mensagemErro');
+
+        if (usuario === '5013' && senha === 'loja.292929') {
+            alert('Login realizado com sucesso!');
+            window.location.href = 'menu.html';
+        } else {
+            mensagemErro.classList.remove('d-none');
+            mensagemErro.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Usuário ou senha incorretos! (Dica: usuário 5013, senha loja.292929)';
+        }
+    });
 </script>
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 </body>

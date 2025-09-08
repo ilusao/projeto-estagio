@@ -9,6 +9,11 @@ public class Faixa {
     private String condicao;
     private String comentario;
     private int limiteCpf;
+    private int usando;
+    private int diasUso;
+    private int diasRestantes;
+    private int vezesUsada;
+    private String dataCadastro;
 
     // Construtor
     public Faixa(String produto, String tipoOferta, double precoOferta, double precoNormal,
@@ -21,6 +26,9 @@ public class Faixa {
         this.condicao = condicao;
         this.comentario = comentario;
         this.limiteCpf = limiteCpf;
+    }
+
+    public Faixa() {
     }
 
     // Getters
@@ -42,4 +50,24 @@ public class Faixa {
     public void setCondicao(String condicao) { this.condicao = condicao; }
     public void setComentario(String comentario) { this.comentario = comentario; }
     public void setLimiteCpf(int limiteCpf) { this.limiteCpf = limiteCpf; }
+
+    public int getUsando() { return usando; }
+    public void setUsando(int usando) { this.usando = usando; }
+
+    public int getDiasUso() { return diasUso; }
+    public void setDiasUso(int diasUso) { this.diasUso = diasUso; }
+
+    public int getDiasRestantes() { return diasRestantes; }
+    public void setDiasRestantes(int diasRestantes) { this.diasRestantes = diasRestantes; }
+
+    public int getVezesUsada() {
+        return vezesUsada;
+    }
+
+    public void setVezesUsada(int vezesUsada) {
+        this.vezesUsada = vezesUsada;
+    }
+
+    public String getDataCadastro() { return dataCadastro; }
+    public void setDataCadastro(String dataCadastro) { this.dataCadastro = dataCadastro; }
 }
