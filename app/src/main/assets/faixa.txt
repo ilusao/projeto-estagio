@@ -1,263 +1,262 @@
-Bisteca do contrafilé bovino reserva granel;SV;34.90;39.90;velha;mais ou menos;da pra usar;0
-Costela minga bovina KG;SV;24.90;28.90;nova;excelente;N/D;0
-Ancho maturatta embalada kg;*;;;nova;*;N/D;1
-Ancho maturatta embalado kg;*;;;nova;**;N/D;1
-Picanha maturatta bovina embalada vácuo KG;SV;69.90;79.90;boa;nova;um pouco rasgado onde tá OFERTA;---;1
-Bisteca suína resfriada KG;SV;14.90;17.90;velha;mas ou menos;ficou melhor agora;0
-Ancho maturatta embalado KG;SV;44.90;57.90;nova;mais ou menos;precisa repintar;1
-Pernil ou paleta c/osso couro suína kg;SV;14.90;17.90;nova;boa;NÃO TEM PREÇO;0
-Ponta de peito reserva bovino kg;SV;34.90;39.90;nova;meio;precisando dar uma repassada na tinta e apertada na madeira;0
-Cupim bovino embalado kg;oferta;36.90;;;meio;bom;N/D;0
-Picanha maturatta bovina embalada a vácuo kg;SV;79.90;89.90;nova;bom;só dá uma melhorada no preço normal se possível;0
-Filé de peito de frango congelado pacote kg;oferta;19.90;;;meio;bom;N/D;0
-Ancho maturatta embalado kg;oferta;49.90;;;velha;bom;N/D;0
-Fraldinha bovina embalada kg;oferta;32.90;;;nova;bom;N/D;0
-Filé de tilápia Brazilian fish fresco 500g;oferta;19.90;;;nova;excelente;---;0
-Bisteca suína resfriada kg;SV;15.90;18.90;meio;mais ou menos;repassa a tinta;0
-Ancho maturatta embalado kg;oferta;44.90;;;meio;mais ou menos;---;0
-Costela minga bovina pedaço kg;oferta;24.90;;;meio;bom;N/D;0
-Bisteca do contrafilé bovino reserva kg;oferta;36.90;;;velha;mais ou menos;foi apagada a tinta mas ainda aparece então ficou um visual estranho;0
-Contrafilé embalado bovino porcionado kg;SV;37.90;44.90;meio;bom;N/D;0
-Fraldinha Friboi bovina embalada kg;SV;35.90;37.90;nova;boa;N/D;1
-Cupim bovino embalado kg;SV;36.90;42.90;nova;boa;N/D;0
-Costela minga bovina kg;oferta;25.90;;;meio;boa;N/D;0
-Fraldinha bovina embalada Friboi kg;SV;36.90;39.90;meio;boa;dar uma pintada na parte do Friboi tem um buraquinho no O;1
-Ponta de peito, maturatta bovina embalada kg;oferta;39.90;;;novo;bom;N/D;0
-Bisteca contrafilé bovino reserva granel kg;SV;37.90;39.90;nova;boa;N/D;0
-Contrafilé bovino porcionado embalado kg;SV;38.90;44.90;velha;boa;---;1
-Fraldinha Friboi bovino embalado kg;oferta;37.90;;;meio;mais ou menos;no M do embalada está meio rasgadinho;0
-Contrafilé bovino porcionado embalado kg;SV;39.90;44.90;meio;bom;meio rasgadinho;1
-Costela janela kg;oferta;24.90;;;meio;mais ou menos;é só isso mesmo na faixa?;0
-Fraldinha embalada kg;**;;;velha;---;---;0
-Costela janela bovina a granel kg;SV;26.90;28.90;nova;boa;N/D;0
-Contrafilé bovino porcionado embalado kg;oferta;44.90;;;nova;excelente;N/D;0
-Frango resfriado inteiro kg;SV;6.99;7.99;meio;feio;foi apagado o SV aí ficou feio;1
-Costela minga bovina kg;SV;23.90;;;velha;boa;parte de trás soja de tinta;0
-Drumet sadia congelada pacote 1kg;SV;17.90;18.90;meio;mais ou menos;repintar;0
-Músculo reserva bovino kg;oferta;32.90;;;meio;boa;N/D;0
-Fraldinha bovina embalada kg;SV;37.90;39.90;nova;boa;furinhos no B do bovina;0
-Coxa com sobrecoxa resfriada kg;SV;6.98;8.98;nova;boa;Madeira quebrada;1
-Picanha bovina Friboi embalada kg;SV;59.90;79.90;velha;boa;N/D;0
-Contrafilé bovino porcionado embalado KG;oferta;39.90;;;velha;mais ou menos;repintar;0
-Acém bovino s/osso reserva KG;cartão;32.90;37.90;meio;boa;com furinhos tomar cuidado;0
-Músculo bovino reserva KG;SV;31.90;32.90;meio;boa;N/D;0
-Picanha maturatta bovina embalada vácuo kg;oferta;69.90;;;nova;boa;N/D;0
-Linguiça Pamplona Toscana KG;SV;16.90;18.90;nova;boa;N/D;1
-Salsicha sadia hot dog KG;oferta;12.90;;;nova;boa;N/D;0
-Salsicha Seara hot dog KG;SV;8.99;12.90;meio;boa;N/D;0
-Linguiça Seara Toscana KG;SV;17.90;21.90;meio;boa;N/D;0
-Contrafilé maturatta bovino embalado a vácuo kg;SV;59.90;64.90;velha;feia;repintar tudo se não funcionar jogar fora;0
-Muçarela Monte Castelo cada 100 g peça ou pedaço;SV;2.99;4.49;meio;mais ou menos;com buraquinho no 100 G;1
-Queijo prato Monte Castelo cada 100g;SV;4.79;5.49;---;---;N/D;0
-Muçarela Monte Castelo peça ou pedaço queijo KG;SV;34.90;39.90;nova;boa;N/D;1
-Paleta reserva bovina KG;SV;34.90;39.90;meio;boa;N/D;0
-Coxinha da asa resfriada a granel KG;SV;13.90;15.90;nova;boa;N/D;0
-Linguiça Seara de pernil KG;SV;19.90;21.90;meio;feio;limpar e repintar;0
-Muçarela Monte Castelo KG;SV;29.90;39.90;nova;boa;N/D;1
-Linguiça Toscana Pamplona KG;SV;17.90;18.90;nova;boa;N/D;0
-Picanha bovina Bordon fatiada embalada KG;oferta;49.90;---;nova;meio;rasgada na madeira cuidado;0
-Salsicha hot dog sadia kg;SV;10.90;12.90;nova;mais ou menos;furada embaixo do KG;0
-Picanha Bordon bovina fatiada KG;SV;42.90;57.90;nova;boa;N/D;0
-Filé de peito de frango congelada pacote KG;SV;15.90;22.90;meio;mais ou menos;N/D;0
-Salsicha hot dog Seara KG;SV;9.90;12.90;nova;excelente;N/D;0
-Frango inteiro resfriado KG;oferta;7.99;---;nova;boa;N/D;0
-Frango inteiro resfriado KG;SV;5.98;7.98;nova;boa;N/D;1
-Frango inteiro resfriado kg;---;6.99;9.89;nova;mais ou menos;tá rasgadinho mas dá pra usar pelo menos por algum tempo curto;0
-Frango inteiro resfriado kg;SV;7.68;9.89;nova;boa;N/D;0
-Frango inteiro resfriado KG;oferta;5.99;---;nova;boa;N/D;0
-Frango inteiro resfriado;SV;7.99;9.89;velha;boa;muito boa pra tá velha;0
-Ancho maturatta embalado KG;SV;42.90;45.90;nova;boa;tentei deixar boa;1
-Contrafilé maturatta bovino embalado a vácuo;SV;49.90;59.90;nova;boa;tiraram e amassaram a coitada;0
-Linguiça Pamplona Toscana KG;SV;15.90;18.90;nova;boa;N/D;1
-Linguiça aurora Toscana KG;SV;19.90;21.90;nova;boa;N/D;0
-Linguiça Toscana sadia kg;SV;19.90;22.90;nova;boa;N/D;0
-Fraldinha Friboi bov. Emb. kG;SV;32.90;34.90;nova;boa;N/D;1
-Tulipa de frango resfriada KG;SV;18.90;22.90;nova;boa;N/D;0
-Linguiça Perdigão Toscana na brasa KG;SV;17.90;24.90;nova;boa;de longe umas das faixas mais bonita que temos;1
-Linguiça Toscana Seara KG;---;---;---;nova;boa;N/D;0
-Linguiça sadia calabresa a granel kg;SV;22.90;25.90;nova;boa;N/D;0
-Costela janela bovina a granel kg;SV;24.90;28.90;nova;boa;N/D;0
-Costela suína congelada kg;SV;25.90;27.90;nova;boa;apagar a falha na tinta no 2;0
-Músculo bovino reserva a granel kg;SV;32.90;35.90;nova;boa;N/D;1
-Coxa com sobrecoxa resfriada a granel KG;SV;8.98;13.90;nova;boa;N/D;0
-Ancho maturatta embalado kg;SV;49.90;57.90;nova;boa;é nova mas já dá pra repintar;1
-Salsicha seara hot dog KG;SV;10.90;12.90;nova;boa;N/D;0
-Bisteca suína resfriada a granel kg;cartão;9.98;15.90;nova;boa;N/D;0
-Linguiça Pamplona calabresa kg;SV;19.90;22.90;nova;boa;N/D;0
-Fraldinha Friboi bovina embalada kg;SV;34.90;39.90;nova;boa;N/D;0
-Salsicha sadia hot dog KG;cartao;8.90;12.90;nova;boa;N/D;0
-Paleta bovina sem osso reserva kg;cartão;29.90;37.90;nova;mais ou menos;repintar apagar borrão;0
-Cenoura KG;SV;2.99;3.79;nova;boa;N/D;0
-Cebola kg;SV;2.98;3.98;meio;boa;N/D;0
-Banana nanica kg;SV;2.98;3.98;nova;mais ou menos;N/D;1
-Batata kg;SV;3.98;4.98;nova;boa;N/D;0
-Batata kg;SV;2.99;3.99;nova;mais ou menos;foi refeita mais ficou até legalsinha ... Tirando o 9 kk;0
-Abacaxi pérola unidade Kg;SV;8.99;9.89;meio;boa;tá velhinha mas só uma repintada e trocar a madeira porque tá quebrada;0
-Maçã gala kg;SV;9.98;10.98;nova;boa;N/D;0
-Laranja pera KG;SV;4.98;5.98;velha;mais ou menos;repintar;0
-Melancia KG;SV;1.98;2.98;nova;boa;N/D;0
-Abacaxi pérola unidade;SV;8.99;9.99;velha;mais ou menos;repintar tirar a umidade e tá bom;0
-Laranja pera KG;SV;4.98;5.98;velha;mais ou menos;repintar e tá nova de novo;0
-Melão amarelo KG;SV;4.99;5.98;nova;boa;N/D;0
-Tomate carmen KG;SV;5.98;6.98;velha;boa;repintar;0
-Melancia KG;SV;2.99;3.89;velha;boa;repetintar;0
-Tomate italiano KG;SV;3.98;4.99;velha;boa;N/D;1
-Maracujá;SV;7.98;8.48;nova;mais ou menos;foi apagado e repintado então ficou meio manchado mas só no preço normal;0
-Cenoura KG;SV;2.98;3.98;meia;mais ou menos;tive que apagar e repintar então ficou meio borrado só ficar apagando que melhora;0
-Melão amarelo KG;SV;3.98;4.98;nova;mais ou menos;repinta o 3 aí porque tá feio;0
-Manga Tommy kg;SV;6.98;7.98;nova;mais ou menos;a tinta tava seila ruim aí deu umas falhadas só repintar;0
-Banana nanica;SV;3.98;4.98;velha;boa;tá velhinha mas acredito que aguenta bastante ainda;1
-Banana nanica ou laranja pera KG;SV;2.98;3.98;nova;boa;N/D;1
-Cebola KG;SV;1.98;2.98;nova;boa;N/D;1
-Banana ou laranja pera KG;SV;2.98;3.98;nova;boa;preta kkkk atenção no limite por CPF prós dois;1
-Cenoura ou batata kg;SV;2.98;3.98;nova;boa;prestar atenção no limite por CPF prós 2;1
-Mamão papaya KG;SV;6.98;7.98;nova;boa;N/D;0
-Ovos brancos extra PVC com 20 unidades;SV;11.90;12.90;nova;boa;N/D;0
-Ovos brancos extra PVC com 20 unidades;SV;12.90;13.90;nova;boa;N/D;0
-Banana nanica, batata ou cebola kg;SV;1.98;2.98;nova;boa;repintar S do SV e o preço normal;0
-Mamão papaya kg;SV;6.98;7.98;nova;boa;N/D;0
-Laranja pera ou cebola kg;SV;1.98;2.98;nova;boa;N/D;1
-Tangerina murcote kg;SV;4.99;5.99;nova;boa;N/D;0
-Uva branca sem semente doce uva 500G;SV;6.98;7.98;nova;boa;mesmo nova é bom repintar;0
-Manga Palmer kg;SV;4.99;5.99;nova;boa;N/D;0
-Laranja pera Kg;SV;1.98;2.98;nova;boa;N/D;0
-Café pelé pacote 500g;cartão;25.90;29.90;nova;mais ou menos;já que foi feita com as últimas faixas ele saiu tudo agendado com as faixas, mas dá usar;0
-Café caboclo 500g;SV;27.90;29.90;nova;boa;N/D;1
-Leite italac 1L;SV;4.19;4.99;nova;boa;N/D;0
-Leite L.vida italac 1lt unidade;SV;3.98;4.99;nova;boa;N/D;1
-Café brasileiro pacote 500g;oferta;27.90;0;nova;boa;N/D;1
-Leite italac 1l;SV;4.49;4.99;meio;boa;tenta dar uma repintada;1
-Café meitta pacote 500g;SV;29.99;34.90;nova;boa;N/D;1
-Café união puch ou vácuo 500g;SV;29.89;33.90;nova;boa;N/D;1
-Leite italac 1L;SV;4.59;5.49;nova;boa;se quiser dar uma repintada mais não é muito necessário;1
-Leite L.vida Tirol Edge 1L;SV;3.89;4.99;velha;boa;tá muito bonita sempre tenta usar ela;1
-Leite longa vida quatá Edge 1L;SV;3.78;4.99;meio;mais ou menos;quando tiver tempo se possível tentar deixar o preço em vermelho mais cheios grossos;1
-Café união pouch ou vácuo 500g;SV;26.89;33.90;meio;boa;N/D;1
-Café Melita pacote 500g;SV;29.90;34.90;Nem nova nem velha;boa;com buraco em Melita;1
-Leite L.V quatá Edge 1L;SV;3.98;5.29;nova;mais ou menos;colocaram ela na grade sem motivo algum etão ele ficou bastante acabada mas dá pra usar;0
-Café 3 corações Premium 500g;SV;35.90;45.90;nova;boa;acho que nunca mais usa ela em...;0
-Café 3 corações tradicional ou extra forte pacote 500g;SV;29.90;35.90;nova;boa;N/D;1
-Café união 500G tradicional ou extra forte;SV;25.90;34.90;nova;boa;ficou legal;1
-Café brasileiro pacote 500g;oferta;24.90;0;nova;boa;N/S;1
-Leite L.V. shefa garrafa 1L;cartão;3.79;4.79;nova;boa;difícil usar;1
-Papel higiênico personal f.dupla noutro 30mt. L16 P15, vip;SV;23.90;26.99;velha;boa;muito específica apesar de ser boa;0
-Amaciante amacitel roupas 2LT.;SV;5.89;9.59;mais ou menos;boa;N/D;0
-Papel hig. Stylus folha d.neutro 2M. Com 12 unidades;SV;12.99;14.99;nova;boa;N/D;0
-Amaciante downy concentrado 1l+100ml;SV;17.90;24.29;mais ou menos;meio;N/D;0
-Lava-roupas omo líquido 3L;oferta;39.90;0;nova;boa;N/D;0
-Fralda Huggies tripla proteção descartável;SV;29.90;38.90;nova;boa;N/D;0
-Desinfetante Barbarex fragrâncias 2L;oferta;4.99;0;meio;mais ou menos;N/D;0
-Vassoura noviça original c/com cabo unidade;oferta;13.90;0;meio;boa;N/D;0
-Lava- roupas omo lavagem perfeita 2,2KG;SV;25.89;33.99;velha;boa;N/D;1
-Lava-roupas brilhante em pó limpeza total 1,6kg grátis 150g;SV;17.90;21.74;meio;boa;N/D;0
-Vassoura condor Madri c/cabo;SV;8.99;9.99;meio;boa;N/D;0
-Água sanitária Ypê 2LT;oferta;5.99;0;velha;boa;N/D;0
-Água sanitária bio-kriss 2L;SV;3.99;4.39;nova;boa;N/D;0
-Lava roupas omo em pé 2,2kg sanitiza e higieniza;SV;27.90;31.90;velha;boa;N/D;0
-Água sanitária bio kriss 2lt;SV;3.49;4.19;meio;boa;N/D;0
-Lava- roupas tixan em pó, leve 1,6 pague 1,52 kg;SV;15.90;17.90;nova;boa;N/D;0
-Papel-hig sublime neutro folha dupla 30M leve 12 pague 11;SV;15.99;18.39;nova;boa;N/D;0
-Papel higi neve neutro folha dupla 30M leve 12 pague 11;SV;18.90;23.59;nova;boa;N/D;0
-Álcool duratto uso geral 1LT.;SV;4.99;6.28;velha;boa;N/D;0
-Lava roupas OMO 720G em pó expert branco AB;SV;12.90;15.99;nova;boa;N/D;0
-Lava-roupas brilhante limpeza total 2,2kg em pó;SV;19.90;29.49;nova;boa;N/D;0
-Papel higi supra f.dupla neutro 30M com 12 unidades;SV;19.90;25.69;meio;boa;N/D;0
-Água sanitária Ypê 5LT;oferta;13.99;0;velha;mais ou menos;repintar vai ajudar bastante;0
-Limpador azulim muitiuso 500ml fragrâncias;SV;1.99;3.99;velha;boa;foi repintada e ficou linda;0
-Lava louças minuano 500ml;SV;2.19;2.49;velha;boa;N/D;0
-Inseticida Raid mult aerosol 420ml;SV;15.99;19.99;velha;mais ou menos;repintar;0
-Lava roupas OMO lavagem perfeita 2,2kg em pó;SV;28.90;33.99;nova;mais ou menos;arrumar o preço normal tá feio o 9;0
-Papel higi. Duetto Velvet. F.dupla neutro c/12 un.;SV;16.90;19.99;nova;boa;N/D;0
-Amaciante Ypê concentrado 1l;SV;17.99;19.99;nova;boa;N/D;0
-Amaciante roupas baby soft 2l;SV;6.99;8.89;nova;boa;N/D;0
-Papel hig.personal neutro f.dupla vip 30ml. L16P15;SV;0;0;velha;feia;arrume o oferta, repinte e tente apagar os borrões;0
-Lava roupas surf líquido 1,8l;SV;16.90;20.69;nova;boa;N/D;0
-Papel higiênico familiar FD. 30MT-L16P15;SV;19.70;26.79;velha;boa;N/D;0
-Água sanitária 2L;oferta;4.99;0;nova;boa;N/D;0
-Fralda bunnis Premium Jumbo;SV;28.90;31.90;nova;boa;repintar só o Premium;0
-Lava roupas urca embalagem 2,2kg econômica concentrado em pó;SV;16.90;19.79;nova;boa;N/D;0
-Limpador multiuso azulim fragrâncias 500ml;SV;2.99;3.99;nova;boa;repintar fragrâncias;0
-Vassoura noviça original c/cabo unidade;cartão;11.90;14.90;nova;boa;repintar;0
-Papel higiênico cotton neutro folha D. 30m leve 12P11;SV;16.90;21.59;nova;boa;N/D;0
-Amaciante Barbarex roupas 2Lt;oferta;5.49;0;nova;boa;N/D;0
-Lava roupas tixan primavera 3l c/10% de desc.;SV;23.90;32.19;velha;mais ou menos;repintar, apesar que acho que nunca vai usar;0
-Lava roupas pó brilhante limpeza total 2,2kg;SV;21.89;30.90;velha;mais ou menos;repintar;0
-Arroz T.1 prato fino pacote 5 KG;SV;22.99;28.89;nova;boa;N/D;1
-Arroz T.1 namorado pacote 5KG;SV;19.99;27.89;nova;boa;N/D;1
-Arroz T.1 namorado pacote 5kg;SV;19.90;27.89;meio;boa;repintar;1
-Vinho oásis 5L TTO seco 5L;SV;79.90;109.00;nova;boa;nunca mais vai usar ela kkkk;0
-Alimento para cães adultos pedigree 900g;SV;19.90;21.49;meio;boa;N/D;0
-Arroz prato fino T.1 pacote 5KG;SV;23.89;28.90;velha;mais ou menos;o preço em vermelho tão feinhos;1
-Cerveja SKOL lata Pilsen 350ml 18 unidades;oferta;53.82;0;nova;boa;não;0
-Arroz prato fino T.1 pacote 5kg;SV;25.59;29.90;nova;boa;N/D;0
-Cerveja spaten M. Puro malte 350ml;SV;3.79;4.69;nova;boa;N/D;0
-Arroz T.1 namorado pacote 5kg;SV;20.89;28.90;nova;boa;N/D;0
-Cerveja Budweiser 350ml a unidade;oferta;2.99;0;nova;boa;N/D;0
-Arroz empório são João tipo 1 pacote 5kg;SV;25.98;32.90;velha;boa;N/D;1
-Arroz broto legal pacote 5 kg;SV;25.89;30.90;meio;mais ou menos;seila só não parece tão boa...;0
-Alimento para gatos adultos special cat pacote 3 kg;SV;43.90;59.90;meio;mais ou menos;N/D;0
-Óleo de soja cocamar pet 900ml;SV;5.99;7.19;velha;mais ou menos;tenta dá uma arrumada;1
-Cerveja Budweiser 350ml unidade Lata;oferta;3.99;0;velha;mais ou menos;N/D;0
-Açúcar cristal Colombo pacote 5kg;SV;15.90;20.49;Nem nova Nem velha;boa;N/D;1
-Batata uai congelada 2 KG;SV;19.99;24.49;nova;boa;N/D;1
-Arroz T.1 broto legal pacote 5kg;SV;23.89;27.90;nova;boa;N/D;1
-Cerveja amstel lata puro malte 350ml;SV;2.99;3.39;velha;boa;N/D;0
-Ancho maturatta embalado kg;oferta;44.90;0;velha;mais ou menos;faixa especial;0
-Cupim bov embalado KG;oferta;32.90;0;velha;mais ou menos;faixa especial;0
-Muçarela Monte Castelo KG peça ou pedaço;SV;33.90;44.90;velha;ruim;faixa especial;1
-Linguiça Pamplona Toscana KG;SV;15.90;18.90;velha;ruim;faixa especial;1
-Costela janela bovina kg;oferta;24.90;0;velha;mais ou menos;faixa especial;0
-Músculo reserva KG bovino;SV;32.90;0;velha;mais ou menos;faixa especial;0
-Canjica kisabor branca 500G;SV;6.89;7.29;meio;mais ou menos;só repintar e vai tá ok...;0
-Feijão cari. Puro & nobre pacote 1KG;SV;4.89;5.79;nova;boa;N/D;0
-Feijão cari. Du divino pacote 1KG;SV;4.69;5.99;nova;boa;N/D;1
-Ceral Mucilon sabores lata 400g;SV;17.69;19.79;velha;mais ou menos;preço normal feito tenta arrumar ou joga fora a faixa;0
-Arroz namorado tipo 1 PCT. 5KG;SV;22.89;28.90;meio;boa;N/D;1
-Arroz Camil pacote 5KG;SV;20.60;24.90;nova;boa;N/D;0
-Feijão carioca pacote 1KG;cartão;5.98;6.99;N/D;N/D;N/D;1
-Açúcar demerara caravelas pacote 1KG;cartão;3.99;5.49;meio;mais ou menos;repintar se não funcionar joga fora;0
-Óleo de soja vila velha pet 900ml;SV;5.98;7.15;meio;boa;N/D;1
-Arroz T.1 broto legal pacote 5KG;SV;22.89;24.89;nova;boa;N/D;1
-Batata congelada UAI KG;*;0;0;nova;**;N/D;0
-Arroz T.1 empório são João pacote 5kg;SV;24.99;29.90;nova;boa;N/D;1
-Batata bem Brasil congelada tradicional 1,5 kg;SV;19.90;22.90;nova;boa;N/D;0
-Feijão cari. Camil pacote 1kg;SV;5.89;6.45;nova;boa;N/D;1
-Macarrão Camil ovos 500g;SV;2.99;3.99;nova;boa;N/D;0
-Arroz T.1 Camil pacote 5kg;SV;20.60;24.90;nova;mais ou menos;repintar a parte do número;0
-Coxa com sobrecoxa resfriada kg;SV;6,98;8,98;nova;boa;N/D;sim
-Costela suína congelada;*;*;*;nova;boa;N/D;não
-Filé de tilápia Brazilian fish fresco 500g;oferta;19,90;*;nova;boa;N/D;não
-Lava roupas OMO em pó, lavagem perfeita 1,6kg grátis 320g;SV;21,90;23,19;nova;boa;N/D;não
-Filé de salmão bom peixe 350g c/o resf. Band;oferta;29,90;*;nova;boa;N/D;não
-Salsicha Perdigão hot dog KG;SV;10,90;12,90;nova;boa;N/D;não
-Feijão Du divino pacote 1kg;SV;4,89;5,99;nova;boa;N/D;sim
-Arroz T.1 grão de campo pacote 5kg;SV;17,90;24,89;nova;boa;N/D;sim
-Lava roupas líquido brilhante higiene total 1,8LT;SV;16,29;21,99;velha;mais ou menos;repintar e tá ótimo;não
-Ponta de peito bovina com isso kg;SV;25,90;29,90;nova;boa;N/D;não
-Laranja pera ou melancia KG;SV;2,98;3,98;nova;mais ou menos;se não for dar nada deixe mas laranja pera tá tudo junto;não
-Refrigerante Pepsi pet 2l;SV;7,99;8,49;nova;boa;N/D;não
-Batata ou cebola kg;SV;1,98;2,98;nova;boa;N/D;não
-Peito de frango a granel resfriado com pele e osso kg;SV;10,90;15,90;nova;mais ou menos;repintar;não
-Pão de hot dog cada 100G;SV;1,99;2,39;nova;mais ou menos;repintar;não
-Cerveja spaten Munich puro malte lata 350 ml;SV;4,19 (12: 50,28);4,59 (12: 55,08);nova;boa;até que ficou legal;não
-Panceta suina kg;SV;22,90;24,90;nova;boa;N/D;não
-Toalha de papel Scala plus 19X22,2CM com 2 unidades de 60 Folhas;SV;5,49;6,99;nova;boa;N/D;não
-Azeite Gallo dia a dia puro português 400 ml;cartão;23,99;35,99;nova;boa;repintar no preço normal;não
-Frango resfriado inteiro KG;cartão;5,98;7,98;nova;boa;N/D;não
-Óleo de soja liza pet 900ml;cartão;6,99;7,99;nova;boa;N/D;não
-Arroz T.1 empório são João pacote 5kg;SV;23,90;29,90;nova;boa;N/D;sim
-Cerveja puro malte preta lata 350ml;*;*;*;nova;boa;tá bom se acerta a oferta vai ficar top;não
-Asa de frango resfriada kg;SV;14,99;16,90;nova;boa;N/D;não
-Amaciante de roupas baby soft 2L;SV;7,99;9,49;nova;boa;N/D;não
-Batata;SV;1,98;2,98;nova;boa;N/D;não
-Batata bem Brasil tradicional 1,5KG congelada;*;19,90;*;nova;boa;N/D;não
-Arroz T.1 broto legal pacote 5KG;SV;24,89;27,90;nova;boa;N/D;sim
-Feijão ca. Broto legal pacote 1kg;*;7,79;*;nova;boa;N/D;sim
-Linguiça Perdigão Toscana na brasa KG;*;*;*;nova;boa;N/D;não
-Costela minga bovina pedaço KG;*;*;*;nova;boa;N/D;não
-Feijão carioca pantera pacote 1kg;SV;5,99;7,99;nova;boa;N/D;não
-Salsicha Perdigão congelada a granel hot dog KG;SV;9,98;11,90;nova;boa;N/D;não
-Sabonete Brasilidades francis 80g;SV;2,69;3,59;nova;mais ou menos;N/D;não
-
+3;Bisteca do contrafilé bovino reserva granel;SV;34.90;39.90;velha;mais ou menos;da pra usar;0
+4;Costela minga bovina KG;SV;24.90;28.90;nova;excelente;N/D;0
+5;Ancho maturatta embalada kg;*;;;nova;*;N/D;1
+6;Ancho maturatta embalado kg;*;;;nova;**;N/D;1
+7;Picanha maturatta bovina embalada vácuo KG;SV;69.90;79.90;boa;nova;um pouco rasgado onde tá OFERTA;1
+8;Bisteca suína resfriada KG;SV;14.90;17.90;velha;mas ou menos;ficou melhor agora;0
+9;Ancho maturatta embalado KG;SV;44.90;57.90;nova;mais ou menos;precisa repintar;1
+10;Pernil ou paleta c/osso couro suína kg;SV;14.90;17.90;nova;boa;NÃO TEM PREÇO;0
+11;Ponta de peito reserva bovino kg;SV;34.90;39.90;nova;meio;precisando dar uma repassada na tinta e apertada na madeira;0
+12;Cupim bovino embalado kg;oferta;36.90;;;meio;bom;N/D;0
+13;Picanha maturatta bovina embalada a vácuo kg;SV;79.90;89.90;nova;bom;só dá uma melhorada no preço normal se possível;0
+14;Filé de peito de frango congelado pacote kg;oferta;19.90;;;meio;bom;N/D;0
+15;Ancho maturatta embalado kg;oferta;49.90;;;velha;bom;N/D;0
+16;Fraldinha bovina embalada kg;oferta;32.90;;;nova;bom;N/D;0
+17;Filé de tilápia Brazilian fish fresco 500g;oferta;19.90;;;nova;excelente;---;0
+18;Bisteca suína resfriada kg;SV;15.90;18.90;meio;mais ou menos;repassa a tinta;0
+19;Ancho maturatta embalado kg;oferta;44.90;;;meio;mais ou menos;---;0
+20;Costela minga bovina pedaço kg;oferta;24.90;;;meio;bom;N/D;0
+21;Bisteca do contrafilé bovino reserva kg;oferta;36.90;;;velha;mais ou menos;foi apagada a tinta mas ainda aparece então ficou um visual estranho;0
+22;Contrafilé embalado bovino porcionado kg;SV;37.90;44.90;meio;bom;N/D;0
+23;Fraldinha Friboi bovina embalada kg;SV;35.90;37.90;nova;boa;N/D;1
+24;Cupim bovino embalado kg;SV;36.90;42.90;nova;boa;N/D;0
+25;Costela minga bovina kg;oferta;25.90;;;meio;boa;N/D;0
+26;Fraldinha bovina embalada Friboi kg;SV;36.90;39.90;meio;boa;dar uma pintada na parte do Friboi tem um buraquinho no O;1
+27;Ponta de peito, maturatta bovina embalada kg;oferta;39.90;;;novo;bom;N/D;0
+28;Bisteca contrafilé bovino reserva granel kg;SV;37.90;39.90;nova;boa;N/D;0
+29;Contrafilé bovino porcionado embalado kg;SV;38.90;44.90;velha;boa;---;1
+30;Fraldinha Friboi bovina embalado kg;oferta;37.90;;;meio;mais ou menos;no M do embalada está meio rasgadinho;0
+31;Contrafilé bovino porcionado embalado kg;SV;39.90;44.90;meio;bom;meio rasgadinho;1
+32;Costela janela kg;oferta;24.90;;;meio;mais ou menos;é só isso mesmo na faixa?;0
+33;Fraldinha embalada kg;**;;;velha;---;---;0
+34;Costela janela bovina a granel kg;SV;26.90;28.90;nova;boa;N/D;0
+35;Contrafilé bovino porcionado embalado kg;oferta;44.90;;;nova;excelente;N/D;0
+36;Frango resfriado inteiro kg;SV;6.99;7.99;meio;feio;foi apagado o SV aí ficou feio;1
+37;Costela minga bovina kg;SV;23.90;;;velha;boa;parte de trás soja de tinta;0
+38;Drumet sadia congelada pacote 1kg;SV;17.90;18.90;meio;mais ou menos;repintar;0
+39;Músculo reserva bovino kg;oferta;32.90;;;meio;boa;N/D;0
+40;Fraldinha bovina embalada kg;SV;37.90;39.90;nova;boa;furinhos no B do bovina;0
+41;Coxa com sobrecoxa resfriada kg;SV;6.98;8.98;nova;boa;Madeira quebrada;1
+42;Picanha bovina Friboi embalada kg;SV;59.90;79.90;velha;boa;N/D;0
+43;Contrafilé bovino porcionado embalado KG;oferta;39.90;;;velha;mais ou menos;repintar;0
+44;Acém bovino s/osso reserva KG;cartão;32.90;37.90;meio;boa;com furinhos tomar cuidado;0
+45;Músculo bovino reserva KG;SV;31.90;32.90;meio;boa;N/D;0
+46;Picanha maturatta bovina embalada vácuo kg;oferta;69.90;;;nova;boa;N/D;0
+47;Linguiça Pamplona Toscana KG;SV;16.90;18.90;nova;boa;N/D;1
+48;Salsicha sadia hot dog KG;oferta;12.90;;;nova;boa;N/D;0
+49;Salsicha Seara hot dog KG;SV;8.99;12.90;meio;boa;N/D;0
+50;Linguiça Seara Toscana KG;SV;17.90;21.90;meio;boa;N/D;0
+51;Contrafilé maturatta bovino embalado a vácuo kg;SV;59.90;64.90;velha;feia;repintar tudo se não funcionar jogar fora;0
+52;Muçarela Monte Castelo cada 100 g peça ou pedaço;SV;2.99;4.49;meio;mais ou menos;com buraquinho no 100 G;1
+53;Queijo prato Monte Castelo cada 100g;SV;4.79;5.49;---;---;N/D;0
+54;Muçarela Monte Castelo peça ou pedaço queijo KG;SV;34.90;39.90;nova;boa;N/D;1
+55;Paleta reserva bovina KG;SV;34.90;39.90;meio;boa;N/D;0
+56;Coxinha da asa resfriada a granel KG;SV;13.90;15.90;nova;boa;N/D;0
+57;Linguiça Seara de pernil KG;SV;19.90;21.90;meio;feio;limpar e repintar;0
+58;Muçarela Monte Castelo KG;SV;29.90;39.90;nova;boa;N/D;1
+59;Linguiça Toscana Pamplona KG;SV;17.90;18.90;nova;boa;N/D;0
+60;Picanha bovina Bordon fatiada embalada KG;oferta;49.90;---;nova;meio;rasgada na madeira cuidado;0
+61;Salsicha hot dog sadia kg;SV;10.90;12.90;nova;mais ou menos;furada embaixo do KG;0
+62;Picanha Bordon bovina fatiada KG;SV;42.90;57.90;nova;boa;N/D;0
+63;Filé de peito de frango congelada pacote KG;SV;15.90;22.90;meio;mais ou menos;N/D;0
+64;Salsicha hot dog Seara KG;SV;9.90;12.90;nova;excelente;N/D;0
+65;Frango inteiro resfriado KG;oferta;7.99;---;nova;boa;N/D;0
+66;Frango inteiro resfriado KG;SV;5.98;7.98;nova;boa;N/D;1
+67;Frango inteiro resfriado kg;---;6.99;9.89;nova;mais ou menos;tá rasgadinho mas dá pra usar pelo menos por algum tempo curto;0
+68;Frango inteiro resfriado kg;SV;7.68;9.89;nova;boa;N/D;0
+69;Frango inteiro resfriado KG;oferta;5.99;---;nova;boa;N/D;0
+70;Frango inteiro resfriado;SV;7.99;9.89;velha;boa;muito boa pra tá velha;0
+71;Ancho maturatta embalado KG;SV;42.90;45.90;nova;boa;tentei deixar boa;1
+72;Contrafilé maturatta bovino embalado a vácuo;SV;49.90;59.90;nova;boa;tiraram e amassaram a coitada;0
+73;Linguiça Pamplona Toscana KG;SV;15.90;18.90;nova;boa;N/D;1
+74;Linguiça aurora Toscana KG;SV;19.90;21.90;nova;boa;N/D;0
+75;Linguiça Toscana sadia kg;SV;19.90;22.90;nova;boa;N/D;0
+76;Fraldinha Friboi bov. Emb. kG;SV;32.90;34.90;nova;boa;N/D;1
+77;Tulipa de frango resfriada KG;SV;18.90;22.90;nova;boa;N/D;0
+78;Linguiça Perdigão Toscana na brasa KG;SV;17.90;24.90;nova;boa;de longe umas das faixas mais bonita que temos;1
+79;Linguiça Toscana Seara KG;---;---;---;nova;boa;N/D;0
+80;Linguiça sadia calabresa a granel kg;SV;22.90;25.90;nova;boa;N/D;0
+81;Costela janela bovina a granel kg;SV;24.90;28.90;nova;boa;N/D;0
+82;Costela suína congelada kg;SV;25.90;27.90;nova;boa;apagar a falha na tinta no 2;0
+83;Músculo bovino reserva a granel kg;SV;32.90;35.90;nova;boa;N/D;1
+84;Coxa com sobrecoxa resfriada a granel KG;SV;8.98;13.90;nova;boa;N/D;0
+85;Ancho maturatta embalado kg;SV;49.90;57.90;nova;boa;é nova mas já dá pra repintar;1
+86;Salsicha seara hot dog KG;SV;10.90;12.90;nova;boa;N/D;0
+87;Bisteca suína resfriada a granel kg;cartão;9.98;15.90;nova;boa;N/D;0
+88;Linguiça Pamplona calabresa kg;SV;19.90;22.90;nova;boa;N/D;0
+89;Fraldinha Friboi bovina embalada kg;SV;34.90;39.90;nova;boa;N/D;0
+90;Salsicha sadia hot dog KG;cartao;8.90;12.90;nova;boa;N/D;0
+91;Paleta bovina sem osso reserva kg;cartão;29.90;37.90;nova;mais ou menos;repintar apagar borrão;0
+92;Cenoura KG;SV;2.99;3.79;nova;boa;N/D;0
+93;Cebola kg;SV;2.98;3.98;meio;boa;N/D;0
+94;Banana nanica kg;SV;2.98;3.98;nova;mais ou menos;N/D;1
+95;Batata kg;SV;3.98;4.98;nova;boa;N/D;0
+96;Batata kg;SV;2.99;3.99;nova;mais ou menos;foi refeita mais ficou até legalsinha ... Tirando o 9 kk;0
+97;Abacaxi pérola unidade Kg;SV;8.99;9.89;meio;boa;tá velhinha mas só uma repintada e trocar a madeira porque tá quebrada;0
+98;Maçã gala kg;SV;9.98;10.98;nova;boa;N/D;0
+99;Laranja pera KG;SV;4.98;5.98;velha;mais ou menos;repintar;0
+100;Melancia KG;SV;1.98;2.98;nova;boa;N/D;0
+101;Abacaxi pérola unidade;SV;8.99;9.99;velha;mais ou menos;repintar tirar a umidade e tá bom;0
+102;Laranja pera KG;SV;4.98;5.98;velha;mais ou menos;repintar e tá nova de novo;0
+103;Melão amarelo KG;SV;4.99;5.98;nova;boa;N/D;0
+104;Tomate carmen KG;SV;5.98;6.98;velha;boa;repintar;0
+105;Melancia KG;SV;2.99;3.89;velha;boa;repetintar;0
+106;Tomate italiano KG;SV;3.98;4.99;velha;boa;N/D;1
+107;Maracujá;SV;7.98;8.48;nova;mais ou menos;foi apagado e repintado então ficou meio manchado mas só no preço normal;0
+108;Cenoura KG;SV;2.98;3.98;meia;mais ou menos;tive que apagar e repintar então ficou meio borrado só ficar apagando que melhora;0
+109;Melão amarelo KG;SV;3.98;4.98;nova;mais ou menos;repinta o 3 aí porque tá feio;0
+110;Manga Tommy kg;SV;6.98;7.98;nova;mais ou menos;a tinta tava seila ruim aí deu umas falhadas só repintar;0
+111;Banana nanica;SV;3.98;4.98;velha;boa;tá velhinha mas acredito que aguenta bastante ainda;1
+112;Banana nanica ou laranja pera KG;SV;2.98;3.98;nova;boa;N/D;1
+113;Cebola KG;SV;1.98;2.98;nova;boa;N/D;1
+114;Banana ou laranja pera KG;SV;2.98;3.98;nova;boa;preta kkkk atenção no limite por CPF prós dois;1
+115;Cenoura ou batata kg;SV;2.98;3.98;nova;boa;prestar atenção no limite por CPF prós 2;1
+116;Mamão papaya KG;SV;6.98;7.98;nova;boa;N/D;0
+117;Ovos brancos extra PVC com 20 unidades;SV;11.90;12.90;nova;boa;N/D;0
+118;Ovos brancos extra PVC com 20 unidades;SV;12.90;13.90;nova;boa;N/D;0
+119;Banana nanica, batata ou cebola kg;SV;1.98;2.98;nova;boa;repintar S do SV e o preço normal;0
+120;Mamão papaya kg;SV;6.98;7.98;nova;boa;N/D;0
+121;Laranja pera ou cebola kg;SV;1.98;2.98;nova;boa;N/D;1
+122;Tangerina murcote kg;SV;4.99;5.99;nova;boa;N/D;0
+123;Uva branca sem semente doce uva 500G;SV;6.98;7.98;nova;boa;mesmo nova é bom repintar;0
+124;Manga Palmer kg;SV;4.99;5.99;nova;boa;N/D;0
+125;Laranja pera Kg;SV;1.98;2.98;nova;boa;N/D;0
+126;Café pelé pacote 500g;cartão;25.90;29.90;nova;mais ou menos;já que foi feita com as últimas faixas ele saiu tudo agendado com as faixas, mas dá usar;0
+127;Café caboclo 500g;SV;27.90;29.90;nova;boa;N/D;1
+128;Leite italac 1L;SV;4.19;4.99;nova;boa;N/D;0
+129;Leite L.vida italac 1lt unidade;SV;3.98;4.99;nova;boa;N/D;1
+130;Café brasileiro pacote 500g;oferta;27.90;0;nova;boa;N/D;1
+131;Leite italac 1l;SV;4.49;4.99;meio;boa;tenta dar uma repintada;1
+132;Café meitta pacote 500g;SV;29.99;34.90;nova;boa;N/D;1
+133;Café união puch ou vácuo 500g;SV;29.89;33.90;nova;boa;N/D;1
+134;Leite italac 1L;SV;4.59;5.49;nova;boa;se quiser dar uma repintada mais não é muito necessário;1
+135;Leite L.vida Tirol Edge 1L;SV;3.89;4.99;velha;boa;tá muito bonita sempre tenta usar ela;1
+136;Leite longa vida quatá Edge 1L;SV;3.78;4.99;meio;mais ou menos;quando tiver tempo se possível tentar deixar o preço em vermelho mais cheios grossos;1
+137;Café união pouch ou vácuo 500g;SV;26.89;33.90;meio;boa;N/D;1
+138;Café Melita pacote 500g;SV;29.90;34.90;Nem nova nem velha;boa;com buraco em Melita;1
+139;Leite L.V quatá Edge 1L;SV;3.98;5.29;nova;mais ou menos;colocaram ela na grade sem motivo algum etão ele ficou bastante acabada mas dá pra usar;0
+140;Café 3 corações Premium 500g;SV;35.90;45.90;nova;boa;acho que nunca mais usa ela em...;0
+141;Café 3 corações tradicional ou extra forte pacote 500g;SV;29.90;35.90;nova;boa;N/D;1
+142;Café união 500G tradicional ou extra forte;SV;25.90;34.90;nova;boa;ficou legal;1
+143;Café brasileiro pacote 500g;oferta;24.90;0;nova;boa;N/S;1
+144;Leite L.V. shefa garrafa 1L;cartão;3.79;4.79;nova;boa;difícil usar;1
+145;Papel higiênico personal f.dupla noutro 30mt. L16 P15, vip;SV;23.90;26.99;velha;boa;muito específica apesar de ser boa;0
+146;Amaciante amacitel roupas 2LT.;SV;5.89;9.59;mais ou menos;boa;N/D;0
+147;Papel hig. Stylus folha d.neutro 2M. Com 12 unidades;SV;12.99;14.99;nova;boa;N/D;0
+148;Amaciante downy concentrado 1l+100ml;SV;17.90;24.29;mais ou menos;meio;N/D;0
+149;Lava-roupas omo líquido 3L;oferta;39.90;0;nova;boa;N/D;0
+150;Fralda Huggies tripla proteção descartável;SV;29.90;38.90;nova;boa;N/D;0
+151;Desinfetante Barbarex fragrâncias 2L;oferta;4.99;0;meio;mais ou menos;N/D;0
+1;Vassoura condor Madri c/cabo;SV;8.99;9.99;meio;boa;N/D;0
+2;Vassoura noviça original c/com cabo unidade;oferta;13.90;0;meio;boa;N/D;0
+152;Lava- roupas omo lavagem perfeita 2,2KG;SV;25.89;33.99;velha;boa;N/D;1
+153;Lava-roupas brilhante em pó limpeza total 1,6kg grátis 150g;SV;17.90;21.74;meio;boa;N/D;0
+154;Água sanitária Ypê 2LT;oferta;5.99;0;velha;boa;N/D;0
+155;Água sanitária bio-kriss 2L;SV;3.99;4.39;nova;boa;N/D;0
+156;Lava roupas omo em pé 2,2kg sanitiza e higieniza;SV;27.90;31.90;velha;boa;N/D;0
+157;Água sanitária bio kriss 2lt;SV;3.49;4.19;meio;boa;N/D;0
+158;Lava- roupas tixan em pó, leve 1,6 pague 1,52 kg;SV;15.90;17.90;nova;boa;N/D;0
+159;Papel-hig sublime neutro folha dupla 30M leve 12 pague 11;SV;15.99;18.39;nova;boa;N/D;0
+160;Papel higi neve neutro folha dupla 30M leve 12 pague 11;SV;18.90;23.59;nova;boa;N/D;0
+161;Álcool duratto uso geral 1LT.;SV;4.99;6.28;velha;boa;N/D;0
+162;Lava roupas OMO 720G em pó expert branco AB;SV;12.90;15.99;nova;boa;N/D;0
+163;Lava-roupas brilhante limpeza total 2,2kg em pó;SV;19.90;29.49;nova;boa;N/D;0
+164;Papel higi supra f.dupla neutro 30M com 12 unidades;SV;19.90;25.69;meio;boa;N/D;0
+165;Água sanitária Ypê 5LT;oferta;13.99;0;velha;mais ou menos;repintar vai ajudar bastante;0
+166;Limpador azulim muitiuso 500ml fragrâncias;SV;1.99;3.99;velha;boa;foi repintada e ficou linda;0
+167;Lava louças minuano 500ml;SV;2.19;2.49;velha;boa;N/D;0
+168;Inseticida Raid mult aerosol 420ml;SV;15.99;19.99;velha;mais ou menos;repintar;0
+169;Lava roupas OMO lavagem perfeita 2,2kg em pó;SV;28.90;33.99;nova;mais ou menos;arrumar o preço normal tá feio o 9;0
+170;Papel higi. Duetto Velvet. F.dupla neutro c/12 un.;SV;16.90;19.99;nova;boa;N/D;0
+171;Amaciante Ypê concentrado 1l;SV;17.99;19.99;nova;boa;N/D;0
+172;Amaciante roupas baby soft 2l;SV;6.99;8.89;nova;boa;N/D;0
+173;Papel hig.personal neutro f.dupla vip 30ml. L16P15;SV;0;0;velha;feia;arrume o oferta, repinte e tente apagar os borrões;0
+174;Lava roupas surf líquido 1,8l;SV;16.90;20.69;nova;boa;N/D;0
+175;Papel higiênico familiar FD. 30MT-L16P15;SV;19.70;26.79;velha;boa;N/D;0
+176;Água sanitária 2L;oferta;4.99;0;nova;boa;N/D;0
+177;Fralda bunnis Premium Jumbo;SV;28.90;31.90;nova;boa;repintar só o Premium;0
+178;Lava roupas urca embalagem 2,2kg econômica concentrado em pó;SV;16.90;19.79;nova;boa;N/D;0
+179;Limpador multiuso azulim fragrâncias 500ml;SV;2.99;3.99;nova;boa;repintar fragrâncias;0
+180;Vassoura noviça original c/com cabo unidade;cartão;11.90;14.90;nova;boa;repintar;0
+181;Papel higiênico cotton neutro folha D. 30m leve 12P11;SV;16.90;21.59;nova;boa;N/D;0
+182;Amaciante Barbarex roupas 2Lt;oferta;5.49;0;nova;boa;N/D;0
+183;Lava roupas tixan primavera 3l c/10% de desc.;SV;23.90;32.19;velha;mais ou menos;repintar, apesar que acho que nunca vai usar;0
+184;Lava roupas pó brilhante limpeza total 2,2kg;SV;21.89;30.90;velha;mais ou menos;repintar;0
+185;Arroz T.1 prato fino pacote 5 KG;SV;22.99;28.89;nova;boa;N/D;1
+186;Arroz T.1 namorado pacote 5KG;SV;19.99;27.89;nova;boa;N/D;1
+187;Arroz T.1 namorado pacote 5kg;SV;19.90;27.89;meio;boa;repintar;1
+188;Vinho oásis 5L TTO seco 5L;SV;79.90;109.00;nova;boa;nunca mais vai usar ela kkkk;0
+189;Alimento para cães adultos pedigree 900g;SV;19.90;21.49;meio;boa;N/D;0
+190;Arroz prato fino T.1 pacote 5KG;SV;23.89;28.90;velha;mais ou menos;o preço em vermelho tão feinhos;1
+191;Cerveja SKOL lata Pilsen 350ml 18 unidades;oferta;53.82;0;nova;boa;não;0
+192;Arroz prato fino T.1 pacote 5kg;SV;25.59;29.90;nova;boa;N/D;0
+193;Cerveja spaten M. Puro malte 350ml;SV;3.79;4.69;nova;boa;N/D;0
+194;Arroz T.1 namorado pacote 5kg;SV;20.89;28.90;nova;boa;N/D;0
+195;Cerveja Budweiser 350ml a unidade;oferta;2.99;0;nova;boa;N/D;0
+196;Arroz empório são João tipo 1 pacote 5kg;SV;25.98;32.90;velha;boa;N/D;1
+197;Arroz broto legal pacote 5 kg;SV;25.89;30.90;meio;mais ou menos;seila só não parece tão boa...;0
+198;Alimento para gatos adultos special cat pacote 3 kg;SV;43.90;59.90;meio;mais ou menos;N/D;0
+199;Óleo de soja cocamar pet 900ml;SV;5.99;7.19;velha;mais ou menos;tenta dá uma arrumada;1
+200;Cerveja Budweiser 350ml unidade Lata;oferta;3.99;0;velha;mais ou menos;N/D;0
+201;Açúcar cristal Colombo pacote 5kg;SV;15.90;20.49;Nem nova Nem velha;boa;N/D;1
+202;Batata uai congelada 2 KG;SV;19.99;24.49;nova;boa;N/D;1
+203;Arroz T.1 broto legal pacote 5kg;SV;23.89;27.90;nova;boa;N/D;1
+204;Cerveja amstel lata puro malte 350ml;SV;2.99;3.39;velha;boa;N/D;0
+205;Ancho maturatta embalado kg;oferta;44.90;0;velha;mais ou menos;faixa especial;0
+206;Cupim bov embalado KG;oferta;32.90;0;velha;mais ou menos;faixa especial;0
+207;Muçarela Monte Castelo KG peça ou pedaço;SV;33.90;44.90;velha;ruim;faixa especial;1
+208;Linguiça Pamplona Toscana KG;SV;15.90;18.90;velha;ruim;faixa especial;1
+209;Costela janela bovina kg;oferta;24.90;0;velha;mais ou menos;faixa especial;0
+210;Músculo reserva KG bovino;SV;32.90;0;velha;mais ou menos;faixa especial;0
+211;Canjica kisabor branca 500G;SV;6.89;7.29;meio;mais ou menos;só repintar e vai tá ok...;0
+212;Feijão cari. Puro & nobre pacote 1KG;SV;4.89;5.79;nova;boa;N/D;0
+213;Feijão cari. Du divino pacote 1KG;SV;4.69;5.99;nova;boa;N/D;1
+214;Ceral Mucilon sabores lata 400g;SV;17.69;19.79;velha;mais ou menos;preço normal feito tenta arrumar ou joga fora a faixa;0
+215;Arroz namorado tipo 1 PCT. 5KG;SV;22.89;28.90;meio;boa;N/D;1
+216;Arroz Camil pacote 5KG;SV;20.60;24.90;nova;boa;N/D;0
+217;Feijão carioca pacote 1KG;cartão;5.98;6.99;N/D;N/D;N/D;1
+218;Açúcar demerara caravelas pacote 1KG;cartão;3.99;5.49;meio;mais ou menos;repintar se não funcionar joga fora;0
+219;Óleo de soja vila velha pet 900ml;SV;5.98;7.15;meio;boa;N/D;1
+220;Arroz T.1 broto legal pacote 5KG;SV;22.89;24.89;nova;boa;N/D;1
+221;Batata congelada UAI KG;*;0;0;nova;**;N/D;0
+222;Arroz T.1 empório são João pacote 5kg;SV;24.99;29.90;nova;boa;N/D;1
+223;Batata bem Brasil congelada tradicional 1,5 kg;SV;19.90;22.90;nova;boa;N/D;0
+224;Feijão cari. Camil pacote 1kg;SV;5.89;6.45;nova;boa;N/D;1
+225;Macarrão Camil ovos 500g;SV;2.99;3.99;nova;boa;N/D;0
+226;Arroz T.1 Camil pacote 5kg;SV;20.60;24.90;nova;mais ou menos;repintar a parte do número;0
+227;Coxa com sobrecoxa resfriada kg;SV;6,98;8,98;nova;boa;N/D;sim
+228;Costela suína congelada;*;*;*;nova;boa;N/D;não
+229;Filé de tilápia Brazilian fish fresco 500g;oferta;19,90;*;nova;boa;N/D;não
+230;Lava roupas OMO em pó, lavagem perfeita 1,6kg grátis 320g;SV;21,90;23,19;nova;boa;N/D;não
+231;Filé de salmão bom peixe 350g c/o resf. Band;oferta;29,90;*;nova;boa;N/D;não
+232;Salsicha Perdigão hot dog KG;SV;10,90;12,90;nova;boa;N/D;não
+233;Feijão Du divino pacote 1kg;SV;4,89;5,99;nova;boa;N/D;sim
+234;Arroz T.1 grão de campo pacote 5kg;SV;17,90;24,89;nova;boa;N/D;sim
+235;Lava roupas líquido brilhante higiene total 1,8LT;SV;16,29;21,99;velha;mais ou menos;repintar e tá ótimo;não
+236;Ponta de peito bovina com isso kg;SV;25,90;29,90;nova;boa;N/D;não
+237;Laranja pera ou melancia KG;SV;2,98;3,98;nova;mais ou menos;se não for dar nada deixe mas laranja pera tá tudo junto;não
+238;Refrigerante Pepsi pet 2l;SV;7,99;8,49;nova;boa;N/D;não
+239;Batata ou cebola kg;SV;1,98;2,98;nova;boa;N/D;não
+240;Peito de frango a granel resfriado com pele e osso kg;SV;10,90;15,90;nova;mais ou menos;repintar;não
+241;Pão de hot dog cada 100G;SV;1,99;2,39;nova;mais ou menos;repintar;não
+242;Cerveja spaten Munich puro malte lata 350 ml;SV;4,19 (12:50,28);4,59 (12:55,08);nova;boa;até que ficou legal;não
+243;Panceta suina kg;SV;22,90;24,90;nova;boa;N/D;não
+244;Toalha de papel Scala plus 19X22,2CM com 2 unidades de 60 Folhas;SV;5,49;6,99;nova;boa;N/D;não
+245;Azeite Gallo dia a dia puro português 400 ml;cartão;23,99;35,99;nova;boa;repintar no preço normal;não
+246;Frango resfriado inteiro KG;cartão;5,98;7,98;nova;boa;N/D;não
+247;Óleo de soja liza pet 900ml;cartão;6,99;7,99;nova;boa;N/D;não
+248;Arroz T.1 empório são João pacote 5kg;SV;23,90;29,90;nova;boa;N/D;sim
+249;Cerveja puro malte preta lata 350ml;*;*;*;nova;boa;tá bom se acerta a oferta vai ficar top;não
+250;Asa de frango resfriada kg;SV;14,99;16,90;nova;boa;N/D;não
+251;Amaciante de roupas baby soft 2L;SV;7,99;9,49;nova;boa;N/D;não
+252;Batata;SV;1,98;2,98;nova;boa;N/D;não
+253;Batata bem Brasil tradicional 1,5KG congelada;*;19,90;*;nova;boa;N/D;não
+254;Arroz T.1 broto legal pacote 5KG;SV;24,89;27,90;nova;boa;N/D;sim
+255;Feijão ca. Broto legal pacote 1kg;*;7,79;*;nova;boa;N/D;sim
+256;Linguiça Perdigão Toscana na brasa KG;*;*;*;nova;boa;N/D;não
+257;Costela minga bovina pedaço KG;*;*;*;nova;boa;N/D;não
+258;Feijão carioca pantera pacote 1kg;SV;5,99;7,99;nova;boa;N/D;não
+259;Salsicha Perdigão congelada a granel hot dog KG;SV;9,98;11,90;nova;boa;N/D;não
+260;Sabonete Brasilidades francis 80g;SV;2,69;3,59;nova;mais ou menos;N/D;não
 
 

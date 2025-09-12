@@ -14,6 +14,11 @@ public class Faixa {
     private int diasRestantes;
     private int vezesUsada;
     private String dataCadastro;
+    private String dataInicioUso;
+    private String tempoFaixa;
+
+    private int id;
+    private int codigoFaixa;
 
     // Construtor
     public Faixa(String produto, String tipoOferta, double precoOferta, double precoNormal,
@@ -26,6 +31,7 @@ public class Faixa {
         this.condicao = condicao;
         this.comentario = comentario;
         this.limiteCpf = limiteCpf;
+
     }
 
     public Faixa() {
@@ -40,6 +46,11 @@ public class Faixa {
     public String getCondicao() { return condicao; }
     public String getComentario() { return comentario; }
     public int getLimiteCpf() { return limiteCpf; }
+    public String getDataInicioUso() { return dataInicioUso; }
+    public String getTempoFaixa() { return tempoFaixa; }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     // Setters (se precisar editar depois)
     public void setProduto(String produto) { this.produto = produto; }
@@ -50,24 +61,19 @@ public class Faixa {
     public void setCondicao(String condicao) { this.condicao = condicao; }
     public void setComentario(String comentario) { this.comentario = comentario; }
     public void setLimiteCpf(int limiteCpf) { this.limiteCpf = limiteCpf; }
-
     public int getUsando() { return usando; }
     public void setUsando(int usando) { this.usando = usando; }
-
     public int getDiasUso() { return diasUso; }
     public void setDiasUso(int diasUso) { this.diasUso = diasUso; }
-
     public int getDiasRestantes() { return diasRestantes; }
     public void setDiasRestantes(int diasRestantes) { this.diasRestantes = diasRestantes; }
-
-    public int getVezesUsada() {
-        return vezesUsada;
-    }
-
-    public void setVezesUsada(int vezesUsada) {
-        this.vezesUsada = vezesUsada;
-    }
-
+    public int getVezesUsada() {return vezesUsada;}
+    public void setVezesUsada(int vezesUsada) {this.vezesUsada = vezesUsada;}
     public String getDataCadastro() { return dataCadastro; }
     public void setDataCadastro(String dataCadastro) { this.dataCadastro = dataCadastro; }
+    public void setDataInicioUso(String dataInicioUso) { this.dataInicioUso = dataInicioUso; }
+    public void setTempoFaixa(String tempoFaixa) { this.tempoFaixa = tempoFaixa; }
+    public int getCodigoFaixa() { return codigoFaixa; }
+    public void setCodigoFaixa(int codigoFaixa) { this.codigoFaixa = codigoFaixa; }
+
 }

@@ -15,6 +15,13 @@ import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.io.File;
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
+import android.os.Environment;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
 
         dbHelper = new Bancodedados(this);
 
@@ -71,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowFileAccess(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
-
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
 
         webView.setWebViewClient(new WebViewClient() {
@@ -204,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("id", cursor.getInt(cursor.getColumnIndex("id")));
+                    obj.put("codigo_faixa", cursor.getString(cursor.getColumnIndex("codigo_faixa")));
                     obj.put("nome_produto", cursor.getString(cursor.getColumnIndex("produto")));
                     obj.put("tipo_oferta", cursor.getString(cursor.getColumnIndex("tipo_oferta")));
                     obj.put("preco_oferta", cursor.isNull(cursor.getColumnIndex("preco_oferta")) ? JSONObject.NULL : cursor.getDouble(cursor.getColumnIndex("preco_oferta")));
@@ -249,22 +263,62 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enviarFaixasPesquisaParaJS(String texto) {
-        Cursor cursor = dbHelper.pesquisarFaixas(texto);
-        JSONArray array = gerarJSONArray(cursor);
-        webView.evaluateJavascript("if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }", null);
-    }
+        // Pega a lista de faixas do banco
+        List<Faixa> lista = dbHelper.pesquisarFaixa(texto);
 
-    private void enviarFaixasVelhasParaJS() {
-        List<Faixa> faixas = dbHelper.getFaixasVelhas();
+        // Cria um JSONArray
         JSONArray array = new JSONArray();
-        for (Faixa f : faixas) {
+        for (Faixa f : lista) {
             try {
                 JSONObject obj = new JSONObject();
-                obj.put("produto", f.getProduto());
-                obj.put("estado", f.getEstado());
-                obj.put("data_criacao", f.getDataCadastro());
+                obj.put("id", f.getId());
+                obj.put("codigo_faixa", f.getCodigoFaixa());
+                obj.put("nome_produto", f.getProduto());
+                obj.put("tipo_oferta", f.getTipoOferta());
+                obj.put("preco_oferta", f.getPrecoOferta());
+                obj.put("preco_normal", f.getPrecoNormal());
+                obj.put("estado_faixa", f.getEstado());
+                obj.put("condicao_faixa", f.getCondicao());
+                obj.put("comentario", f.getComentario());
+                obj.put("limite_cpf", f.getLimiteCpf());
+                obj.put("usando", f.getUsando());
+                obj.put("dias_uso", f.getDiasUso());
+                obj.put("data_inicio_uso", f.getDataInicioUso());
+                obj.put("vezes_usada", f.getVezesUsada());
+                obj.put("tempo_faixa", f.getTempoFaixa());
                 array.put(obj);
-            } catch (JSONException e) { e.printStackTrace(); }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Envia para o WebView
+        webView.evaluateJavascript(
+                "if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }",
+                null
+        );
+
+    }
+
+
+
+    private void enviarFaixasVelhasParaJS() {
+        Cursor cursor = dbHelper.listarFaixas();
+        JSONArray array = new JSONArray();
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                JSONObject faixa = new JSONObject();
+                try {
+                    faixa.put("nome", cursor.getString(cursor.getColumnIndex("produto")));
+                    faixa.put("estado", cursor.getString(cursor.getColumnIndex("estado")));
+                    faixa.put("condicao", cursor.getString(cursor.getColumnIndex("condicao")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                array.put(faixa);
+            }
+            cursor.close();
         }
 
         // Apenas armazena os dados em JS, não abre modal
@@ -309,18 +363,12 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // 🔹 Define o estado final:
-                // Se não vier nada → é cadastro manual → começa como "Nova"
-                // Se já vier algo (ex: faixa.txt) → mantém
-                String estadoFinal;
-                if (estado == null || estado.trim().isEmpty()) {
-                    estadoFinal = "Nova";
-                } else {
-                    estadoFinal = normalizarEstado(estado);
-                }
+                // 🔹 Define o estado final
+                String estadoFinal = (estado == null || estado.trim().isEmpty()) ? "Nova" : normalizarEstado(estado);
 
-                // 🔹 Insere no banco (checa duplicata)
+                // 🔹 Insere no banco, passando 0 para código → gera automaticamente
                 int resultado = dbHelper.inserirFaixaComDuplicataOpcional(
+                        0, // 0 indica que o método vai gerar o próximo código disponível
                         produto, tipo_oferta, preco_oferta_str, preco_normal_str,
                         estadoFinal, condicao, comentario, limite_cpf, false
                 );
@@ -332,11 +380,11 @@ public class MainActivity extends AppCompatActivity {
                             .setMessage("Já existe uma faixa igual. Deseja cadastrar mesmo assim?")
                             .setPositiveButton("Sim", (dialog, which) -> {
                                 dbHelper.inserirFaixaComDuplicataOpcional(
-                                        produto, tipo_oferta, preco_oferta_str, preco_normal_str,
+                                        0, produto, tipo_oferta, preco_oferta_str, preco_normal_str,
                                         estadoFinal, condicao, comentario, limite_cpf, true
                                 );
                                 Toast.makeText(MainActivity.this, "Faixa duplicada cadastrada!", Toast.LENGTH_SHORT).show();
-                                enviarFaixasParaJS();
+                                enviarFaixasParaJS(); // envia todas as faixas para JS
                             })
                             .setNegativeButton("Não", (dialog, which) ->
                                     Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show())
@@ -350,6 +398,35 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        @JavascriptInterface
+        public void exportarFaixas() {
+            runOnUiThread(() -> {
+                try {
+                    // 🔹 Onde salvar o arquivo → Downloads
+                    File pasta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                    if (!pasta.exists()) pasta.mkdirs();
+
+                    File arquivo = new File(pasta, "faixa.txt");
+
+                    boolean ok = dbHelper.exportarFaixasParaTxt(arquivo);
+
+                    if (ok) {
+                        Toast.makeText(MainActivity.this,
+                                "Backup salvo em: " + arquivo.getAbsolutePath(),
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                "Erro ao gerar backup.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this,
+                            "Falha no backup: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         @JavascriptInterface
         public void excluirFaixa(int id) {
@@ -394,8 +471,37 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void pesquisarFaixa(String texto) {
-            runOnUiThread(() -> enviarFaixasPesquisaParaJS(texto));
+            List<Faixa> lista = dbHelper.pesquisarFaixa(texto);
+            JSONArray array = new JSONArray();
+
+            for (Faixa f : lista) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("codigo_faixa", f.getCodigoFaixa());
+                    obj.put("nome_produto", f.getProduto());
+                    obj.put("tipo_oferta", f.getTipoOferta());
+                    obj.put("preco_oferta", f.getPrecoOferta());
+                    obj.put("preco_normal", f.getPrecoNormal());
+                    obj.put("estado_faixa", f.getEstado());
+                    obj.put("condicao_faixa", f.getCondicao());
+                    obj.put("comentario", f.getComentario());
+                    obj.put("limite_cpf", f.getLimiteCpf());
+                    obj.put("usando", f.getUsando());
+                    obj.put("dias_uso", f.getDiasUso());
+                    obj.put("data_inicio_uso", f.getDataInicioUso());
+                    obj.put("vezes_usada", f.getVezesUsada());
+                    obj.put("tempo_faixa", f.getTempoFaixa());
+                    array.put(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            webView.post(() -> webView.evaluateJavascript(
+                    "if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }",
+                    null));
         }
+
 
         @JavascriptInterface
         public void filtrarFaixas(String filtroJson) {

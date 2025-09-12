@@ -281,7 +281,10 @@
             let btnUsar = criarBotaoUsar(faixa);
 
             div.innerHTML = `
-                <div class="faixa-header"><h3>${faixa.nome_produto}</h3></div>
+                 <div class="faixa-header">
+        <small class="text-muted">#${faixa.codigo_faixa}</small>
+        <h3>${faixa.nome_produto}</h3>
+    </div>
                 <div class="faixa-info tipo-oferta text-center mb-2"><strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}</div>
                 <div class="faixa-precos d-flex justify-content-center gap-4 mb-2">
                     <div><strong>Preço Oferta:</strong> ${typeof faixa.preco_oferta === 'number' ? faixa.preco_oferta.toFixed(2) : '-'}</div>
@@ -331,41 +334,48 @@
     // Editar faixa
     function abrirEditarFaixa(faixa) {
         faixaAtualParaEditar = faixa;
-        document.getElementById('editarId').value = faixa.id;
         document.getElementById('editarNome').value = faixa.nome_produto;
         document.getElementById('editarTipo').value = faixa.tipo_oferta;
         document.getElementById('editarPrecoOferta').value = faixa.preco_oferta || '';
         document.getElementById('editarPrecoNormal').value = faixa.preco_normal || '';
         document.getElementById('editarComentario').value = faixa.comentario || '';
         document.getElementById('editarLimiteCPF').checked = faixa.limite_cpf === 1;
+        document.getElementById('editarIdadeFaixa').value = faixa.estado_faixa || 'Nova';
+        document.getElementById('editarCondicao').value = faixa.condicao_faixa || 'Boa';
         atualizarPrecoNormal();
         editarBootstrapModal.show();
     }
 
     document.getElementById('salvarEditar').addEventListener('click', () => {
-        if (!faixaAtualParaEditar) return;
-        const dadosAtualizados = {
-            id: faixaAtualParaEditar.id,
-            nome_produto: document.getElementById('editarNome').value,
-            tipo_oferta: document.getElementById('editarTipo').value,
-            preco_oferta: parseFloat(document.getElementById('editarPrecoOferta').value || 0),
-            preco_normal: parseFloat(document.getElementById('editarPrecoNormal').value || 0),
-            comentario: document.getElementById('editarComentario').value,
-            limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
-        };
-        Android.editarFaixa(
-            dadosAtualizados.id,
-            dadosAtualizados.nome_produto,
-            dadosAtualizados.tipo_oferta,
-            dadosAtualizados.preco_oferta,
-            dadosAtualizados.preco_normal,
-            '', // idade_faixa, se houver
-            '', // condicao, se houver
-            dadosAtualizados.comentario,
-            dadosAtualizados.limite_cpf
-        );
-        editarBootstrapModal.hide();
-    });
+    if (!faixaAtualParaEditar) return;
+
+    const dadosAtualizados = {
+        id: faixaAtualParaEditar.id,
+        nome_produto: document.getElementById('editarNome').value,
+        tipo_oferta: document.getElementById('editarTipo').value,
+        preco_oferta: parseFloat(document.getElementById('editarPrecoOferta').value || 0),
+        preco_normal: parseFloat(document.getElementById('editarPrecoNormal').value || 0),
+        estado: document.getElementById('editarIdadeFaixa').value,
+        condicao: document.getElementById('editarCondicao').value,
+        comentario: document.getElementById('editarComentario').value,
+        limite_cpf: document.getElementById('editarLimiteCPF').checked ? 1 : 0
+    };
+
+    Android.editarFaixa(
+        dadosAtualizados.id,
+        dadosAtualizados.nome_produto,
+        dadosAtualizados.tipo_oferta,
+        dadosAtualizados.preco_oferta,
+        dadosAtualizados.preco_normal,
+        dadosAtualizados.estado,
+        dadosAtualizados.condicao,
+        dadosAtualizados.comentario,
+        dadosAtualizados.limite_cpf
+    );
+
+    editarBootstrapModal.hide();
+});
+
 
     // Mudar estilo das faixas
     function mudarEstiloFaixa(estilo) {
@@ -420,12 +430,21 @@
     });
 
     // Pesquisa
-    function pesquisar() {
-        const texto = document.getElementById('barraPesquisa').value;
-        if (window.Android && window.Android.pesquisarFaixa) {
-            window.Android.pesquisarFaixa(texto);
-        }
+   function pesquisar() {
+    const texto = document.getElementById('barraPesquisa').value;
+    console.log('Pesquisa enviada:', texto); // LOG da pesquisa
+    if (window.Android && window.Android.pesquisarFaixa) {
+        window.Android.pesquisarFaixa(texto);
+        console.log('Chamou Android.pesquisarFaixa'); // LOG do envio para Android
+    } else {
+        console.warn('Android.pesquisarFaixa não disponível'); // LOG caso Android não exista
     }
+}
+
+document.getElementById('botaoPesquisar').addEventListener('click', pesquisar);
+document.getElementById('barraPesquisa').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') pesquisar();
+});
     document.getElementById('botaoPesquisar').addEventListener('click', pesquisar);
     document.getElementById('barraPesquisa').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') pesquisar();

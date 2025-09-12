@@ -40,6 +40,10 @@
             <i class="bi bi-box-arrow-right" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
             Sair
         </button>
+        <button class="btn-custom" id="btnBackupFaixas">
+            <i class="bi bi-cloud-download" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
+            Backup de Faixas
+        </button>
     </div>
 
     <div class="cards-grid" style="margin-top: 2rem;">
@@ -177,6 +181,18 @@
         if (typeof Android !== "undefined") Android.navegarPara("CadastrarFaixa.html");
         else window.location.href = "CadastrarFaixa.html";
     });
+
+    // Backup de faixas
+    const btnBackup = document.getElementById("btnBackupFaixas");
+
+btnBackup.addEventListener("click", () => {
+    if (typeof Android !== "undefined" && Android.exportarFaixas) {
+        Android.exportarFaixas();
+        alert("Backup gerado com sucesso! Verifique seus arquivos.");
+    } else {
+        alert("Função de backup não disponível fora do app.");
+    }
+});
 
     // Atualiza barras
     function atualizarGraficos() {

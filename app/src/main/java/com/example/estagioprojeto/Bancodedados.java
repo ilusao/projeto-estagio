@@ -22,6 +22,9 @@ import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 
 
 public class Bancodedados extends SQLiteOpenHelper {
@@ -42,6 +45,7 @@ public class Bancodedados extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_FAIXAS + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "codigo_faixa INTEGER NOT NULL, " +
                 "produto TEXT NOT NULL, " +
                 "tipo_oferta TEXT NOT NULL, " +
                 "preco_oferta REAL, " +
@@ -95,14 +99,13 @@ public class Bancodedados extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public int inserirFaixaComDuplicataOpcional(String produto, String tipo_oferta, String preco_oferta_str,
+    public int inserirFaixaComDuplicataOpcional(int codigoFaixa, String produto, String tipo_oferta, String preco_oferta_str,
                                                 String preco_normal_str, String estado, String condicao,
                                                 String comentario, boolean limite_cpf, boolean permitirDuplicata) {
-
         try {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            // Converter preços para double, tratando valores nulos ou inválidos
+            // Converter preços para double
             Double precoOferta = null;
             Double precoNormal = null;
 
@@ -111,7 +114,7 @@ public class Bancodedados extends SQLiteOpenHelper {
                     precoOferta = Double.parseDouble(preco_oferta_str.replace(",", "."));
                 } catch (NumberFormatException e) {
                     Log.e("DEBUG_DB", "Preço oferta inválido: " + preco_oferta_str);
-                    return 0; // preço inválido
+                    return 0;
                 }
             }
 
@@ -120,16 +123,40 @@ public class Bancodedados extends SQLiteOpenHelper {
                     precoNormal = Double.parseDouble(preco_normal_str.replace(",", "."));
                 } catch (NumberFormatException e) {
                     Log.e("DEBUG_DB", "Preço normal inválido: " + preco_normal_str);
-                    return 0; // preço inválido
+                    return 0;
                 }
+            }
+
+            // 🔹 Gerar código de faixa automaticamente se for 0 ou inválido
+            if (codigoFaixa <= 0) {
+                // Busca os códigos existentes ordenados
+                Cursor cursor = db.rawQuery("SELECT codigo_faixa FROM " + TABLE_FAIXAS + " ORDER BY codigo_faixa ASC", null);
+                int novoCodigo = 1;
+                while (cursor.moveToNext()) {
+                    int existente = cursor.getInt(0);
+                    if (existente == novoCodigo) {
+                        novoCodigo++;
+                    } else if (existente > novoCodigo) {
+                        break; // encontrou o primeiro espaço vazio
+                    }
+                }
+                cursor.close();
+
+                // Limite de 3 dígitos
+                if (novoCodigo > 999) {
+                    Log.e("DEBUG_DB", "Limite de códigos de faixa atingido!");
+                    return 0;
+                }
+                codigoFaixa = novoCodigo;
             }
 
             // Checagem de duplicata
             if (!permitirDuplicata) {
                 Cursor cursor = db.rawQuery(
-                        "SELECT id FROM " + TABLE_FAIXAS + " WHERE produto=? AND tipo_oferta=? AND preco_oferta=? AND preco_normal=? " +
-                                "AND estado=? AND condicao=? AND limite_cpf=?",
+                        "SELECT id FROM " + TABLE_FAIXAS + " WHERE codigo_faixa=? OR (produto=? AND tipo_oferta=? AND preco_oferta=? AND preco_normal=? " +
+                                "AND estado=? AND condicao=? AND limite_cpf=?)",
                         new String[]{
+                                String.valueOf(codigoFaixa),
                                 produto,
                                 tipo_oferta,
                                 precoOferta == null ? "0" : precoOferta.toString(),
@@ -141,12 +168,13 @@ public class Bancodedados extends SQLiteOpenHelper {
                 boolean existe = cursor.moveToFirst();
                 cursor.close();
                 if (existe) {
-                    return -2; // duplicata encontrada
+                    return -2;
                 }
             }
 
             // Inserção no banco
             ContentValues values = new ContentValues();
+            values.put("codigo_faixa", codigoFaixa);
             values.put("produto", produto);
             values.put("tipo_oferta", tipo_oferta);
             values.put("preco_oferta", precoOferta);
@@ -157,15 +185,18 @@ public class Bancodedados extends SQLiteOpenHelper {
             values.put("limite_cpf", limite_cpf ? 1 : 0);
 
             long id = db.insert(TABLE_FAIXAS, null, values);
-            Log.d("DEBUG_DB", "Insert result: " + id);
+            Log.d("DEBUG_DB", "Insert result: " + id + " | codigo_faixa=" + codigoFaixa);
 
-            return id != -1 ? 1 : 0; // sucesso ou erro
+            if(id == -1) return 0;
+            return codigoFaixa;
 
         } catch (Exception e) {
             Log.e("DEBUG_DB", "Erro ao inserir faixa", e);
             return 0;
         }
     }
+
+
 
 
 
@@ -259,20 +290,37 @@ public class Bancodedados extends SQLiteOpenHelper {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] partes = linha.split(";");
-                if (partes.length >= 7) {
+                if (partes.length >= 8) {
                     ContentValues values = new ContentValues();
-                    values.put("produto", partes[0]);
-                    values.put("tipo_oferta", partes[1]);
-                    values.put("preco_oferta", partes[2]);
-                    values.put("preco_normal", partes[3]);
-                    values.put("estado", partes[4]);
-                    values.put("condicao", partes[5]);
-                    values.put("comentario", partes[6]);
+
+                    // Código de faixa numérico ou 0
+                    int codigoFaixa = 0;
+                    try {
+                        codigoFaixa = Integer.parseInt(partes[0].trim());
+                    } catch (NumberFormatException e) {
+                        codigoFaixa = 0; // será gerado automaticamente se necessário
+                    }
+                    values.put("codigo_faixa", codigoFaixa);
+
+                    values.put("produto", partes[1]);
+                    values.put("tipo_oferta", partes[2]);
+
+                    // Preços
+                    try {
+                        values.put("preco_oferta", Double.parseDouble(partes[3].replace(",", ".")));
+                    } catch (Exception e) { values.putNull("preco_oferta"); }
+                    try {
+                        values.put("preco_normal", Double.parseDouble(partes[4].replace(",", ".")));
+                    } catch (Exception e) { values.putNull("preco_normal"); }
+
+                    values.put("estado", partes[5]);
+                    values.put("condicao", partes[6]);
+                    values.put("comentario", partes[7]);
 
                     // Tratamento correto do limite_cpf
                     int limiteCpf = 0; // padrão = 0
-                    if (partes.length > 7) {
-                        String limiteStr = partes[7].trim();
+                    if (partes.length > 8) {
+                        String limiteStr = partes[8].trim(); // antes era partes[7], agora é 8
                         if (limiteStr.equalsIgnoreCase("Sim") || limiteStr.equals("1")) {
                             limiteCpf = 1;
                         }
@@ -288,6 +336,9 @@ public class Bancodedados extends SQLiteOpenHelper {
         }
     }
 
+
+
+
     public void popularBancoDeFaixas() {
         SQLiteDatabase db = this.getWritableDatabase();
         popularBancoDeFaixasInterno(db);
@@ -302,13 +353,52 @@ public class Bancodedados extends SQLiteOpenHelper {
 
 
     // Busca faixas por nome do produto (ou parte dele)
-    public Cursor pesquisarFaixas(String texto) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery(
-                "SELECT * FROM " + TABLE_FAIXAS + " WHERE produto LIKE ?",
-                new String[]{"%" + texto + "%"}
-        );
+    public List<Faixa> pesquisarFaixa(String texto) {
+        List<Faixa> resultado = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        String[] palavras = texto.trim().toLowerCase().split("\\s+");
+
+        StringBuilder where = new StringBuilder();
+        List<String> args = new ArrayList<>();
+
+        for (String palavra : palavras) {
+            if (where.length() > 0) where.append(" AND ");
+            where.append("LOWER(produto) LIKE ?");
+            args.add("%" + palavra + "%");
+        }
+
+        Cursor cursor = db.query(TABLE_FAIXAS,
+                null,
+                where.toString(),
+                args.toArray(new String[0]),
+                null, null, null);
+
+        while (cursor.moveToNext()) {
+            Faixa f = new Faixa();
+            f.setProduto(cursor.getString(cursor.getColumnIndexOrThrow("produto")));
+            f.setTipoOferta(cursor.getString(cursor.getColumnIndexOrThrow("tipo_oferta")));
+            f.setPrecoOferta(cursor.getDouble(cursor.getColumnIndexOrThrow("preco_oferta")));
+            f.setPrecoNormal(cursor.getDouble(cursor.getColumnIndexOrThrow("preco_normal")));
+            f.setEstado(cursor.getString(cursor.getColumnIndexOrThrow("estado")));
+            f.setCondicao(cursor.getString(cursor.getColumnIndexOrThrow("condicao")));
+            f.setComentario(cursor.getString(cursor.getColumnIndexOrThrow("comentario")));
+            f.setLimiteCpf(cursor.getInt(cursor.getColumnIndexOrThrow("limite_cpf")));
+            f.setUsando(cursor.getInt(cursor.getColumnIndexOrThrow("usando")));
+            f.setDiasUso(cursor.getInt(cursor.getColumnIndexOrThrow("dias_uso")));
+            f.setDiasRestantes(0); // opcional, calcular depois
+            f.setVezesUsada(cursor.getInt(cursor.getColumnIndexOrThrow("vezes_usada")));
+            f.setDataCadastro(cursor.getString(cursor.getColumnIndexOrThrow("data_criacao")));
+            f.setDataInicioUso(cursor.getString(cursor.getColumnIndexOrThrow("data_inicio_uso")));
+            f.setTempoFaixa(null); // opcional
+
+            resultado.add(f);
+        }
+
+        cursor.close();
+        return resultado;
     }
+
     public Cursor filtrarFaixas(String tipoOferta, String estado, String condicao, String limiteCpf, String emUso) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_FAIXAS + " WHERE 1=1";
@@ -366,6 +456,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                int codigoFaixa = cursor.getInt(cursor.getColumnIndexOrThrow("codigo_faixa"));
                 String produto = cursor.getString(cursor.getColumnIndexOrThrow("produto"));
                 String tipoOferta = cursor.getString(cursor.getColumnIndexOrThrow("tipo_oferta"));
                 double precoOferta = cursor.getDouble(cursor.getColumnIndexOrThrow("preco_oferta"));
@@ -396,6 +487,8 @@ public class Bancodedados extends SQLiteOpenHelper {
 
                 Faixa f = new Faixa(produto, tipoOferta, precoOferta, precoNormal,
                         estado, condicao, comentario, limiteCpf);
+                f.setId(id);
+                f.setCodigoFaixa(codigoFaixa);
                 f.setUsando(usando);
                 f.setDiasUso(diasUso);
                 f.setDiasRestantes(diasRestantes);
@@ -405,6 +498,43 @@ public class Bancodedados extends SQLiteOpenHelper {
         }
         cursor.close();
         return faixas;
+    }
+
+    public boolean exportarFaixasParaTxt(File destino) {
+        try {
+            FileWriter writer = new FileWriter(destino, false); // sobrescreve
+            BufferedWriter bw = new BufferedWriter(writer);
+
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT produto, tipo_oferta, preco_oferta, preco_normal, estado, condicao, comentario, limite_cpf FROM " + TABLE_FAIXAS, null);
+
+            while (cursor.moveToNext()) {
+                String produto = cursor.getString(0);
+                String tipoOferta = cursor.getString(1);
+                String precoOferta = cursor.getString(2);
+                String precoNormal = cursor.getString(3);
+                String estado = cursor.getString(4);
+                String condicao = cursor.getString(5);
+                String comentario = cursor.getString(6);
+                int limiteCpf = cursor.getInt(7);
+
+                String linha = produto + ";" + tipoOferta + ";" + precoOferta + ";" +
+                        precoNormal + ";" + estado + ";" + condicao + ";" +
+                        comentario + ";" + (limiteCpf == 1 ? "Sim" : "Não");
+
+                bw.write(linha);
+                bw.newLine();
+            }
+
+            cursor.close();
+            bw.close();
+            writer.close();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
