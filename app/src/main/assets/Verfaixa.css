@@ -121,3 +121,18 @@ body {
     background-color: #cce5ff; /* azul clarinho */
     border-left: 5px solid #007bff;
 }
+
+.faixa-id {
+       font-weight: bold;
+          font-size: 1.2rem;
+          background: linear-gradient(45deg, #FFD700, #8B4513, #000000, #FFD700);
+          background-size: 400% 400%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: brilho-lendario 6s ease infinite;
+      }
+
+      @keyframes brilho-lendario {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }

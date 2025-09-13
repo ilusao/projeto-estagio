@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.webkit.JavascriptInterface;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
+
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.io.File;
@@ -37,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private Bancodedados dbHelper;
     private long backPressedTime;
+
+    public static String removerAcentos(String str) {
+        return Normalizer.normalize(str, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -333,12 +340,19 @@ public class MainActivity extends AppCompatActivity {
         public void cadastrarFaixa(String produto, String tipo_oferta, String preco_oferta_str,
                                    String preco_normal_str, String estado, String condicao,
                                    String comentario, boolean limite_cpf) {
+
+            Log.d("CadastrarFaixa", "Início do cadastro: produto=" + produto + ", tipo_oferta=" + tipo_oferta +
+                    ", preco_oferta=" + preco_oferta_str + ", preco_normal=" + preco_normal_str +
+                    ", estado=" + estado + ", condicao=" + condicao + ", comentario=" + comentario +
+                    ", limite_cpf=" + limite_cpf);
+
             runOnUiThread(() -> {
                 // 🔹 Valida preços obrigatórios
                 if ((preco_oferta_str == null || preco_oferta_str.trim().isEmpty()) &&
                         (tipo_oferta.equalsIgnoreCase("sv") ||
                                 tipo_oferta.equalsIgnoreCase("Cartão") ||
                                 tipo_oferta.equalsIgnoreCase("oferta"))) {
+                    Log.d("CadastrarFaixa", "Falha: preço de oferta obrigatório");
                     Toast.makeText(MainActivity.this, "Preço de oferta obrigatório!", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -346,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
                 if ((preco_normal_str == null || preco_normal_str.trim().isEmpty()) &&
                         (tipo_oferta.equalsIgnoreCase("sv") ||
                                 tipo_oferta.equalsIgnoreCase("Cartão"))) {
+                    Log.d("CadastrarFaixa", "Falha: preço normal obrigatório");
                     Toast.makeText(MainActivity.this, "Preço normal obrigatório!", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -359,44 +374,54 @@ public class MainActivity extends AppCompatActivity {
                         Double.parseDouble(preco_normal_str.replace(",", "."));
                     }
                 } catch (NumberFormatException e) {
+                    Log.d("CadastrarFaixa", "Falha: preços inválidos - " + e.getMessage());
                     Toast.makeText(MainActivity.this, "Preços devem ser números válidos!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 // 🔹 Define o estado final
                 String estadoFinal = (estado == null || estado.trim().isEmpty()) ? "Nova" : normalizarEstado(estado);
+                Log.d("CadastrarFaixa", "Estado final definido: " + estadoFinal);
 
                 // 🔹 Insere no banco, passando 0 para código → gera automaticamente
                 int resultado = dbHelper.inserirFaixaComDuplicataOpcional(
-                        0, // 0 indica que o método vai gerar o próximo código disponível
+                        0,
                         produto, tipo_oferta, preco_oferta_str, preco_normal_str,
                         estadoFinal, condicao, comentario, limite_cpf, false
                 );
 
+                Log.d("CadastrarFaixa", "Resultado do banco: " + resultado);
+
                 if (resultado == -2) {
-                    // Já existe → pergunta se quer cadastrar mesmo assim
+                    Log.d("CadastrarFaixa", "Faixa duplicada detectada");
                     new AlertDialog.Builder(MainActivity.this)
                             .setTitle("Faixa duplicada")
                             .setMessage("Já existe uma faixa igual. Deseja cadastrar mesmo assim?")
                             .setPositiveButton("Sim", (dialog, which) -> {
+                                Log.d("CadastrarFaixa", "Usuário optou por cadastrar duplicada");
                                 dbHelper.inserirFaixaComDuplicataOpcional(
                                         0, produto, tipo_oferta, preco_oferta_str, preco_normal_str,
                                         estadoFinal, condicao, comentario, limite_cpf, true
                                 );
                                 Toast.makeText(MainActivity.this, "Faixa duplicada cadastrada!", Toast.LENGTH_SHORT).show();
-                                enviarFaixasParaJS(); // envia todas as faixas para JS
+                                enviarFaixasParaJS();
                             })
-                            .setNegativeButton("Não", (dialog, which) ->
-                                    Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show())
+                            .setNegativeButton("Não", (dialog, which) -> {
+                                Log.d("CadastrarFaixa", "Usuário cancelou cadastro duplicado");
+                                Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show();
+                            })
                             .show();
                 } else if (resultado == 1) {
+                    Log.d("CadastrarFaixa", "Faixa cadastrada com sucesso");
                     Toast.makeText(MainActivity.this, "Faixa cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
                     enviarFaixasParaJS();
                 } else {
+                    Log.d("CadastrarFaixa", "Erro desconhecido ao cadastrar faixa");
                     Toast.makeText(MainActivity.this, "Erro ao cadastrar faixa.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
+
 
         @JavascriptInterface
         public void exportarFaixas() {
@@ -503,23 +528,77 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+
         @JavascriptInterface
         public void filtrarFaixas(String filtroJson) {
             runOnUiThread(() -> {
                 try {
                     JSONObject filtro = new JSONObject(filtroJson);
-                    Cursor cursor = dbHelper.filtrarFaixas(
-                            filtro.optString("tipo", ""),
-                            filtro.optString("estado", ""),
-                            filtro.optString("condicao", ""),
-                            filtro.optString("limite_cpf", ""),
-                            filtro.optString("em_uso", "")
+
+                    // 1️⃣ Carregar todas as faixas do banco (sem filtro SQL)
+                    Cursor cursor = dbHelper.listarFaixas();
+                    JSONArray todasFaixas = gerarJSONArray(cursor);
+
+                    // 2️⃣ Pegar valores do filtro e normalizar
+                    String tipoFiltro = removerAcentos(filtro.optString("tipo", "")).toUpperCase().trim();
+                    String estadoFiltro = removerAcentos(filtro.optString("estado", "")).toUpperCase().trim();
+                    String condicaoFiltro = removerAcentos(filtro.optString("condicao", "")).toUpperCase().trim();
+                    String limiteCpfFiltro = filtro.optString("limite_cpf", "").trim();
+                    String emUsoFiltro = filtro.optString("em_uso", "").trim();
+
+                    // 3️⃣ Filtrar manualmente
+                    JSONArray filtradas = new JSONArray();
+                    for (int i = 0; i < todasFaixas.length(); i++) {
+                        JSONObject faixa = todasFaixas.getJSONObject(i);
+
+                        boolean passa = true;
+
+                        // Tipo de oferta
+                        if (!tipoFiltro.isEmpty()) {
+                            String tipoBanco = removerAcentos(faixa.getString("tipo_oferta")).toUpperCase().trim();
+                            if (!tipoBanco.equals(tipoFiltro)) passa = false;
+                        }
+
+                        // Estado
+                        if (!estadoFiltro.isEmpty()) {
+                            String estadoBanco = removerAcentos(faixa.getString("estado_faixa")).toUpperCase().trim();
+                            if (!estadoBanco.equals(estadoFiltro)) passa = false;
+                        }
+
+                        // Condição
+                        if (!condicaoFiltro.isEmpty()) {
+                            String condicaoBanco = removerAcentos(faixa.getString("condicao_faixa")).toUpperCase().trim();
+                            if (!condicaoBanco.equals(condicaoFiltro)) passa = false;
+                        }
+
+                        // Limite CPF
+                        if (!limiteCpfFiltro.isEmpty()) {
+                            String limiteBanco = String.valueOf(faixa.getInt("limite_cpf"));
+                            if (!limiteBanco.equals(limiteCpfFiltro)) passa = false;
+                        }
+
+                        // Em uso
+                        if (!emUsoFiltro.isEmpty()) {
+                            String usandoBanco = String.valueOf(faixa.getInt("usando"));
+                            if (!usandoBanco.equals(emUsoFiltro)) passa = false;
+                        }
+
+                        if (passa) filtradas.put(faixa);
+                    }
+
+                    // 4️⃣ Enviar para o WebView
+                    webView.evaluateJavascript(
+                            "if (typeof carregarFaixas === 'function') { carregarFaixas(" + filtradas.toString() + "); }",
+                            null
                     );
-                    JSONArray array = gerarJSONArray(cursor);
-                    webView.evaluateJavascript("if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }", null);
-                } catch (Exception e) { e.printStackTrace(); }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
         }
+
 
         @JavascriptInterface
         public void navegarPara(String pagina) {

@@ -376,6 +376,7 @@ public class Bancodedados extends SQLiteOpenHelper {
 
         while (cursor.moveToNext()) {
             Faixa f = new Faixa();
+            f.setCodigoFaixa(cursor.getInt(cursor.getColumnIndexOrThrow("codigo_faixa")));
             f.setProduto(cursor.getString(cursor.getColumnIndexOrThrow("produto")));
             f.setTipoOferta(cursor.getString(cursor.getColumnIndexOrThrow("tipo_oferta")));
             f.setPrecoOferta(cursor.getDouble(cursor.getColumnIndexOrThrow("preco_oferta")));
@@ -416,12 +417,16 @@ public class Bancodedados extends SQLiteOpenHelper {
             query += " AND UPPER(TRIM(tipo_oferta)) = ?";
             args.add(tipoOferta);
         }
+
         if (estado != null && !estado.isEmpty()) {
-            query += " AND UPPER(TRIM(estado)) = UPPER(TRIM(?))";
+            estado = removerAcentos(estado).toUpperCase();
+            query += " AND UPPER(TRIM(estado)) = ?";
             args.add(estado);
         }
+
         if (condicao != null && !condicao.isEmpty()) {
-            query += " AND UPPER(TRIM(condicao)) = UPPER(TRIM(?))";
+            condicao = removerAcentos(condicao).toUpperCase();
+            query += " AND UPPER(TRIM(condicao)) = ?";
             args.add(condicao);
         }
         if (limiteCpf != null && !limiteCpf.isEmpty()) {

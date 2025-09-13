@@ -97,8 +97,8 @@
                             <label for="editarIdadeFaixa" class="form-label">Idade da Faixa</label>
                             <select class="form-select" id="editarIdadeFaixa">
                                 <option value="Nova">Nova</option>
-                                <option value="Usada">Usada</option>
-                                <option value="Antiga">Antiga</option>
+                                <option value="Nem Nova Nem Velha">Nem Nova Nem Velha</option>
+                                <option value="Velha">Velha</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -282,7 +282,7 @@
 
             div.innerHTML = `
                  <div class="faixa-header">
-        <small class="text-muted">#${faixa.codigo_faixa}</small>
+        <small class="faixa-id">ID: ${faixa.codigo_faixa}</small>
         <h3>${faixa.nome_produto}</h3>
     </div>
                 <div class="faixa-info tipo-oferta text-center mb-2"><strong>Tipo de Oferta:</strong> ${faixa.tipo_oferta}</div>
@@ -331,22 +331,81 @@
         }
     }
 
-    // Editar faixa
-    function abrirEditarFaixa(faixa) {
-        faixaAtualParaEditar = faixa;
-        document.getElementById('editarNome').value = faixa.nome_produto;
-        document.getElementById('editarTipo').value = faixa.tipo_oferta;
-        document.getElementById('editarPrecoOferta').value = faixa.preco_oferta || '';
-        document.getElementById('editarPrecoNormal').value = faixa.preco_normal || '';
-        document.getElementById('editarComentario').value = faixa.comentario || '';
-        document.getElementById('editarLimiteCPF').checked = faixa.limite_cpf === 1;
-        document.getElementById('editarIdadeFaixa').value = faixa.estado_faixa || 'Nova';
-        document.getElementById('editarCondicao').value = faixa.condicao_faixa || 'Boa';
-        atualizarPrecoNormal();
-        editarBootstrapModal.show();
-    }
 
-    document.getElementById('salvarEditar').addEventListener('click', () => {
+
+    // Editar faixa
+function abrirEditarFaixa(faixa) {
+    console.log('--- Abrindo modal de edição ---');
+    console.log('Objeto recebido:', faixa);
+
+    faixaAtualParaEditar = faixa;
+
+    // Campos básicos
+    document.getElementById('editarNome').value = faixa.nome_produto || '';
+    console.log('Nome do produto:', faixa.nome_produto);
+
+    document.getElementById('editarPrecoOferta').value = faixa.preco_oferta || '';
+    console.log('Preço oferta:', faixa.preco_oferta);
+
+    document.getElementById('editarPrecoNormal').value = faixa.preco_normal || '';
+    console.log('Preço normal:', faixa.preco_normal);
+
+    document.getElementById('editarComentario').value = faixa.comentario || '';
+    console.log('Comentário:', faixa.comentario);
+
+    document.getElementById('editarLimiteCPF').checked = faixa.limite_cpf === 1;
+    console.log('Limite CPF:', faixa.limite_cpf);
+
+    // --- Normalizar Tipo de Oferta ---
+    let tipo = (faixa.tipo_oferta || '').trim().toLowerCase();
+    console.log('Tipo original:', faixa.tipo_oferta, '-> normalizado para minúsculo e trim:', tipo);
+
+    switch (tipo) {
+        case 'sv': tipo = 'SV'; break;
+        case 'oferta': tipo = 'Oferta'; break;
+        case 'cartao':
+        case 'cartão': tipo = 'Cartão'; break;
+        default: tipo = 'SV';
+    }
+    console.log('Tipo final atribuído ao select:', tipo);
+    document.getElementById('editarTipo').value = tipo;
+
+    // --- Normalizar Idade da Faixa ---
+    let estado = (faixa.estado_faixa || '').trim().toLowerCase();
+    console.log('Estado original:', faixa.estado, '-> normalizado:', estado);
+
+    switch (estado) {
+        case 'nova': estado = 'Nova'; break;
+        case 'velha': estado = 'Velha'; break;
+        case 'nem nova nem velha': estado = 'Nem Nova Nem Velha'; break;
+        default: estado = 'Nova';
+    }
+    console.log('Estado final atribuído ao select:', estado);
+    document.getElementById('editarIdadeFaixa').value = estado;
+
+    // --- Normalizar Condição da Faixa ---
+    let condicao = (faixa.condicao_faixa || '').trim().toLowerCase();
+    console.log('Condição original:', faixa.condicao, '-> normalizado:', condicao);
+
+    switch (condicao) {
+        case 'boa': condicao = 'Boa'; break;
+        case 'mais ou menos':
+        case 'mais ou meno': condicao = 'Mais ou Menos'; break;
+        case 'ruim': condicao = 'Ruim'; break;
+        default: condicao = 'Boa';
+    }
+    console.log('Condição final atribuído ao select:', condicao);
+    document.getElementById('editarCondicao').value = condicao;
+
+    // Atualiza preços e mostra modal
+    atualizarPrecoNormal();
+    editarBootstrapModal.show();
+    console.log('Modal aberto.');
+}
+
+
+// Salvar alterações
+document.getElementById('salvarEditar').addEventListener('click', () => {
     if (!faixaAtualParaEditar) return;
 
     const dadosAtualizados = {
@@ -375,6 +434,7 @@
 
     editarBootstrapModal.hide();
 });
+
 
 
     // Mudar estilo das faixas
