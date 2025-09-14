@@ -129,7 +129,6 @@ public class Bancodedados extends SQLiteOpenHelper {
 
             // 🔹 Gerar código de faixa automaticamente se for 0 ou inválido
             if (codigoFaixa <= 0) {
-                // Busca os códigos existentes ordenados
                 Cursor cursor = db.rawQuery("SELECT codigo_faixa FROM " + TABLE_FAIXAS + " ORDER BY codigo_faixa ASC", null);
                 int novoCodigo = 1;
                 while (cursor.moveToNext()) {
@@ -142,7 +141,6 @@ public class Bancodedados extends SQLiteOpenHelper {
                 }
                 cursor.close();
 
-                // Limite de 3 dígitos
                 if (novoCodigo > 999) {
                     Log.e("DEBUG_DB", "Limite de códigos de faixa atingido!");
                     return 0;
@@ -185,9 +183,13 @@ public class Bancodedados extends SQLiteOpenHelper {
             values.put("limite_cpf", limite_cpf ? 1 : 0);
 
             long id = db.insert(TABLE_FAIXAS, null, values);
-            Log.d("DEBUG_DB", "Insert result: " + id + " | codigo_faixa=" + codigoFaixa);
+            Log.d("DEBUG_DB", "Insert result: " + id + " | código_faixa=" + codigoFaixa);
 
-            if(id == -1) return 0;
+            if (id == -1) return 0;
+
+            // 🔹 Log para confirmar faixa cadastrada
+            Log.i("DEBUG_DB", "Faixa cadastrada com sucesso! Código da faixa: " + codigoFaixa);
+
             return codigoFaixa;
 
         } catch (Exception e) {
@@ -195,11 +197,6 @@ public class Bancodedados extends SQLiteOpenHelper {
             return 0;
         }
     }
-
-
-
-
-
 
     // Buscar todas as faixas
     public Cursor listarFaixas() {
@@ -223,9 +220,9 @@ public class Bancodedados extends SQLiteOpenHelper {
                 new Object[]{id});
     }
 
-    public boolean deletarFaixa(int id) {
+    public boolean deletarFaixaPorCodigo(int codigoFaixa) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int linhasAfetadas = db.delete(TABLE_FAIXAS, "id=?", new String[]{String.valueOf(id)});
+        int linhasAfetadas = db.delete(TABLE_FAIXAS, "codigo_faixa=?", new String[]{String.valueOf(codigoFaixa)});
         return linhasAfetadas > 0;
     }
 
@@ -255,29 +252,29 @@ public class Bancodedados extends SQLiteOpenHelper {
         values.put("comentario", comentario);
         values.put("limite_cpf", limiteCpf);
 
-        int linhasAfetadas = db.update(TABLE_FAIXAS, values, "id = ?", new String[]{String.valueOf(id)});
+        int linhasAfetadas = db.update(TABLE_FAIXAS, values, "codigo_faixa = ?", new String[]{String.valueOf(id)});
         return linhasAfetadas > 0;
     }
 
     // Iniciar uso da faixa
-    public boolean iniciarUso(int id, int dias) {
+    public boolean iniciarUso(int codigo, int dias) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("usando", 1);
         values.put("dias_uso", dias);
         values.put("data_inicio_uso", java.time.LocalDate.now().toString());
-        int linhas = db.update(TABLE_FAIXAS, values, "id=?", new String[]{String.valueOf(id)});
+        int linhas = db.update(TABLE_FAIXAS, values, "codigo_faixa=?", new String[]{String.valueOf(codigo)});
         return linhas > 0;
     }
 
     // Cancelar uso da faixa
-    public boolean cancelarUso(int id) {
+    public boolean cancelarUso(int codigo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("usando", 0);
         values.put("dias_uso", 0);
         values.putNull("data_inicio_uso");
-        int linhas = db.update(TABLE_FAIXAS, values, "id=?", new String[]{String.valueOf(id)});
+        int linhas = db.update(TABLE_FAIXAS, values, "codigo_faixa=?", new String[]{String.valueOf(codigo)});
         return linhas > 0;
     }
 
@@ -579,6 +576,7 @@ public class Bancodedados extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndexOrThrow("limite_cpf"))
             );
             f.setVezesUsada(cursor.getInt(cursor.getColumnIndexOrThrow("vezes_usada")));
+            f.setCodigoFaixa(cursor.getInt(cursor.getColumnIndexOrThrow("codigo_faixa")));
             lista.add(f);
         }
         cursor.close();
@@ -598,6 +596,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Faixa f = new Faixa();
+                f.setCodigoFaixa(cursor.getInt(cursor.getColumnIndexOrThrow("codigo_faixa")));
                 f.setProduto(cursor.getString(cursor.getColumnIndexOrThrow("produto")));
                 f.setEstado(cursor.getString(cursor.getColumnIndexOrThrow("estado")));
                 f.setVezesUsada(cursor.getInt(cursor.getColumnIndexOrThrow("vezes_usada")));
@@ -619,6 +618,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Faixa f = new Faixa();
+                f.setCodigoFaixa(cursor.getInt(cursor.getColumnIndex("codigo_faixa")));
                 f.setProduto(cursor.getString(cursor.getColumnIndex("produto")));
                 f.setEstado(cursor.getString(cursor.getColumnIndex("estado")));
                 f.setVezesUsada(cursor.getInt(cursor.getColumnIndex("vezes_usada")));
@@ -639,6 +639,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Faixa f = new Faixa();
+                f.setCodigoFaixa(cursor.getInt(cursor.getColumnIndexOrThrow("codigo_faixa")));
                 f.setProduto(cursor.getString(cursor.getColumnIndexOrThrow("produto")));
                 f.setEstado(cursor.getString(cursor.getColumnIndexOrThrow("estado")));
                 f.setVezesUsada(cursor.getInt(cursor.getColumnIndexOrThrow("vezes_usada")));
@@ -671,6 +672,9 @@ public class Bancodedados extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Faixa> faixasSemana = new ArrayList<>();
 
+
+        atualizarUsoAutomatico();
+
         LocalDate hoje = LocalDate.now();
         LocalDate inicioSemana = hoje.with(DayOfWeek.MONDAY);
         LocalDate inicioSemanaPassada = inicioSemana.minusWeeks(1);
@@ -684,6 +688,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         if (cursorAtual.moveToFirst()) {
             do {
                 Faixa f = new Faixa();
+                f.setCodigoFaixa(cursorAtual.getInt(cursorAtual.getColumnIndexOrThrow("codigo_faixa")));
                 f.setProduto(cursorAtual.getString(cursorAtual.getColumnIndex("produto")));
                 f.setDataCadastro(cursorAtual.getString(cursorAtual.getColumnIndex("data_criacao")));
                 faixasSemana.add(f);
@@ -699,6 +704,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         if (cursorPassada.moveToFirst()) {
             do {
                 Faixa f = new Faixa();
+                f.setCodigoFaixa(cursorPassada.getInt(cursorPassada.getColumnIndexOrThrow("codigo_faixa")));
                 f.setProduto(cursorPassada.getString(cursorPassada.getColumnIndex("produto")));
                 f.setDataCadastro(cursorPassada.getString(cursorPassada.getColumnIndex("data_criacao")));
                 faixasSemana.add(f);
@@ -708,6 +714,7 @@ public class Bancodedados extends SQLiteOpenHelper {
 
         return faixasSemana;
     }
+
 
 
 }

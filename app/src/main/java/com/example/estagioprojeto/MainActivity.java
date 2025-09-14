@@ -266,7 +266,11 @@ public class MainActivity extends AppCompatActivity {
     private void enviarFaixasParaJS() {
         Cursor cursor = dbHelper.listarFaixas();
         JSONArray array = gerarJSONArray(cursor);
-        webView.evaluateJavascript("if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }", null);
+        Log.d("DEBUG_DB_JSON", "Enviando JSON para JS: " + array.toString());
+        webView.evaluateJavascript(
+                "if (typeof carregarFaixas === 'function') { carregarFaixas(" + array.toString() + "); }",
+                null
+        );
     }
 
     private void enviarFaixasPesquisaParaJS(String texto) {
@@ -399,11 +403,13 @@ public class MainActivity extends AppCompatActivity {
                             .setMessage("Já existe uma faixa igual. Deseja cadastrar mesmo assim?")
                             .setPositiveButton("Sim", (dialog, which) -> {
                                 Log.d("CadastrarFaixa", "Usuário optou por cadastrar duplicada");
-                                dbHelper.inserirFaixaComDuplicataOpcional(
+                                int codigoDuplicata = dbHelper.inserirFaixaComDuplicataOpcional(
                                         0, produto, tipo_oferta, preco_oferta_str, preco_normal_str,
                                         estadoFinal, condicao, comentario, limite_cpf, true
                                 );
-                                Toast.makeText(MainActivity.this, "Faixa duplicada cadastrada!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this,
+                                        "Faixa duplicada cadastrada! Código da faixa: " + codigoDuplicata,
+                                        Toast.LENGTH_SHORT).show();
                                 enviarFaixasParaJS();
                             })
                             .setNegativeButton("Não", (dialog, which) -> {
@@ -411,9 +417,11 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show();
                             })
                             .show();
-                } else if (resultado == 1) {
-                    Log.d("CadastrarFaixa", "Faixa cadastrada com sucesso");
-                    Toast.makeText(MainActivity.this, "Faixa cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
+                } else if (resultado > 0) {
+                    Log.d("CadastrarFaixa", "Faixa cadastrada com sucesso, código=" + resultado);
+                    Toast.makeText(MainActivity.this,
+                            "Faixa cadastrada com sucesso! Código da faixa: " + resultado,
+                            Toast.LENGTH_SHORT).show();
                     enviarFaixasParaJS();
                 } else {
                     Log.d("CadastrarFaixa", "Erro desconhecido ao cadastrar faixa");
@@ -454,41 +462,47 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void excluirFaixa(int id) {
+        public void excluirFaixa(int codigoFaixa) {
+            Log.d("EXCLUIR_FAIXA", "Chamando exclusão da faixa: codigo_faixa=" + codigoFaixa);
             runOnUiThread(() -> {
-                boolean sucesso = dbHelper.deletarFaixa(id);
+                boolean sucesso = dbHelper.deletarFaixaPorCodigo(codigoFaixa);
+                Log.d("EXCLUIR_FAIXA", "Resultado exclusão: " + sucesso);
                 Toast.makeText(MainActivity.this, sucesso ? "Faixa excluída!" : "Erro ao excluir faixa.", Toast.LENGTH_SHORT).show();
                 enviarFaixasParaJS();
             });
         }
 
         @JavascriptInterface
-        public void editarFaixa(int id, String produto, String tipoOferta,
+        public void editarFaixa(int codigo, String produto, String tipoOferta,
                                 double precoOferta, double precoNormal,
                                 String estado, String condicao,
                                 String comentario, int limiteCpf) {
             runOnUiThread(() -> {
-                boolean sucesso = dbHelper.editarFaixa(id, produto, tipoOferta, precoOferta, precoNormal, estado, condicao, comentario, limiteCpf);
+                boolean sucesso = dbHelper.editarFaixa(codigo, produto, tipoOferta, precoOferta, precoNormal, estado, condicao, comentario, limiteCpf);
                 Toast.makeText(MainActivity.this, sucesso ? "Faixa atualizada!" : "Erro ao atualizar faixa.", Toast.LENGTH_SHORT).show();
                 enviarFaixasParaJS();
             });
         }
 
         @JavascriptInterface
-        public void usarFaixa(int id, int dias) {
+        public void usarFaixa(int codigo, int dias) {
             runOnUiThread(() -> {
-                if (dias <= 0) { Toast.makeText(MainActivity.this, "Número de dias inválido!", Toast.LENGTH_SHORT).show(); return; }
-                boolean sucesso = dbHelper.iniciarUso(id, dias);
-                if (sucesso) dbHelper.incrementarUso(id);
+                if (dias <= 0) {
+                    Toast.makeText(MainActivity.this, "Número de dias inválido!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                boolean sucesso = dbHelper.iniciarUso(codigo, dias);
+                if (sucesso) dbHelper.incrementarUso(codigo);
                 Toast.makeText(MainActivity.this, sucesso ? "Faixa em uso por " + dias + " dias!" : "Erro: faixa não encontrada.", Toast.LENGTH_SHORT).show();
                 enviarFaixasParaJS();
             });
         }
 
+
         @JavascriptInterface
-        public void cancelarUsoFaixa(int id) {
+        public void cancelarUsoFaixa(int codigo) {
             runOnUiThread(() -> {
-                boolean sucesso = dbHelper.cancelarUso(id);
+                boolean sucesso = dbHelper.cancelarUso(codigo);
                 Toast.makeText(MainActivity.this, sucesso ? "Uso da faixa cancelado!" : "Erro ao cancelar uso.", Toast.LENGTH_SHORT).show();
                 enviarFaixasParaJS();
             });
@@ -502,6 +516,7 @@ public class MainActivity extends AppCompatActivity {
             for (Faixa f : lista) {
                 try {
                     JSONObject obj = new JSONObject();
+                    obj.put("id", f.getId());
                     obj.put("codigo_faixa", f.getCodigoFaixa());
                     obj.put("nome_produto", f.getProduto());
                     obj.put("tipo_oferta", f.getTipoOferta());
@@ -647,7 +662,7 @@ public class MainActivity extends AppCompatActivity {
             List<Faixa> faixas = dbHelper.getFaixasParadasUltimoMes();
             JSONArray array = new JSONArray();
             for (Faixa f : faixas) {
-                try { JSONObject obj = new JSONObject(); obj.put("produto", f.getProduto()); obj.put("vezes_usada", f.getVezesUsada()); array.put(obj); }
+                try { JSONObject obj = new JSONObject();obj.put("codigo_faixa", f.getCodigoFaixa()); obj.put("produto", f.getProduto()); obj.put("vezes_usada", f.getVezesUsada()); array.put(obj); }
                 catch (JSONException e) { e.printStackTrace(); }
             }
             return array.toString();
@@ -664,6 +679,7 @@ public class MainActivity extends AppCompatActivity {
             for (Faixa f : faixas) {
                 try {
                     JSONObject obj = new JSONObject();
+                    obj.put("codigo_faixa", f.getCodigoFaixa());
                     obj.put("produto", f.getProduto());
                     obj.put("estado", f.getEstado());
                     obj.put("data_criacao", f.getDataCadastro());
@@ -694,6 +710,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 for (Faixa f : faixas) {
                     JSONObject obj = new JSONObject();
+                    obj.put("codigo_faixa", f.getCodigoFaixa());
                     obj.put("produto", f.getProduto());
                     obj.put("estado", f.getEstado());
                     obj.put("vezes_usada", f.getVezesUsada());
@@ -716,6 +733,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 for (Faixa f : faixas) {
                     JSONObject obj = new JSONObject();
+                    obj.put("codigo_faixa", f.getCodigoFaixa());
                     obj.put("produto", f.getProduto());
                     obj.put("estado", f.getEstado());
                     obj.put("vezes_usada", f.getVezesUsada());
@@ -739,8 +757,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 for (Faixa f : faixas) {
                     JSONObject obj = new JSONObject();
+                    obj.put("codigo_faixa", f.getCodigoFaixa());
                     obj.put("produto", f.getProduto());
-                    obj.put("estado", f.getEstado() != null ? f.getEstado() : ""); // algumas faixas podem não ter estado
+                    obj.put("estado", f.getEstado() != null ? f.getEstado() : "");
                     obj.put("vezes_usada", f.getVezesUsada());
                     obj.put("data_criacao", f.getDataCadastro());
                     obj.put("condicao", f.getCondicao() != null ? f.getCondicao() : "");

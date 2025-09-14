@@ -240,7 +240,7 @@
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 <script>
-    let faixaIdParaExcluir = null;
+    let faixaIdParaExcluir = 0;
     let faixaAtualParaEditar = null;
     let estiloAtual = 'original';
     let faixaIdParaUsar = null;
@@ -315,7 +315,7 @@
                 <div class="faixa-actions">
                     <button class="btn btn-warning" onclick='abrirEditarFaixa(${JSON.stringify(faixa)})'>Editar</button>
                     ${btnUsar}
-                    <button class="btn btn-danger" onclick="excluirFaixa(${faixa.id}, '${faixa.nome_produto}')">Excluir</button>
+                    <button class="btn btn-danger" onclick="excluirFaixa(${faixa.codigo_faixa}, '${faixa.nome_produto}')">Excluir</button>
                 </div>
             `;
             container.appendChild(div);
@@ -324,12 +324,12 @@
 
     // Botão Usar ou Cancelar
     function criarBotaoUsar(faixa) {
-        if (faixa.usando === 1) {
-            return `<button class="btn btn-secondary" onclick='cancelarUso(${faixa.id})'>Cancelar Uso</button>`;
-        } else {
-            return `<button class="btn btn-success" onclick='usarFaixaPrompt(${faixa.id})'>Usar Faixa</button>`;
-        }
+    if (faixa.usando === 1) {
+        return `<button class="btn btn-secondary" onclick='cancelarUso(${faixa.codigo_faixa})'>Cancelar Uso</button>`;
+    } else {
+        return `<button class="btn btn-success" onclick='usarFaixaPrompt(${faixa.codigo_faixa})'>Usar Faixa</button>`;
     }
+}
 
 
 
@@ -409,7 +409,7 @@ document.getElementById('salvarEditar').addEventListener('click', () => {
     if (!faixaAtualParaEditar) return;
 
     const dadosAtualizados = {
-        id: faixaAtualParaEditar.id,
+        codigo_faixa: faixaAtualParaEditar.codigo_faixa, // ✅ usar código da faixa
         nome_produto: document.getElementById('editarNome').value,
         tipo_oferta: document.getElementById('editarTipo').value,
         preco_oferta: parseFloat(document.getElementById('editarPrecoOferta').value || 0),
@@ -421,7 +421,7 @@ document.getElementById('salvarEditar').addEventListener('click', () => {
     };
 
     Android.editarFaixa(
-        dadosAtualizados.id,
+        dadosAtualizados.codigo_faixa,
         dadosAtualizados.nome_produto,
         dadosAtualizados.tipo_oferta,
         dadosAtualizados.preco_oferta,
@@ -434,6 +434,7 @@ document.getElementById('salvarEditar').addEventListener('click', () => {
 
     editarBootstrapModal.hide();
 });
+
 
 
 
@@ -474,20 +475,23 @@ document.getElementById('salvarEditar').addEventListener('click', () => {
         }
     });
 
-    // Excluir faixa
-    function excluirFaixa(id, nome) {
-        faixaIdParaExcluir = id;
-        document.getElementById("confirmText").innerText = `Deseja realmente excluir a faixa "${nome}"?`;
-        document.getElementById("confirmModal").style.display = "flex";
-    }
+    function excluirFaixa(codigo, nome) {
+    console.log("EXCLUIR_FAIXA_JS: Clique para excluir faixa: codigo_faixa=" + codigo + " nome=" + nome);
+    faixaIdParaExcluir = codigo;
+    document.getElementById("confirmText").innerText = `Deseja realmente excluir a faixa "${nome}"?`;
+    document.getElementById("confirmModal").style.display = "flex";
+}
 
-    document.getElementById("confirmYes").addEventListener("click", () => {
-        Android.excluirFaixa(faixaIdParaExcluir);
-        document.getElementById("confirmModal").style.display = "none";
-    });
-    document.getElementById("confirmNo").addEventListener("click", () => {
-        document.getElementById("confirmModal").style.display = "none";
-    });
+document.getElementById("confirmYes").addEventListener("click", () => {
+    console.log("EXCLUIR_FAIXA_JS: Confirmou exclusão faixa codigo_faixa=" + faixaIdParaExcluir);
+    Android.excluirFaixa(faixaIdParaExcluir);
+    document.getElementById("confirmModal").style.display = "none";
+});
+
+document.getElementById("confirmNo").addEventListener("click", () => {
+    console.log("EXCLUIR_FAIXA_JS: Cancelou exclusão faixa codigo_faixa=" + faixaIdParaExcluir);
+    document.getElementById("confirmModal").style.display = "none";
+});
 
     // Pesquisa
    function pesquisar() {

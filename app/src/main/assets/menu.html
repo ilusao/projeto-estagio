@@ -288,7 +288,7 @@ btnBackup.addEventListener("click", () => {
             faixas.forEach(f => {
                 const li = document.createElement("li");
                 li.className = "list-group-item";
-                li.textContent = f.produto + " (Usos: " + f.vezes_usada + ")";
+                  li.textContent = `#${f.codigo_faixa} - ${f.produto} (Usos: ${f.vezes_usada})`;
                 lista.appendChild(li);
             });
         }
@@ -330,7 +330,9 @@ graficoFaixasVelhas.addEventListener("click", () => {
         li.className = "list-group-item d-flex justify-content-between align-items-start flex-column flex-md-row";
 
         li.innerHTML = `
-            <div class="fw-bold text-dark mb-2 mb-md-0">${f.produto}</div>
+             <div class="fw-bold text-dark mb-2 mb-md-0">
+            #${f.codigo_faixa} - ${f.produto}
+        </div>
             <div>
                 <span class="badge bg-danger me-2">
                     ${f.dias_uso} dias
@@ -367,7 +369,7 @@ cardTop10.addEventListener("click", () => {
     faixas.forEach(f => {
         const li = document.createElement("li");
         li.className = "list-group-item d-flex justify-content-between";
-        li.innerHTML = `<span>${f.produto}</span><span>Usos: ${f.vezes_usada}</span>`;
+        li.innerHTML = `<span>#${f.codigo_faixa} - ${f.produto}</span><span>Usos: ${f.vezes_usada}</span>`;
         lista.appendChild(li);
     });
 
@@ -402,7 +404,7 @@ cardFaixasLixo.addEventListener("click", () => {
         lixoReal.forEach(f => {
             const li = document.createElement("li");
             li.className = "list-group-item d-flex justify-content-between";
-            li.innerHTML = `<span>${f.produto}</span><span>Cadastro: ${f.data_criacao}</span>`;
+            li.innerHTML = `<span>#${f.codigo_faixa} - ${f.produto}</span><span>Cadastro: ${f.data_criacao}</span>`;
             lista.appendChild(li);
         });
     }
@@ -412,7 +414,7 @@ cardFaixasLixo.addEventListener("click", () => {
         sugestao.forEach(f => {
             const li = document.createElement("li");
             li.className = "list-group-item d-flex justify-content-between";
-            li.innerHTML = `<span>${f.produto}</span><span>Cadastro: ${f.data_criacao}</span>`;
+            li.innerHTML = `<span>#${f.codigo_faixa} - ${f.produto}</span><span>Cadastro: ${f.data_criacao}</span>`;
             lista.appendChild(li);
         });
     }
@@ -439,7 +441,7 @@ cardFaixasSemana.addEventListener("click", () => {
     faixas.forEach(f => {
         const li = document.createElement("li");
         li.className = "list-group-item d-flex justify-content-between";
-        li.innerHTML = `<span>${f.produto}</span><span>Data: ${f.data_criacao}</span>`;
+        li.innerHTML = `<span>#${f.codigo_faixa} - ${f.produto}</span><span>Data: ${f.data_criacao}</span>`;
         lista.appendChild(li);
     });
 
