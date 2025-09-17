@@ -1,0 +1,24 @@
+.card-custom {
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .card-custom:hover {
+          transform: scale(1.05);
+          box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+        }
+
+        #tabMenu {
+            display: flex !important;
+            flex-wrap: nowrap !important;  /* não empilha em telas pequenas */
+            justify-content: space-between; /* espaça igualmente */
+            overflow-x: auto; /* permite scroll horizontal se não couber */
+        }
+
+        #tabMenu .nav-item {
+            flex: 1 0 auto; /* cada tab ocupa espaço mínimo necessário */
+        }
+
+        #tabMenu .nav-link {
+            text-align: center;
+            white-space: nowrap; /* evita quebra de linha */
+        }

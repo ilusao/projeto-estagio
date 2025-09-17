@@ -24,7 +24,7 @@
             <i class="bi bi-collection" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
             Ver Faixas
         </button>
-        <button class="btn-custom">
+        <button class="btn-custom" id="btnVerProdutos">
             <i class="bi bi-box-seam" style="font-size: 1.4rem; margin-bottom: 0.3rem;"></i><br>
             Ver Produtos
         </button>
@@ -45,6 +45,7 @@
             Backup de Faixas
         </button>
     </div>
+</div>
 
     <div class="cards-grid" style="margin-top: 2rem;">
         <div class="card">
@@ -169,18 +170,23 @@
 
 <script>
     const btnVer = document.getElementById("btnVerFaixas");
-    const btnCad = document.getElementById("btnCadastrarFaixas");
+const btnCad = document.getElementById("btnCadastrarFaixas");
 
-    // Navegação
-    btnVer.addEventListener("click", () => {
-        if (typeof Android !== "undefined") Android.navegarPara("VerFaixa.html");
-        else window.location.href = "VerFaixa.html";
-    });
+// Navegação
+btnVer.addEventListener("click", () => {
+    if (typeof Android !== "undefined") Android.navegarPara("VerFaixa.html");
+    else window.location.href = "VerFaixa.html";
+});
 
-    btnCad.addEventListener("click", () => {
-        if (typeof Android !== "undefined") Android.navegarPara("CadastrarFaixa.html");
-        else window.location.href = "CadastrarFaixa.html";
-    });
+btnCad.addEventListener("click", () => {
+    if (typeof Android !== "undefined") Android.navegarPara("CadastrarFaixa.html");
+    else window.location.href = "CadastrarFaixa.html";
+});
+
+document.getElementById("btnVerProdutos").addEventListener("click", () => {
+    if (typeof Android !== "undefined") Android.navegarPara("produtos.html");
+    else window.location.href = "produtos.html";
+});
 
     // Backup de faixas
     const btnBackup = document.getElementById("btnBackupFaixas");

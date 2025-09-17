@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Produtos</title>
+    <link rel="stylesheet" href="Bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="Bootstrap/bootstrap-icons.css" />
+    <link rel="stylesheet" href="produtos.css" />
+    <script src="chart.min.js"></script>
+</head>
+<body>
+<div class="container py-4">
+    <h2 class="text-center mb-4">Gestão de Produtos</h2>
+
+    <!-- Navegação -->
+    <ul class="nav nav-tabs" id="tabMenu" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="pedidos-tab" data-bs-toggle="tab" href="#pedidos" role="tab">Pedidos de Produtos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="estoque-tab" data-bs-toggle="tab" href="#estoque" role="tab">Estoque / Consumo</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="graficos-tab" data-bs-toggle="tab" href="#graficos" role="tab">Relatórios / Gráficos</a>
+        </li>
+    </ul>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content mt-3">
+        <!-- Aba 1: Pedidos -->
+        <div class="tab-pane fade show active" id="pedidos" role="tabpanel">
+            <h4>Adicionar Pedido de Produto</h4>
+            <form id="formPedidos">
+                <div class="mb-3">
+                    <label class="form-label">Nome do Produto</label>
+                    <input type="text" class="form-control" placeholder="Ex: Canetão" id="produtoNome" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" class="form-control" placeholder="Ex: 10" id="produtoQtd" required>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Adicionar Pedido</button>
+            </form>
+        </div>
+
+        <!-- Aba 2: Estoque -->
+        <div class="tab-pane fade" id="estoque" role="tabpanel">
+            <h4>Estoque / Consumo</h4>
+            <table class="table table-bordered table-striped" id="tabelaEstoque">
+                <thead class="table-dark">
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Canetão</td>
+                    <td>5</td>
+                    <td>10/09/2025</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Aba 3: Gráficos -->
+        <div class="tab-pane fade" id="graficos" role="tabpanel">
+            <h4>Relatórios / Gasto Mensal</h4>
+            <canvas id="graficoMes" width="400" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="Bootstrap/js/bootstrap.bundle.js"></script>
+<script>
+    // Gráfico inicial
+    const ctx = document.getElementById('graficoMes').getContext('2d');
+    const grafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Janeiro', 'Fevereiro', 'Março'],
+            datasets: [{
+                label: 'Gasto em R$',
+                data: [200, 350, 180],
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Adicionar pedidos na tabela
+    const formPedidos = document.getElementById('formPedidos');
+    formPedidos.addEventListener('submit', e => {
+        e.preventDefault();
+        const nome = document.getElementById('produtoNome').value;
+        const qtd = document.getElementById('produtoQtd').value;
+        const data = new Date().toLocaleDateString();
+
+        const tabela = document.getElementById('tabelaEstoque').querySelector('tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${nome}</td><td>${qtd}</td><td>${data}</td>`;
+        tabela.appendChild(tr);
+
+        // Limpar formulário
+        formPedidos.reset();
+    });
+</script>
+</body>
+</html>

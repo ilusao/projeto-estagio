@@ -508,19 +508,24 @@ public class Bancodedados extends SQLiteOpenHelper {
             BufferedWriter bw = new BufferedWriter(writer);
 
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery("SELECT produto, tipo_oferta, preco_oferta, preco_normal, estado, condicao, comentario, limite_cpf FROM " + TABLE_FAIXAS, null);
+            Cursor cursor = db.rawQuery(
+                    "SELECT id,codigo_faixa, produto, tipo_oferta, preco_oferta, preco_normal, estado, condicao, comentario, limite_cpf FROM " + TABLE_FAIXAS,
+                    null
+            );
 
             while (cursor.moveToNext()) {
-                String produto = cursor.getString(0);
-                String tipoOferta = cursor.getString(1);
-                String precoOferta = cursor.getString(2);
-                String precoNormal = cursor.getString(3);
-                String estado = cursor.getString(4);
-                String condicao = cursor.getString(5);
-                String comentario = cursor.getString(6);
-                int limiteCpf = cursor.getInt(7);
+                int id = cursor.getInt(0);
+                int codigo_faixa = cursor.getInt(1);
+                String produto = cursor.getString(2);
+                String tipoOferta = cursor.getString(3);
+                String precoOferta = cursor.getString(4);
+                String precoNormal = cursor.getString(5);
+                String estado = cursor.getString(6);
+                String condicao = cursor.getString(7);
+                String comentario = cursor.getString(8);
+                int limiteCpf = cursor.getInt(9);
 
-                String linha = produto + ";" + tipoOferta + ";" + precoOferta + ";" +
+                String linha =  id + ";" + codigo_faixa + ";" + produto + ";" + tipoOferta + ";" + precoOferta + ";" +
                         precoNormal + ";" + estado + ";" + condicao + ";" +
                         comentario + ";" + (limiteCpf == 1 ? "Sim" : "Não");
 
