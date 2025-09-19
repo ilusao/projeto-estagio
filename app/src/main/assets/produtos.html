@@ -30,17 +30,12 @@
         <!-- Aba 1: Pedidos -->
         <div class="tab-pane fade show active" id="pedidos" role="tabpanel">
             <h4>Adicionar Pedido de Produto</h4>
-            <form id="formPedidos">
-                <div class="mb-3">
-                    <label class="form-label">Nome do Produto</label>
-                    <input type="text" class="form-control" placeholder="Ex: Canetão" id="produtoNome" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Quantidade</label>
-                    <input type="number" class="form-control" placeholder="Ex: 10" id="produtoQtd" required>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Adicionar Pedido</button>
-            </form>
+            <div id="listaProdutos">
+                <!-- Os produtos serão inseridos pelo JS -->
+            </div>
+            <button id="finalizarPedidos" class="btn btn-success mt-3">
+                <i class="bi bi-check-circle me-1"></i> Finalizar Pedidos
+            </button>
         </div>
 
         <!-- Aba 2: Estoque -->
@@ -74,44 +69,40 @@
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 <script>
-    // Gráfico inicial
-    const ctx = document.getElementById('graficoMes').getContext('2d');
-    const grafico = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Janeiro', 'Fevereiro', 'Março'],
-            datasets: [{
-                label: 'Gasto em R$',
-                data: [200, 350, 180],
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
 
-    // Adicionar pedidos na tabela
-    const formPedidos = document.getElementById('formPedidos');
-    formPedidos.addEventListener('submit', e => {
-        e.preventDefault();
-        const nome = document.getElementById('produtoNome').value;
-        const qtd = document.getElementById('produtoQtd').value;
-        const data = new Date().toLocaleDateString();
+    function carregarProdutosDoBanco() {
+        // Recebe JSON do Android
+        const produtosJson = Android.getProdutosCartazista();
+        const produtos = JSON.parse(produtosJson);
 
-        const tabela = document.getElementById('tabelaEstoque').querySelector('tbody');
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${nome}</td><td>${qtd}</td><td>${data}</td>`;
-        tabela.appendChild(tr);
+        const listaDiv = document.getElementById('listaProdutos');
+        listaDiv.innerHTML = ''; // limpar
 
-        // Limpar formulário
-        formPedidos.reset();
-    });
+        produtos.forEach(prod => {
+            const div = document.createElement('div');
+            div.className = "mb-3 d-flex align-items-center";
+
+            div.innerHTML = `
+                <label class="form-label me-2" style="width: 250px;">${prod.descricao}</label>
+                <button class="btn btn-outline-secondary btn-sm me-1" type="button">-</button>
+                <input type="number" class="form-control form-control-sm me-1" value="0" min="0" style="width: 70px;">
+                <button class="btn btn-outline-secondary btn-sm me-2" type="button">+</button>
+            `;
+
+            listaDiv.appendChild(div);
+
+            const input = div.querySelector('input');
+            const btnMais = div.querySelectorAll('button')[1];
+            const btnMenos = div.querySelectorAll('button')[0];
+
+            btnMais.addEventListener('click', () => { input.value = parseInt(input.value) + 1; });
+            btnMenos.addEventListener('click', () => { if(parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
+        });
+    }
+
+    // Chama assim que a página carregar
+    document.addEventListener("DOMContentLoaded", carregarProdutosDoBanco);
+
 </script>
 </body>
 </html>

@@ -62,6 +62,8 @@ public class Bancodedados extends SQLiteOpenHelper {
                 ")";
         db.execSQL(createTable);
         popularBancoDeFaixasInterno(db);
+        criarTabelaProdutosCartazista(db);
+        popularProdutosCartazista(db);
     }
 
     @Override
@@ -388,7 +390,7 @@ public class Bancodedados extends SQLiteOpenHelper {
             f.setVezesUsada(cursor.getInt(cursor.getColumnIndexOrThrow("vezes_usada")));
             f.setDataCadastro(cursor.getString(cursor.getColumnIndexOrThrow("data_criacao")));
             f.setDataInicioUso(cursor.getString(cursor.getColumnIndexOrThrow("data_inicio_uso")));
-            f.setTempoFaixa(null); // opcional
+            f.setTempoFaixa(calcularTempoFaixa(cursor.getString(cursor.getColumnIndexOrThrow("data_criacao"))));
 
             resultado.add(f);
         }
@@ -541,6 +543,40 @@ public class Bancodedados extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private String calcularTempoFaixa(String dataCriacao) {
+        if (dataCriacao == null) return "0 dias";
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date inicio = sdf.parse(dataCriacao);
+            Date hoje = new Date();
+            long diff = hoje.getTime() - inicio.getTime();
+            long dias = diff / (1000L * 60 * 60 * 24);
+
+            long anos = dias / 360;
+            dias %= 360;
+            long meses = dias / 30;
+            dias %= 30;
+            long semanas = dias / 7;
+            dias %= 7;
+
+            StringBuilder sb = new StringBuilder();
+            if (anos > 0) sb.append(anos).append(anos == 1 ? " ano " : " anos ");
+            if (meses > 0) sb.append(meses).append(meses == 1 ? " mês " : " meses ");
+            if (semanas > 0) sb.append(semanas).append(semanas == 1 ? " semana " : " semanas ");
+            if (dias > 0) sb.append(dias).append(dias == 1 ? " dia" : " dias");
+
+            String resultado = sb.toString().trim();
+            String[] partes = resultado.split(" ");
+            if (partes.length > 4) {
+                resultado = partes[0] + " " + partes[1] + " e " + partes[2] + " " + partes[3];
+            }
+            return resultado.isEmpty() ? "0 dias" : resultado;
+
+        } catch (Exception e) {
+            return "0 dias";
         }
     }
 
@@ -720,6 +756,65 @@ public class Bancodedados extends SQLiteOpenHelper {
         return faixasSemana;
     }
 
+    // -------------------------------------------produtos--produtos---------------------------------------------------------------//
+    // -------------------------------------------produtos--produtos---------------------------------------------------------------//
+    // -------------------------------------------produtos--produtos---------------------------------------------------------------//
+
+    // Cria tabela produtos_cartazista
+    private void criarTabelaProdutosCartazista(SQLiteDatabase db) {
+        String createTableProdutos = "CREATE TABLE IF NOT EXISTS produtos_cartazista (" +
+                "codigo INTEGER PRIMARY KEY, " +
+                "descricao TEXT NOT NULL, " +
+                "categoria TEXT NOT NULL" +
+                ")";
+        db.execSQL(createTableProdutos);
+    }
+
+    // Método para popular a tabela com os produtos iniciais
+    private void popularProdutosCartazista(SQLiteDatabase db) {
+        // Aqui você insere todos os produtos que me passou
+        String[] inserts = {
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717916, 'CART 21x30 CONFIRA 2x (15x21) IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717940, 'CART 21x30 CONFIRA TOPO IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717894, 'CART 21x30 IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717908, 'CART 21x30 OFERTA 2x (15x21) IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717932, 'CART 21x30 OFERTA TOPO IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717950, 'CART 30x66 LISO IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717968, 'CART 42x30 A3 IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717982, 'CART 42x30 CONFIRA TOPO IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717878, 'CART 42x30 OFERTA TOPO IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717967, 'CART 66x96 LISO IMP OFF 120', 'Cartaz')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1422201, 'MAT ESCRIT GRAMPO ROCAMA 106/6', 'Material Escrit')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1429050, 'MAT ESCRIT COLA BASTAO 20G', 'Material Escrit')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (434051, 'CARTAZISTA PAPEL CARTAO AMARELO 66x96', 'Papel')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1432924, 'CARTAZISTA PINCEL ATOM 1100 CARBY PRETO', 'Pincel')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1433324, 'CARTAZISTA PINCEL ATOM 1100 CARBY VERM', 'Pincel')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1432332, 'CARTAZISTA PINCEL ATOM 850 PILOT PRETO', 'Pincel')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1415509, 'CARTAZISTA PINCEL ATOM 850 PILOT VERM', 'Pincel')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1433612, 'CARTAZISTA TINTA P/PINCEL PRETO', 'Tinta')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1415569, 'CARTAZISTA TINTA P/PINCEL VERMELHO', 'Tinta')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (4977924, 'SUPRIMENTO FEIXE DE MADEIRA P/ CARTAZ 1M', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (3777322, 'SUPRIMENTO BOBINA PLAST. AMARELA CARTAZ', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1434640, 'SUPRIMENTO BOBINA PLAST. PERS. GOND. SV', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (3797531, 'SUPRIMENTO TECIDOS JUTA P9', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (3769539, 'SUPRIMENTO SUPORTE CARTAZ PVC 15x21', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1459510, 'SUPRIMENTO ABRACADEIRA NYLON 10 x 2,5', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1459511, 'SUPRIMENTO ABRACADEIRA NYLON 15 x 3,4', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1459512, 'SUPRIMENTO ABRACADEIRA NYLON 30 x 3,6', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (571725, 'SUPRIMENTO PEG BOARDS C/TRAVA 75', 'Suprimento')",
+                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (836427, 'SUPRIMENTO PEG BOARDS C/TRAVA 75', 'Suprimento')"
+        };
+
+        for (String sql : inserts) {
+            db.execSQL(sql);
+        }
+    }
+
+
+
+
 
 
 }
+
+
