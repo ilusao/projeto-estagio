@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.webkit.JavascriptInterface;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
+import androidx.activity.OnBackPressedCallback;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Permissão de escrita
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -66,21 +68,24 @@ public class MainActivity extends AppCompatActivity {
 
         configurarWebView();
         atualizarEstados();
-        enviarFaixasVelhasParaJS(); // gráfico inicial
-    }
+        enviarFaixasVelhasParaJS();
+        enviarProdutosParaWebView();
 
-    @Override
-    public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                super.onBackPressed();
-            } else {
-                Toast.makeText(this, "Pressione novamente para sair", Toast.LENGTH_SHORT).show();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webView != null && webView.canGoBack()) {
+                    webView.goBack(); // volta na WebView
+                } else {
+                    if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                        finish(); // fecha o app
+                    } else {
+                        Toast.makeText(MainActivity.this, "Pressione novamente para sair", Toast.LENGTH_SHORT).show();
+                    }
+                    backPressedTime = System.currentTimeMillis();
+                }
             }
-            backPressedTime = System.currentTimeMillis();
-        }
+        });
     }
 
     // ----------------------------- CONFIG WEBVIEW ----------------------------- //
@@ -91,10 +96,9 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowFileAccess(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
-        webView.getSettings().setJavaScriptEnabled(true);
+
+        // Adiciona a interface apenas UMA vez
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
-
-
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -107,12 +111,15 @@ public class MainActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
 
+                // Chama JS conforme a página
                 if (url.contains("menu.html")) {
                     enviarFaixasVelhasParaJS();
                 } else if (url.contains("login.html")) {
                     enviarFaixasParaJS();
                 } else if (url.contains("VerFaixa.html")) {
                     enviarFaixasPesquisaParaJS("");
+                } else if (url.contains("produtos.html")) {
+                    view.evaluateJavascript("carregarProdutosDoBanco();", null);
                 }
             }
         });
@@ -120,12 +127,46 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-                Log.d("WEBVIEW_LOG", consoleMessage.message() + " -- " + consoleMessage.sourceId() + ":" + consoleMessage.lineNumber());
+                Log.d("WEBVIEW_LOG", consoleMessage.message() + " -- " +
+                        consoleMessage.sourceId() + ":" + consoleMessage.lineNumber());
                 return true;
             }
         });
 
+        // Carrega a página inicial
         webView.loadUrl("file:///android_asset/login.html");
+    }
+
+    private void enviarProdutosParaWebView() {
+        try {
+            Cursor c = dbHelper.listarProdutosCartazista();
+            JSONArray jsonArray = new JSONArray();
+
+            if (c != null) {
+                while (c.moveToNext()) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("codigo", c.getInt(c.getColumnIndexOrThrow("codigo")));
+                    obj.put("descricao", c.getString(c.getColumnIndexOrThrow("descricao")));
+                    obj.put("preco", c.getDouble(c.getColumnIndexOrThrow("preco")));
+                    obj.put("categoria", c.getString(c.getColumnIndexOrThrow("categoria")));
+                    obj.put("embalagem", c.getString(c.getColumnIndexOrThrow("embalagem")));
+                    obj.put("qtd_por_embalagem", c.getDouble(c.getColumnIndexOrThrow("qtd_por_embalagem")));
+                    jsonArray.put(obj);
+                }
+                c.close();
+            }
+
+            Log.d("DB_DEBUG", "JSON produtos cartazista: " + jsonArray.toString());
+
+            if (webView != null) {
+                webView.post(() -> webView.evaluateJavascript(
+                        "javascript:receberProdutos(" + jsonArray.toString() + ")",
+                        null
+                ));
+            }
+        } catch (Exception e) {
+            Log.e("DB_DEBUG", "Erro ao listar produtos cartazista", e);
+        }
     }
 
     // ----------------------------- ATUALIZA ESTADOS ----------------------------- //
@@ -774,5 +815,51 @@ public class MainActivity extends AppCompatActivity {
             return jsonArray.toString();
         }
 
+        // -------------------------------------------------------------PRODUTOS DO CARTAZISTA------------------------------------------------------- //
+
+        @JavascriptInterface
+        public String getProdutosCartazista() {
+            JSONArray produtos = new JSONArray();
+            Cursor cursor = dbHelper.listarProdutosCartazista();
+
+            if (cursor == null) {
+                Log.e("DEBUG_TESTE", "Cursor é nulo!");
+                return produtos.toString();
+            }
+
+            if (!cursor.moveToFirst()) {
+                Log.d("DEBUG_TESTE", "Nenhum produto encontrado no banco!");
+            } else {
+                do {
+                    try {
+                        int codigo = cursor.getInt(cursor.getColumnIndex("codigo"));
+                        String descricao = cursor.getString(cursor.getColumnIndex("descricao"));
+                        String categoria = cursor.getString(cursor.getColumnIndex("categoria"));
+                        double preco = cursor.getDouble(cursor.getColumnIndex("preco"));
+                        String embalagem = cursor.getString(cursor.getColumnIndex("embalagem"));
+                        double qtdPorEmbalagem = cursor.getDouble(cursor.getColumnIndex("qtd_por_embalagem"));
+
+                        Log.d("DEBUG_TESTE", "Produto: " + descricao + ", Código: " + codigo);
+
+                        JSONObject obj = new JSONObject();
+                        obj.put("codigo", codigo);
+                        obj.put("descricao", descricao);
+                        obj.put("categoria", categoria);
+                        obj.put("preco", preco);
+                        obj.put("embalagem", embalagem);
+                        obj.put("qtd_por_embalagem", qtdPorEmbalagem);
+
+                        produtos.put(obj);
+                    } catch (Exception e) {
+                        Log.e("DEBUG_TESTE", "Erro ao criar JSON do produto", e);
+                    }
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+            Log.d("DEBUG_TESTE", "JSON final de produtos: " + produtos.toString());
+            return produtos.toString();
+        }
+
+        }
     }
-}

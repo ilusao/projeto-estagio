@@ -30,7 +30,7 @@ import java.io.BufferedWriter;
 public class Bancodedados extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "cartazista.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_FAIXAS = "faixas";
 
@@ -760,49 +760,54 @@ public class Bancodedados extends SQLiteOpenHelper {
     // -------------------------------------------produtos--produtos---------------------------------------------------------------//
     // -------------------------------------------produtos--produtos---------------------------------------------------------------//
 
+
+    public Cursor listarProdutosCartazista() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query("produtos_cartazista", null, null, null, null, null, "descricao ASC");
+    }
     // Cria tabela produtos_cartazista
     private void criarTabelaProdutosCartazista(SQLiteDatabase db) {
         String createTableProdutos = "CREATE TABLE IF NOT EXISTS produtos_cartazista (" +
                 "codigo INTEGER PRIMARY KEY, " +
                 "descricao TEXT NOT NULL, " +
-                "categoria TEXT NOT NULL" +
+                "categoria TEXT NOT NULL, " +
+                "preco REAL NOT NULL, " +
+                "embalagem TEXT NOT NULL, " +
+                "qtd_por_embalagem REAL NOT NULL" +
                 ")";
         db.execSQL(createTableProdutos);
     }
 
-    // Método para popular a tabela com os produtos iniciais
     private void popularProdutosCartazista(SQLiteDatabase db) {
-        // Aqui você insere todos os produtos que me passou
         String[] inserts = {
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717916, 'CART 21x30 CONFIRA 2x (15x21) IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717940, 'CART 21x30 CONFIRA TOPO IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717894, 'CART 21x30 IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717908, 'CART 21x30 OFERTA 2x (15x21) IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717932, 'CART 21x30 OFERTA TOPO IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717950, 'CART 30x66 LISO IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717968, 'CART 42x30 A3 IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717982, 'CART 42x30 CONFIRA TOPO IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717878, 'CART 42x30 OFERTA TOPO IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (717967, 'CART 66x96 LISO IMP OFF 120', 'Cartaz')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1422201, 'MAT ESCRIT GRAMPO ROCAMA 106/6', 'Material Escrit')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1429050, 'MAT ESCRIT COLA BASTAO 20G', 'Material Escrit')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (434051, 'CARTAZISTA PAPEL CARTAO AMARELO 66x96', 'Papel')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1432924, 'CARTAZISTA PINCEL ATOM 1100 CARBY PRETO', 'Pincel')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1433324, 'CARTAZISTA PINCEL ATOM 1100 CARBY VERM', 'Pincel')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1432332, 'CARTAZISTA PINCEL ATOM 850 PILOT PRETO', 'Pincel')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1415509, 'CARTAZISTA PINCEL ATOM 850 PILOT VERM', 'Pincel')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1433612, 'CARTAZISTA TINTA P/PINCEL PRETO', 'Tinta')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1415569, 'CARTAZISTA TINTA P/PINCEL VERMELHO', 'Tinta')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (4977924, 'SUPRIMENTO FEIXE DE MADEIRA P/ CARTAZ 1M', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (3777322, 'SUPRIMENTO BOBINA PLAST. AMARELA CARTAZ', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1434640, 'SUPRIMENTO BOBINA PLAST. PERS. GOND. SV', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (3797531, 'SUPRIMENTO TECIDOS JUTA P9', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (3769539, 'SUPRIMENTO SUPORTE CARTAZ PVC 15x21', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1459510, 'SUPRIMENTO ABRACADEIRA NYLON 10 x 2,5', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1459511, 'SUPRIMENTO ABRACADEIRA NYLON 15 x 3,4', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (1459512, 'SUPRIMENTO ABRACADEIRA NYLON 30 x 3,6', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (571725, 'SUPRIMENTO PEG BOARDS C/TRAVA 75', 'Suprimento')",
-                "INSERT OR IGNORE INTO produtos_cartazista (codigo, descricao, categoria) VALUES (836427, 'SUPRIMENTO PEG BOARDS C/TRAVA 75', 'Suprimento')"
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717916, 'CARTAZ 21X30 CONFIRA 2X(15X21) IMP OFF 120', 'Cartaz', 0.260, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717940, 'CARTAZ 21X30 CONFIRA TOPO IMP OFF 120', 'Cartaz', 0.260, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717894, 'CARTAZ 21X30 IMP OFF 120', 'Cartaz', 0.390, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717908, 'CARTAZ 21X30 OFERTA 2X (15X21) IMP OFF 120', 'Cartaz', 0.290, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717932, 'CARTAZ 21X30 OFERTA TOPO IMP OFF 120', 'Cartaz', 0.290, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717959, 'CARTAZ 30X66 LISO IMP OFF 120', 'Cartaz', 1.740, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717860, 'CARTAZ 42X30 A3 IMP OFF 120', 'Cartaz', 0.490, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717886, 'CARTAZ 42X30 CONFIRA TOPO IMP OFF 120', 'Cartaz', 0.380, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717878, 'CARTAZ 42X30 OFERTA TOPO IMP OFF 120', 'Cartaz', 0.400, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (717967, 'CARTAZ 66X96 LISO IMP OFF 120', 'Cartaz', 1.610, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (142220, 'MAT ESCRIT GRAMPO ROCAMA 106/6', 'Material Escrit', 14.700, 'Pacote c/ 3500 unidades', 3500)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (142905, 'MAT ESCRIT COLA BASTAO 20G', 'Material Escrit', 9.270, 'Unidade', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (434051, 'CARTAZISTA PAPEL CARTAO AMARELO 66X96', 'Papel', 239.520, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (143278, 'PINCEL ATOM 1100 CARBY PRETO', 'Pincel', 3.960, 'Unidade', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (143294, 'PINCEL ATOM 1100 CARBY VERM', 'Pincel', 3.950, 'Unidade', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (143324, 'PINCEL ATOM 850 PILOT PRETO', 'Pincel', 3.120, 'Unidade', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (143332, 'PINCEL ATOM 850 PILOT VERM', 'Pincel', 3.120, 'Unidade', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (141550, 'CARTAZISTA TINTA P/PINCEL PRETO', 'Tinta', 54.850, 'Unidade (Frasco/Lata)', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (141569, 'CARTAZISTA TINTA P/PINCEL VERMELHO', 'Tinta', 54.870, 'Unidade (Frasco/Lata)', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (497924, 'SUPRIMENTO FEIXE DE MADEIRA P/ CARTAZ 1M', 'Suprimento', 151.990, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (377732, 'SUPRIMENTO BOBINA PLAST AMARELA CARTAZ', 'Suprimento', 21.960, 'Rolo de 20 KG', 20)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (143464, 'SUPRIMENTO BOBINA PLAST PERS.GOND. SV', 'Suprimento', 17.200, 'Rolo de 20 KG (Estimativa)', 20)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (376973, 'SUPRIMENTO TECIDOS JUTA P9', 'Suprimento', 10.000, 'Rolo de 50 metros', 50)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (599530, 'SUPRIMENTO SUPORTE CARTAZ PVC 15X21', 'Suprimento', 6.140, 'Unidade', 1)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (145971, 'SUPRIMENTO ABRAÇADEIRA NYLON 10 X 2,5', 'Suprimento', 5.340, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (145980, 'SUPRIMENTO ABRAÇADEIRA NYLON 15 X 3,4', 'Suprimento', 12.000, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (571725, 'SUPRIMENTO ABRAÇADEIRA NYLON 30 X 3,6', 'Suprimento', 15.980, 'Pacote c/ 100 unidades', 100)",
+                "INSERT OR IGNORE INTO produtos_cartazista VALUES (836427, 'SUPRIMENTO PEG BOARDS C/TRAVA 75', 'Suprimento', 0.520, 'Unidade', 1)"
         };
 
         for (String sql : inserts) {
