@@ -50,11 +50,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>Canetão</td>
-                    <td>5</td>
-                    <td>10/09/2025</td>
-                </tr>
+                <!-- Os pedidos serão inseridos pelo JS -->
                 </tbody>
             </table>
         </div>
@@ -97,9 +93,11 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <strong>${prod.descricao}</strong><br>
-                        <small>Código: ${prod.codigo}</small><br>
+                        <small class="codigo">Código: ${prod.codigo}</small><br>
                         <small>Embalagem: ${prod.embalagem}</small><br>
                         <small>Preço unitário: R$ ${prod.preco.toFixed(2)}</small>
+                        <small class="preco">Preço unitário: R$ ${prod.preco.toFixed(2)}</small>
+                        <small>Qtd por embalagem: ${prod.qtd_por_embalagem}</small>
                     </div>
                     <div class="d-flex align-items-center">
                         <button class="btn btn-outline-secondary btn-sm me-1" type="button">-</button>
@@ -119,6 +117,73 @@
             btnMenos.addEventListener('click', () => { if(parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
         });
     }
+
+    function carregarPedidosDaSemana() {
+    if(typeof Android === "undefined") return;
+
+    let pedidos = JSON.parse(Android.getPedidosDaSemana());
+    let tbody = document.querySelector("#tabelaEstoque tbody");
+    tbody.innerHTML = "";
+
+    pedidos.forEach(p => {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `<td>${p.descricao}</td><td>${p.quantidade}</td><td>${p.data_pedido}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function carregarResumoMensal() {
+    if(typeof Android === "undefined") return;
+
+    let pedidos = JSON.parse(Android.getPedidosDoMes());
+    let ctx = document.getElementById('graficoMes').getContext('2d');
+
+    let labels = pedidos.map(p => `Semana ${p.semana}: ${p.descricao}`);
+    let data = pedidos.map(p => p.quantidade_total);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Quantidade Mensal por Semana',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)'
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    carregarProdutosDoBanco();
+    carregarPedidosDaSemana();
+    carregarResumoMensal();
+});
+
+document.getElementById("finalizarPedidos").addEventListener("click", () => {
+    const cards = document.querySelectorAll("#listaProdutos .card");
+    console.log("Finalizando pedidos...");
+
+    cards.forEach(card => {
+        const input = card.querySelector("input");
+        const quantidade = parseInt(input.value);
+        if (quantidade > 0) {
+            const codigo = parseInt(card.querySelector(".codigo").innerText.split(":")[1].trim());
+            const precoUnitario = parseFloat(card.querySelector(".preco").innerText.split("R$")[1]);
+            const precoTotal = precoUnitario * quantidade;
+
+            console.log(`Chamando Android.finalizarPedido -> codigo: ${codigo}, quantidade: ${quantidade}, precoTotal: ${precoTotal}`);
+
+            Android.finalizarPedido(codigo, quantidade, precoTotal);
+
+            input.value = 0; // resetar
+        }
+    });
+
+    console.log("Pedidos finalizados. Atualizando tabela...");
+    carregarPedidosDaSemana(); // atualizar tabela Estoque
+});
 
     // Chama assim que a página carregar
     document.addEventListener("DOMContentLoaded", carregarProdutosDoBanco);

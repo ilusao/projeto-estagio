@@ -9,19 +9,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import com.example.estagioprojeto.Faixa;
 import java.time.DayOfWeek;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONException;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -30,7 +28,7 @@ import java.io.BufferedWriter;
 public class Bancodedados extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "cartazista.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String TABLE_FAIXAS = "faixas";
 
@@ -64,6 +62,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         popularBancoDeFaixasInterno(db);
         criarTabelaProdutosCartazista(db);
         popularProdutosCartazista(db);
+        criarTabelaPedidos(db);
     }
 
     @Override
@@ -75,22 +74,25 @@ public class Bancodedados extends SQLiteOpenHelper {
     // Atualizar uso automático (verifica se dias de uso acabaram)
     public void atualizarUsoAutomatico() {
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT id, data_inicio_uso, dias_uso FROM " + TABLE_FAIXAS + " WHERE usando=1";
+        String query = "SELECT codigo, data_inicio_uso, dias_uso FROM " + TABLE_FAIXAS + " WHERE usando=1";
         Cursor cursor = db.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
                 String dataInicio = cursor.getString(cursor.getColumnIndexOrThrow("data_inicio_uso"));
                 int diasUso = cursor.getInt(cursor.getColumnIndexOrThrow("dias_uso"));
+                int codigo = cursor.getInt(cursor.getColumnIndexOrThrow("codigo")); // <-- pega o código
+
                 if (dataInicio != null) {
-                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
                     try {
                         java.util.Date inicio = sdf.parse(dataInicio);
                         java.util.Date hoje = new java.util.Date();
                         long diff = hoje.getTime() - inicio.getTime();
                         long diasPassados = diff / (1000L * 60 * 60 * 24);
+
                         if (diasPassados >= diasUso) {
-                            cancelarUso(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                            cancelarUso(codigo);
                         }
                     } catch (java.text.ParseException e) {
                         e.printStackTrace();
@@ -100,6 +102,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         }
         cursor.close();
     }
+
 
     public int inserirFaixaComDuplicataOpcional(int codigoFaixa, String produto, String tipo_oferta, String preco_oferta_str,
                                                 String preco_normal_str, String estado, String condicao,
@@ -813,6 +816,85 @@ public class Bancodedados extends SQLiteOpenHelper {
         for (String sql : inserts) {
             db.execSQL(sql);
         }
+    }
+
+    private void criarTabelaPedidos(SQLiteDatabase db) {
+        String createTablePedidos = "CREATE TABLE IF NOT EXISTS pedidos (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "codigo_produto INTEGER NOT NULL, " +
+                "quantidade INTEGER NOT NULL, " +
+                "preco REAL NOT NULL, " + // preço do momento do pedido
+                "data_pedido TEXT DEFAULT (datetime('now','localtime')), " +
+                "FOREIGN KEY (codigo_produto) REFERENCES produtos_cartazista(codigo)" +
+                ")";
+        db.execSQL(createTablePedidos);
+    }
+
+    // Inserir pedido com chave estrangeira
+    public void inserirPedido(int codigoProduto, int quantidade, double preco) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("codigo_produto", codigoProduto);
+        values.put("quantidade", quantidade);
+        values.put("preco", preco);
+        String dataAtual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        values.put("data_pedido", dataAtual);
+
+        long id = db.insert("pedidos", null, values);
+        Log.d("DB_PEDIDOS", "Pedido inserido -> id: " + id + ", codigo: " + codigoProduto + ", quantidade: " + quantidade + ", preco: " + preco);
+    }
+
+    // Listar pedidos com informações do produto
+    public JSONArray listarPedidos() {
+        JSONArray array = new JSONArray();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String sql = "SELECT p.id, p.codigo_produto, pr.descricao, " +
+                "p.quantidade, p.preco, p.data_pedido " +
+                "FROM pedidos p " +
+                "INNER JOIN produtos_cartazista pr ON p.codigo_produto = pr.codigo " +
+                "ORDER BY p.id DESC";
+
+        Cursor cursor = db.rawQuery(sql, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("id", cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                    obj.put("codigo_produto", cursor.getInt(cursor.getColumnIndexOrThrow("codigo_produto")));
+                    obj.put("descricao", cursor.getString(cursor.getColumnIndexOrThrow("descricao")));
+                    obj.put("quantidade", cursor.getInt(cursor.getColumnIndexOrThrow("quantidade")));
+                    obj.put("preco", cursor.getDouble(cursor.getColumnIndexOrThrow("preco")));
+                    obj.put("data_pedido", cursor.getString(cursor.getColumnIndexOrThrow("data_pedido")));
+                    array.put(obj);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return array;
+    }
+
+    // Converte o Cursor em uma List<Produto>
+    public List<Produto> listarProdutosCartazistaComoLista() {
+        List<Produto> lista = new ArrayList<>();
+        Cursor cursor = listarProdutosCartazista(); // seu método que já existe
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                Produto p = new Produto();
+                p.setCodigo(cursor.getInt(cursor.getColumnIndexOrThrow("codigo")));
+                p.setDescricao(cursor.getString(cursor.getColumnIndexOrThrow("descricao")));
+                p.setCategoria(cursor.getString(cursor.getColumnIndexOrThrow("categoria")));
+                p.setPreco(cursor.getDouble(cursor.getColumnIndexOrThrow("preco")));
+                p.setEmbalagem(cursor.getString(cursor.getColumnIndexOrThrow("embalagem")));
+                p.setQtdPorEmbalagem(cursor.getDouble(cursor.getColumnIndexOrThrow("qtd_por_embalagem")));
+                lista.add(p);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return lista;
     }
 
 

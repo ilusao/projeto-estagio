@@ -14,6 +14,11 @@ import android.webkit.JavascriptInterface;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import androidx.activity.OnBackPressedCallback;
+import android.content.Context;
+import android.content.Intent;
+import android.app.Activity;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowUniversalAccessFromFileURLs(true);
 
         // Adiciona a interface apenas UMA vez
-        webView.addJavascriptInterface(new WebAppInterface(), "Android");
+        webView.addJavascriptInterface(new WebAppInterface(this), "Android");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -382,6 +387,12 @@ public class MainActivity extends AppCompatActivity {
 
     // ----------------------------- WEBAPPINTERFACE ----------------------------- //
     private class WebAppInterface {
+        private Context mContext;
+
+        // Construtor
+        public WebAppInterface(Context context) {
+            mContext = context;
+        }
 
         @JavascriptInterface
         public void cadastrarFaixa(String produto, String tipo_oferta, String preco_oferta_str,
@@ -393,14 +404,14 @@ public class MainActivity extends AppCompatActivity {
                     ", estado=" + estado + ", condicao=" + condicao + ", comentario=" + comentario +
                     ", limite_cpf=" + limite_cpf);
 
-            runOnUiThread(() -> {
+            ((Activity)mContext).runOnUiThread(() -> {
                 // 🔹 Valida preços obrigatórios
                 if ((preco_oferta_str == null || preco_oferta_str.trim().isEmpty()) &&
                         (tipo_oferta.equalsIgnoreCase("sv") ||
                                 tipo_oferta.equalsIgnoreCase("Cartão") ||
                                 tipo_oferta.equalsIgnoreCase("oferta"))) {
                     Log.d("CadastrarFaixa", "Falha: preço de oferta obrigatório");
-                    Toast.makeText(MainActivity.this, "Preço de oferta obrigatório!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Preço de oferta obrigatório!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -408,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
                         (tipo_oferta.equalsIgnoreCase("sv") ||
                                 tipo_oferta.equalsIgnoreCase("Cartão"))) {
                     Log.d("CadastrarFaixa", "Falha: preço normal obrigatório");
-                    Toast.makeText(MainActivity.this, "Preço normal obrigatório!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Preço normal obrigatório!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -422,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } catch (NumberFormatException e) {
                     Log.d("CadastrarFaixa", "Falha: preços inválidos - " + e.getMessage());
-                    Toast.makeText(MainActivity.this, "Preços devem ser números válidos!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Preços devem ser números válidos!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -441,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (resultado == -2) {
                     Log.d("CadastrarFaixa", "Faixa duplicada detectada");
-                    new AlertDialog.Builder(MainActivity.this)
+                    new AlertDialog.Builder(mContext)
                             .setTitle("Faixa duplicada")
                             .setMessage("Já existe uma faixa igual. Deseja cadastrar mesmo assim?")
                             .setPositiveButton("Sim", (dialog, which) -> {
@@ -450,31 +461,46 @@ public class MainActivity extends AppCompatActivity {
                                         0, produto, tipo_oferta, preco_oferta_str, preco_normal_str,
                                         estadoFinal, condicao, comentario, limite_cpf, true
                                 );
-                                Toast.makeText(MainActivity.this,
+                                Toast.makeText(mContext,
                                         "Faixa duplicada cadastrada! Código da faixa: " + codigoDuplicata,
                                         Toast.LENGTH_SHORT).show();
                                 enviarFaixasParaJS();
                             })
                             .setNegativeButton("Não", (dialog, which) -> {
                                 Log.d("CadastrarFaixa", "Usuário cancelou cadastro duplicado");
-                                Toast.makeText(MainActivity.this, "Cadastro cancelado.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Cadastro cancelado.", Toast.LENGTH_SHORT).show();
                             })
                             .show();
                 } else if (resultado > 0) {
                     Log.d("CadastrarFaixa", "Faixa cadastrada com sucesso, código=" + resultado);
-                    Toast.makeText(MainActivity.this,
+                    Toast.makeText(mContext,
                             "Faixa cadastrada com sucesso! Código da faixa: " + resultado,
                             Toast.LENGTH_SHORT).show();
                     enviarFaixasParaJS();
                 } else {
                     Log.d("CadastrarFaixa", "Erro desconhecido ao cadastrar faixa");
-                    Toast.makeText(MainActivity.this, "Erro ao cadastrar faixa.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Erro ao cadastrar faixa.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
-
+        // 🔹 Método para navegar para produtos.html (abre ProdutosActivity)
         @JavascriptInterface
+        public void navegarPara(String pagina) {
+            if (pagina.equals("produtos.html")) {
+                Intent intent = new Intent(mContext, ProdutosActivity.class);
+                mContext.startActivity(intent);
+            } else {
+                ((Activity)mContext).runOnUiThread(() -> {
+                    webView.loadUrl("file:///android_asset/" + pagina);
+                });
+            }
+        }
+
+
+
+
+    @JavascriptInterface
         public void exportarFaixas() {
             runOnUiThread(() -> {
                 try {
@@ -658,10 +684,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        @JavascriptInterface
-        public void navegarPara(String pagina) {
-            runOnUiThread(() -> webView.loadUrl("file:///android_asset/" + pagina));
-        }
 
         // ----------------------------- NORMALIZAR ESTADO ----------------------------- //
         private String normalizarEstado(String estado) {
@@ -815,51 +837,6 @@ public class MainActivity extends AppCompatActivity {
             return jsonArray.toString();
         }
 
-        // -------------------------------------------------------------PRODUTOS DO CARTAZISTA------------------------------------------------------- //
 
-        @JavascriptInterface
-        public String getProdutosCartazista() {
-            JSONArray produtos = new JSONArray();
-            Cursor cursor = dbHelper.listarProdutosCartazista();
-
-            if (cursor == null) {
-                Log.e("DEBUG_TESTE", "Cursor é nulo!");
-                return produtos.toString();
-            }
-
-            if (!cursor.moveToFirst()) {
-                Log.d("DEBUG_TESTE", "Nenhum produto encontrado no banco!");
-            } else {
-                do {
-                    try {
-                        int codigo = cursor.getInt(cursor.getColumnIndex("codigo"));
-                        String descricao = cursor.getString(cursor.getColumnIndex("descricao"));
-                        String categoria = cursor.getString(cursor.getColumnIndex("categoria"));
-                        double preco = cursor.getDouble(cursor.getColumnIndex("preco"));
-                        String embalagem = cursor.getString(cursor.getColumnIndex("embalagem"));
-                        double qtdPorEmbalagem = cursor.getDouble(cursor.getColumnIndex("qtd_por_embalagem"));
-
-                        Log.d("DEBUG_TESTE", "Produto: " + descricao + ", Código: " + codigo);
-
-                        JSONObject obj = new JSONObject();
-                        obj.put("codigo", codigo);
-                        obj.put("descricao", descricao);
-                        obj.put("categoria", categoria);
-                        obj.put("preco", preco);
-                        obj.put("embalagem", embalagem);
-                        obj.put("qtd_por_embalagem", qtdPorEmbalagem);
-
-                        produtos.put(obj);
-                    } catch (Exception e) {
-                        Log.e("DEBUG_TESTE", "Erro ao criar JSON do produto", e);
-                    }
-                } while (cursor.moveToNext());
-            }
-
-            cursor.close();
-            Log.d("DEBUG_TESTE", "JSON final de produtos: " + produtos.toString());
-            return produtos.toString();
-        }
-
-        }
     }
+}
