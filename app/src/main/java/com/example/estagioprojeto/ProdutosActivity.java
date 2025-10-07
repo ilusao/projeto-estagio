@@ -93,7 +93,8 @@ public class ProdutosActivity extends AppCompatActivity {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         try {
-            String sql = "SELECT p.id, p.codigo_produto, pr.descricao, p.quantidade, p.preco, p.data_pedido " +
+            String sql = "SELECT p.id, p.codigo_produto, pr.descricao, pr.embalagem, pr.qtd_por_embalagem, " +
+                    "p.quantidade, p.preco, p.data_pedido " +
                     "FROM pedidos p " +
                     "INNER JOIN produtos_cartazista pr ON p.codigo_produto = pr.codigo " +
                     "WHERE date(p.data_pedido) >= date('now','-6 days') " +
@@ -108,8 +109,10 @@ public class ProdutosActivity extends AppCompatActivity {
                         obj.put("id", cursor.getInt(cursor.getColumnIndexOrThrow("id")));
                         obj.put("codigo_produto", cursor.getInt(cursor.getColumnIndexOrThrow("codigo_produto")));
                         obj.put("descricao", cursor.getString(cursor.getColumnIndexOrThrow("descricao")));
+                        obj.put("embalagem", cursor.getString(cursor.getColumnIndexOrThrow("embalagem")));
+                        obj.put("qtd_por_embalagem", cursor.getDouble(cursor.getColumnIndexOrThrow("qtd_por_embalagem")));
                         obj.put("quantidade", cursor.getInt(cursor.getColumnIndexOrThrow("quantidade")));
-                        obj.put("preco", cursor.getDouble(cursor.getColumnIndexOrThrow("preco")));
+                        obj.put("preco", cursor.getDouble(cursor.getColumnIndexOrThrow("preco"))); // preço por embalagem
                         obj.put("data_pedido", cursor.getString(cursor.getColumnIndexOrThrow("data_pedido")));
                         array.put(obj);
                     } catch (Exception e) {
@@ -117,7 +120,7 @@ public class ProdutosActivity extends AppCompatActivity {
                     }
                 } while(cursor.moveToNext());
             }
-            cursor.close();
+            if (cursor != null) cursor.close();
         } catch (Exception e) {
             Log.e("getPedidosDaSemana", "Erro na query SQL", e);
         }
@@ -130,7 +133,8 @@ public class ProdutosActivity extends AppCompatActivity {
         JSONArray array = new JSONArray();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sql = "SELECT strftime('%W', p.data_pedido) AS semana, SUM(p.quantidade) AS total, pr.descricao " +
+        String sql = "SELECT strftime('%W', p.data_pedido) AS semana, pr.descricao, " +
+                "SUM(p.quantidade) AS quantidade_total, SUM(p.preco * p.quantidade) AS valor_total " +
                 "FROM pedidos p " +
                 "INNER JOIN produtos_cartazista pr ON p.codigo_produto = pr.codigo " +
                 "WHERE strftime('%m', p.data_pedido) = strftime('%m','now') " +
@@ -145,7 +149,8 @@ public class ProdutosActivity extends AppCompatActivity {
                     JSONObject obj = new JSONObject();
                     obj.put("semana", cursor.getString(cursor.getColumnIndexOrThrow("semana")));
                     obj.put("descricao", cursor.getString(cursor.getColumnIndexOrThrow("descricao")));
-                    obj.put("quantidade_total", cursor.getInt(cursor.getColumnIndexOrThrow("total")));
+                    obj.put("quantidade_total", cursor.getInt(cursor.getColumnIndexOrThrow("quantidade_total")));
+                    obj.put("valor_total", cursor.getDouble(cursor.getColumnIndexOrThrow("valor_total")));
                     array.put(obj);
                 } catch (Exception e) { e.printStackTrace(); }
             } while(cursor.moveToNext());

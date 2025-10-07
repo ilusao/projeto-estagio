@@ -1,24 +1,78 @@
+/* Cards */
 .card-custom {
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .card-custom:hover {
-          transform: scale(1.05);
-          box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-        }
+    cursor: pointer;
+    transition: 0.2s;
+}
+.card-custom:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+}
 
-        #tabMenu {
-            display: flex !important;
-            flex-wrap: nowrap !important;  /* não empilha em telas pequenas */
-            justify-content: space-between; /* espaça igualmente */
-            overflow-x: auto; /* permite scroll horizontal se não couber */
-        }
+/* Menu de tabs */
+#tabMenu {
+    display: flex !important;
+    flex-wrap: nowrap !important;  /* não empilha em telas pequenas */
+    justify-content: space-between; /* espaça igualmente */
+    overflow-x: auto; /* permite scroll horizontal se não couber */
+}
+#tabMenu .nav-item {
+    flex: 1 0 auto; /* cada tab ocupa espaço mínimo necessário */
+}
+#tabMenu .nav-link {
+    text-align: center;
+    white-space: nowrap; /* evita quebra de linha */
+}
 
-        #tabMenu .nav-item {
-            flex: 1 0 auto; /* cada tab ocupa espaço mínimo necessário */
-        }
+/* Fullscreen simulado: wrapper centralizado */
+.grafico-wrapper.fullscreen-simulado {
+    position: fixed !important;
+    top: 50%;
+    left: 50%;
+    width: 200vw !important;
+    height: 100vh !important;
+    z-index: 9999;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    transform: translate(-50%, -50%);
+}
 
-        #tabMenu .nav-link {
-            text-align: center;
-            white-space: nowrap; /* evita quebra de linha */
-        }
+/* Canvas do gráfico */
+.grafico-wrapper.fullscreen-simulado canvas {
+    width: 80% !important;
+    height: 56% !important;
+    transform: rotate(90deg);
+    transform-origin: center center;
+}
+
+/* Botão de fechar fica controlado apenas via JS */
+.btn-fullscreen-close {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10000;
+    display: none;
+}
+
+/* Canvas padrão */
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Ajuste para celular em portrait */
+@media screen and (orientation: portrait) {
+    canvas:fullscreen {
+        transform: rotate(90deg);
+        transform-origin: center center;
+        width: 100vh !important;
+        height: 100vw !important;
+    }
+}
+
+/* Altura menor em telas pequenas */
+@media (max-width: 768px) {
+    .grafico-wrapper { height: 230px; }
+}

@@ -30,9 +30,7 @@
         <!-- Aba 1: Pedidos -->
         <div class="tab-pane fade show active" id="pedidos" role="tabpanel">
             <h4>Adicionar Pedido de Produto</h4>
-            <div id="listaProdutos">
-                <!-- Os produtos serão inseridos pelo JS -->
-            </div>
+            <div id="listaProdutos"></div>
             <button id="finalizarPedidos" class="btn btn-success mt-3">
                 <i class="bi bi-check-circle me-1"></i> Finalizar Pedidos
             </button>
@@ -44,150 +42,265 @@
             <table class="table table-bordered table-striped" id="tabelaEstoque">
                 <thead class="table-dark">
                 <tr>
+                    <th>Código</th>
                     <th>Produto</th>
+                    <th>Embalagem</th>
                     <th>Quantidade</th>
+                    <th>Preço Unitário</th>
+                    <th>Preço Total</th>
                     <th>Data</th>
                 </tr>
                 </thead>
-                <tbody>
-                <!-- Os pedidos serão inseridos pelo JS -->
-                </tbody>
+                <tbody></tbody>
+                <tfoot>
+                <tr class="table-secondary fw-bold">
+                    <td colspan="5" class="text-end">Total da Semana:</td>
+                    <td id="totalSemana">R$ 0,00</td>
+                    <td></td>
+                </tr>
+                </tfoot>
             </table>
         </div>
 
-        <!-- Aba 3: Gráficos -->
-        <div class="tab-pane fade" id="graficos" role="tabpanel">
-            <h4>Relatórios / Gasto Mensal</h4>
-            <canvas id="graficoMes" width="400" height="200"></canvas>
+        <!-- 📊 ABA 3: GRÁFICOS -->
+        <!-- ABA DE GRÁFICOS -->
+        <h5 class="mt-4">Resumo da Semana</h5>
+        <div class="grafico-wrapper position-relative text-center">
+            <canvas id="graficoSemana"></canvas>
+            <button id="expandirSemana" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 me-2 mt-1">
+                <i class="bi bi-arrows-fullscreen"></i> Tela cheia
+            </button>
+            <button class="btn btn-sm btn-danger btn-fullscreen-close">✕ Sair</button>
+        </div>
+
+        <h5 class="mt-4">Resumo do Mês</h5>
+        <div class="grafico-wrapper position-relative text-center">
+            <canvas id="graficoMes"></canvas>
+            <button id="expandirMes" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 me-2 mt-1">
+                <i class="bi bi-arrows-fullscreen"></i> Tela cheia
+            </button>
+            <button class="btn btn-sm btn-danger btn-fullscreen-close">✕ Sair</button>
         </div>
     </div>
 </div>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 <script>
-    function carregarProdutosDoBanco() {
-        if (typeof Android === "undefined") {
-            console.error("Android não está definido!");
-            return;
-        }
+    let graficoSemana = null;
+let graficoMes = null;
 
-        const produtosJson = Android.getProdutosCartazista();
-        console.log("JSON recebido do Android:", produtosJson);
+// CARREGA PRODUTOS
+function carregarProdutosDoBanco() {
+    if (typeof Android === "undefined") return;
+    const produtosJson = Android.getProdutosCartazista();
+    let produtos = JSON.parse(produtosJson);
 
-        let produtos;
-        try {
-            produtos = JSON.parse(produtosJson);
-        } catch (e) {
-            console.error("Erro ao parsear JSON:", e);
-            return;
-        }
+    const listaDiv = document.getElementById('listaProdutos');
+    listaDiv.innerHTML = '';
 
-        const listaDiv = document.getElementById('listaProdutos');
-        listaDiv.innerHTML = ''; // limpar
+    produtos.forEach(prod => {
+        const qtdEmb = Number(prod.qtd_por_embalagem) || 1;
+        const precoUnitario = Number(prod.preco) || 0;
+        const precoPorEmbalagem = precoUnitario * qtdEmb;
 
-        produtos.forEach(prod => {
-            const div = document.createElement('div');
-            div.className = "card mb-2 p-2 shadow-sm";
+        const div = document.createElement('div');
+        div.className = "card mb-2 p-2 shadow-sm";
+        div.dataset.precoEmbalagem = precoPorEmbalagem.toFixed(4);
+        div.dataset.qtdPorEmbalagem = qtdEmb;
 
-            div.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${prod.descricao}</strong><br>
-                        <small class="codigo">Código: ${prod.codigo}</small><br>
-                        <small>Embalagem: ${prod.embalagem}</small><br>
-                        <small>Preço unitário: R$ ${prod.preco.toFixed(2)}</small>
-                        <small class="preco">Preço unitário: R$ ${prod.preco.toFixed(2)}</small>
-                        <small>Qtd por embalagem: ${prod.qtd_por_embalagem}</small>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-outline-secondary btn-sm me-1" type="button">-</button>
-                        <input type="number" class="form-control form-control-sm text-center me-1" value="0" min="0" style="width: 70px;">
-                        <button class="btn btn-outline-secondary btn-sm me-2" type="button">+</button>
-                    </div>
+        div.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>${prod.descricao}</strong><br>
+                    <small class="codigo">Código: ${prod.codigo}</small><br>
+                    <small>Embalagem: ${prod.embalagem}</small><br>
+                    <small>Qtd por embalagem: ${qtdEmb}</small><br>
+                    <small>Preço unitário: R$ ${precoUnitario.toFixed(2)}</small><br>
+                    <small>Preço por embalagem: R$ ${precoPorEmbalagem.toFixed(2)}</small>
                 </div>
-            `;
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary btn-sm me-1" type="button">-</button>
+                    <input type="number" class="form-control form-control-sm text-center me-1" value="0" min="0" style="width: 70px;">
+                    <button class="btn btn-outline-secondary btn-sm me-2" type="button">+</button>
+                </div>
+            </div>
+        `;
+        listaDiv.appendChild(div);
 
-            listaDiv.appendChild(div);
+        const input = div.querySelector('input');
+        const btnMais = div.querySelectorAll('button')[1];
+        const btnMenos = div.querySelectorAll('button')[0];
 
-            const input = div.querySelector('input');
-            const btnMais = div.querySelectorAll('button')[1];
-            const btnMenos = div.querySelectorAll('button')[0];
+        btnMais.addEventListener('click', () => input.value = parseInt(input.value) + 1);
+        btnMenos.addEventListener('click', () => { if (parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
+    });
+}
 
-            btnMais.addEventListener('click', () => { input.value = parseInt(input.value) + 1; });
-            btnMenos.addEventListener('click', () => { if(parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
-        });
-    }
+// FINALIZAR PEDIDOS
+document.getElementById("finalizarPedidos").addEventListener("click", () => {
+    const cards = document.querySelectorAll("#listaProdutos .card");
+    cards.forEach(card => {
+        const input = card.querySelector("input");
+        const qtdEmbalagens = parseInt(input.value) || 0;
+        if (qtdEmbalagens > 0) {
+            const codigo = parseInt(card.querySelector(".codigo").innerText.split(":")[1].trim());
+            const precoUnitario = parseFloat(card.querySelector("small:nth-of-type(5)").innerText.split("R$")[1]) || 0;
+            const qtdPorEmb = parseInt(card.dataset.qtdPorEmbalagem) || 1;
+            const precoPorEmbalagem = precoUnitario * qtdPorEmb;
 
-    function carregarPedidosDaSemana() {
-    if(typeof Android === "undefined") return;
+            Android.finalizarPedido(codigo, qtdEmbalagens, precoPorEmbalagem);
+            input.value = 0;
+        }
+    });
 
+    carregarPedidosDaSemana();
+    carregarResumoSemanal();
+    carregarResumoMensal();
+});
+
+// TABELA SEMANAL
+function carregarPedidosDaSemana() {
+    if (typeof Android === "undefined") return;
     let pedidos = JSON.parse(Android.getPedidosDaSemana());
     let tbody = document.querySelector("#tabelaEstoque tbody");
     tbody.innerHTML = "";
 
+    let totalSemana = 0;
     pedidos.forEach(p => {
+        const qtdEmb = Number(p.qtd_por_embalagem) || 1;
+        const precoPorEmbalagem = Number(p.preco) || 0;
+        const precoUnitario = precoPorEmbalagem / qtdEmb;
+        const precoTotalLinha = precoPorEmbalagem * Number(p.quantidade);
+
+        totalSemana += precoTotalLinha;
+
         let tr = document.createElement("tr");
-        tr.innerHTML = `<td>${p.descricao}</td><td>${p.quantidade}</td><td>${p.data_pedido}</td>`;
+        tr.innerHTML = `
+            <td>${p.codigo_produto}</td>
+            <td>${p.descricao}</td>
+            <td>${p.embalagem ?? '-'}</td>
+            <td>${p.quantidade}</td>
+            <td>R$ ${precoUnitario.toFixed(2)}</td>
+            <td>R$ ${precoTotalLinha.toFixed(2)}</td>
+            <td>${p.data_pedido}</td>
+        `;
         tbody.appendChild(tr);
+    });
+
+    document.getElementById("totalSemana").innerText = "R$ " + totalSemana.toFixed(2);
+}
+
+// GRÁFICOS
+function carregarResumoSemanal() {
+    if (typeof Android === "undefined") return;
+    const pedidos = JSON.parse(Android.getPedidosDaSemana());
+    const ctx = document.getElementById('graficoSemana').getContext('2d');
+
+    const totaisPorProduto = {};
+    pedidos.forEach(p => {
+        const codigo = p.codigo_produto || "N/A";
+        const valor = (Number(p.preco) || 0) * (Number(p.quantidade) || 0);
+        totaisPorProduto[codigo] = (totaisPorProduto[codigo] || 0) + valor;
+    });
+
+    const labels = Object.keys(totaisPorProduto);
+    const valores = Object.values(totaisPorProduto);
+
+    if (graficoSemana) graficoSemana.destroy();
+
+    graficoSemana = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Gasto por Produto (R$)', data: valores, backgroundColor: 'rgba(75, 192, 192, 0.7)' }] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => "R$ " + ctx.parsed.y.toFixed(2) } }
+            },
+            scales: { x: { ticks: { font: { size: 8 } } }, y: { beginAtZero: true, ticks: { font: { size: 10 } } } }
+        }
     });
 }
 
 function carregarResumoMensal() {
-    if(typeof Android === "undefined") return;
+    if (typeof Android === "undefined") return;
+    const pedidos = JSON.parse(Android.getPedidosDoMes());
+    const ctx = document.getElementById('graficoMes').getContext('2d');
 
-    let pedidos = JSON.parse(Android.getPedidosDoMes());
-    let ctx = document.getElementById('graficoMes').getContext('2d');
+    const totaisPorDia = {};
+    pedidos.forEach(p => {
+        const dia = p.data_pedido.split(" ")[0];
+        const valor = (Number(p.preco) || 0) * (Number(p.quantidade) || 0);
+        totaisPorDia[dia] = (totaisPorDia[dia] || 0) + valor;
+    });
 
-    let labels = pedidos.map(p => `Semana ${p.semana}: ${p.descricao}`);
-    let data = pedidos.map(p => p.quantidade_total);
+    const labels = Object.keys(totaisPorDia);
+    const valores = Object.values(totaisPorDia);
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Quantidade Mensal por Semana',
-                data: data,
-                backgroundColor: 'rgba(54, 162, 235, 0.7)'
-            }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+    if (graficoMes) graficoMes.destroy();
+
+    graficoMes = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Gasto Total Diário (R$)', data: valores, borderColor: 'rgba(255, 99, 132, 0.7)', fill: false, tension: 0.3 }] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => "R$ " + ctx.parsed.y.toFixed(2) } } },
+            scales: { y: { beginAtZero: true } }
+        }
     });
 }
 
+// FULLSCREEN SIMPLES DEITADO (toggle)
+function toggleFullscreenDeitado(canvas) {
+    const wrapper = canvas.parentElement;
+    wrapper.classList.toggle('fullscreen-simulado');
+
+    // Gira o gráfico se fullscreen, volta ao normal se não
+    canvas.style.transform = wrapper.classList.contains('fullscreen-simulado') ? 'rotate(90deg)' : 'rotate(0deg)';
+
+    // Mostra ou esconde o botão de fechar
+    const btn = wrapper.querySelector('.btn-fullscreen-close');
+    btn.style.display = wrapper.classList.contains('fullscreen-simulado') ? 'block' : 'none';
+
+    // Redesenha gráfico
+    if (graficoSemana && canvas.id === 'graficoSemana') graficoSemana.resize();
+    if (graficoMes && canvas.id === 'graficoMes') graficoMes.resize();
+}
+
+// Botões de fullscreen
+document.getElementById('expandirSemana').addEventListener('click', () => toggleFullscreenDeitado(document.getElementById('graficoSemana')));
+document.getElementById('expandirMes').addEventListener('click', () => toggleFullscreenDeitado(document.getElementById('graficoMes')));
+
+// Botão de fechar
+document.querySelectorAll('.btn-fullscreen-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const canvas = btn.parentElement.querySelector('canvas');
+        if (canvas) toggleFullscreenDeitado(canvas);
+    });
+});
+
+// Redesenhar gráficos ao mudar fullscreen
+['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt => {
+    document.addEventListener(evt, () => {
+        if (graficoSemana) graficoSemana.resize();
+        if (graficoMes) graficoMes.resize();
+    });
+});
+
+// INICIALIZAÇÃO
 document.addEventListener("DOMContentLoaded", () => {
     carregarProdutosDoBanco();
     carregarPedidosDaSemana();
+    carregarResumoSemanal();
     carregarResumoMensal();
 });
 
-document.getElementById("finalizarPedidos").addEventListener("click", () => {
-    const cards = document.querySelectorAll("#listaProdutos .card");
-    console.log("Finalizando pedidos...");
-
-    cards.forEach(card => {
-        const input = card.querySelector("input");
-        const quantidade = parseInt(input.value);
-        if (quantidade > 0) {
-            const codigo = parseInt(card.querySelector(".codigo").innerText.split(":")[1].trim());
-            const precoUnitario = parseFloat(card.querySelector(".preco").innerText.split("R$")[1]);
-            const precoTotal = precoUnitario * quantidade;
-
-            console.log(`Chamando Android.finalizarPedido -> codigo: ${codigo}, quantidade: ${quantidade}, precoTotal: ${precoTotal}`);
-
-            Android.finalizarPedido(codigo, quantidade, precoTotal);
-
-            input.value = 0; // resetar
-        }
-    });
-
-    console.log("Pedidos finalizados. Atualizando tabela...");
-    carregarPedidosDaSemana(); // atualizar tabela Estoque
-});
-
-    // Chama assim que a página carregar
-    document.addEventListener("DOMContentLoaded", carregarProdutosDoBanco);
 </script>
+
+
+
 
 </body>
 </html>

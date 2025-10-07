@@ -898,10 +898,6 @@ public class Bancodedados extends SQLiteOpenHelper {
     }
 
 
-
-
-
-
 }
 
 
