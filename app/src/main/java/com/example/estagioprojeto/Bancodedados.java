@@ -781,7 +781,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         db.execSQL(createTableProdutos);
     }
 
-    private void popularProdutosCartazista(SQLiteDatabase db) {
+    public void popularProdutosCartazista(SQLiteDatabase db) {
         String[] inserts = {
                 "INSERT OR IGNORE INTO produtos_cartazista VALUES (717916, 'CARTAZ 21X30 CONFIRA 2X(15X21) IMP OFF 120', 'Cartaz', 0.260, 'Pacote c/ 100 unidades', 100)",
                 "INSERT OR IGNORE INTO produtos_cartazista VALUES (717940, 'CARTAZ 21X30 CONFIRA TOPO IMP OFF 120', 'Cartaz', 0.260, 'Pacote c/ 100 unidades', 100)",
@@ -821,9 +821,10 @@ public class Bancodedados extends SQLiteOpenHelper {
     private void criarTabelaPedidos(SQLiteDatabase db) {
         String createTablePedidos = "CREATE TABLE IF NOT EXISTS pedidos (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "id_pedido INTEGER NOT NULL, " +
                 "codigo_produto INTEGER NOT NULL, " +
                 "quantidade INTEGER NOT NULL, " +
-                "preco REAL NOT NULL, " + // preço do momento do pedido
+                "preco REAL NOT NULL, " +
                 "data_pedido TEXT DEFAULT (datetime('now','localtime')), " +
                 "FOREIGN KEY (codigo_produto) REFERENCES produtos_cartazista(codigo)" +
                 ")";
@@ -831,9 +832,10 @@ public class Bancodedados extends SQLiteOpenHelper {
     }
 
     // Inserir pedido com chave estrangeira
-    public void inserirPedido(int codigoProduto, int quantidade, double preco) {
+    public void inserirPedido(int idPedido, int codigoProduto, int quantidade, double preco) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put("id_pedido", idPedido);
         values.put("codigo_produto", codigoProduto);
         values.put("quantidade", quantidade);
         values.put("preco", preco);
@@ -841,7 +843,18 @@ public class Bancodedados extends SQLiteOpenHelper {
         values.put("data_pedido", dataAtual);
 
         long id = db.insert("pedidos", null, values);
-        Log.d("DB_PEDIDOS", "Pedido inserido -> id: " + id + ", codigo: " + codigoProduto + ", quantidade: " + quantidade + ", preco: " + preco);
+        Log.d("DB_PEDIDOS", "Produto inserido no pedido -> id: " + id + ", id_pedido: " + idPedido + ", codigo: " + codigoProduto + ", quantidade: " + quantidade);
+    }
+
+    public int gerarIdPedido() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT MAX(id_pedido) AS max_id FROM pedidos", null);
+        int novoId = 1;
+        if (cursor.moveToFirst()) {
+            novoId = cursor.getInt(cursor.getColumnIndexOrThrow("max_id")) + 1;
+        }
+        cursor.close();
+        return novoId;
     }
 
     // Listar pedidos com informações do produto
@@ -896,6 +909,10 @@ public class Bancodedados extends SQLiteOpenHelper {
         }
         return lista;
     }
+
+
+
+
 
 
 }

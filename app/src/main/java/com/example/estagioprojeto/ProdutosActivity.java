@@ -41,6 +41,9 @@ public class ProdutosActivity extends AppCompatActivity {
             }
         });
 
+        // Gera um novo id_pedido para esta "sessão de pedidos"
+        final int novoIdPedido = dbHelper.gerarIdPedido();
+
         // Interface para o JS acessar os produtos
         webView.addJavascriptInterface(new Object() {
             @JavascriptInterface
@@ -69,8 +72,8 @@ public class ProdutosActivity extends AppCompatActivity {
 
             @JavascriptInterface
             public void finalizarPedido(int codigo, int quantidade, double preco) {
-                dbHelper.inserirPedido(codigo, quantidade, preco);
-                Log.d("ProdutosActivity", "Pedido inserido: " + codigo + " x" + quantidade);
+                dbHelper.inserirPedido(novoIdPedido, codigo, quantidade, preco);
+                Log.d("ProdutosActivity", "Pedido inserido: " + codigo + " x" + quantidade + " (id_pedido: " + novoIdPedido + ")");
             }
 
             @JavascriptInterface
@@ -87,13 +90,15 @@ public class ProdutosActivity extends AppCompatActivity {
         webView.loadUrl("file:///android_asset/produtos.html");
     }
 
+
+
     @JavascriptInterface
     public String getPedidosDaSemana() {
         JSONArray array = new JSONArray();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         try {
-            String sql = "SELECT p.id, p.codigo_produto, pr.descricao, pr.embalagem, pr.qtd_por_embalagem, " +
+            String sql = "SELECT p.id, p.id_pedido, p.codigo_produto, pr.descricao, pr.embalagem, pr.qtd_por_embalagem, " +
                     "p.quantidade, p.preco, p.data_pedido " +
                     "FROM pedidos p " +
                     "INNER JOIN produtos_cartazista pr ON p.codigo_produto = pr.codigo " +
@@ -107,12 +112,13 @@ public class ProdutosActivity extends AppCompatActivity {
                     try {
                         JSONObject obj = new JSONObject();
                         obj.put("id", cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                        obj.put("id_pedido", cursor.getInt(cursor.getColumnIndexOrThrow("id_pedido"))); // <-- adicionado
                         obj.put("codigo_produto", cursor.getInt(cursor.getColumnIndexOrThrow("codigo_produto")));
                         obj.put("descricao", cursor.getString(cursor.getColumnIndexOrThrow("descricao")));
                         obj.put("embalagem", cursor.getString(cursor.getColumnIndexOrThrow("embalagem")));
                         obj.put("qtd_por_embalagem", cursor.getDouble(cursor.getColumnIndexOrThrow("qtd_por_embalagem")));
                         obj.put("quantidade", cursor.getInt(cursor.getColumnIndexOrThrow("quantidade")));
-                        obj.put("preco", cursor.getDouble(cursor.getColumnIndexOrThrow("preco"))); // preço por embalagem
+                        obj.put("preco", cursor.getDouble(cursor.getColumnIndexOrThrow("preco")));
                         obj.put("data_pedido", cursor.getString(cursor.getColumnIndexOrThrow("data_pedido")));
                         array.put(obj);
                     } catch (Exception e) {
@@ -127,6 +133,7 @@ public class ProdutosActivity extends AppCompatActivity {
 
         return array.toString();
     }
+
 
     @JavascriptInterface
     public String getPedidosDoMes() {

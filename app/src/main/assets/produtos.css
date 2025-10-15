@@ -11,19 +11,19 @@
 /* Menu de tabs */
 #tabMenu {
     display: flex !important;
-    flex-wrap: nowrap !important;  /* não empilha em telas pequenas */
-    justify-content: space-between; /* espaça igualmente */
-    overflow-x: auto; /* permite scroll horizontal se não couber */
+    flex-wrap: nowrap !important;
+    justify-content: space-between;
+    overflow-x: auto;
 }
 #tabMenu .nav-item {
-    flex: 1 0 auto; /* cada tab ocupa espaço mínimo necessário */
+    flex: 1 0 auto;
 }
 #tabMenu .nav-link {
     text-align: center;
-    white-space: nowrap; /* evita quebra de linha */
+    white-space: nowrap;
 }
 
-/* Fullscreen simulado: wrapper centralizado */
+/* Fullscreen simulado */
 .grafico-wrapper.fullscreen-simulado {
     position: fixed !important;
     top: 50%;
@@ -39,7 +39,6 @@
     transform: translate(-50%, -50%);
 }
 
-/* Canvas do gráfico */
 .grafico-wrapper.fullscreen-simulado canvas {
     width: 80% !important;
     height: 56% !important;
@@ -47,29 +46,32 @@
     transform-origin: center center;
 }
 
-/* Botão de fechar fica controlado apenas via JS */
 .btn-fullscreen-close {
-    position: fixed;
-    top: 10px;
-    right: 10px;
+    position: absolute;
+    top: 0%;
+    right: 25%;
     z-index: 10000;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
     display: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-fullscreen-close:hover {
+    background: #e63636;
+    transform: scale(1.05);
 }
 
 /* Canvas padrão */
 canvas {
     width: 100% !important;
     height: 100% !important;
-}
-
-/* Ajuste para celular em portrait */
-@media screen and (orientation: portrait) {
-    canvas:fullscreen {
-        transform: rotate(90deg);
-        transform-origin: center center;
-        width: 100vh !important;
-        height: 100vw !important;
-    }
 }
 
 /* Altura menor em telas pequenas */

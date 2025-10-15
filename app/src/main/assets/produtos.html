@@ -61,128 +61,180 @@
                 </tfoot>
             </table>
         </div>
+        <div class="tab-pane fade" id="graficos" role="tabpanel">
+            <!-- 📊 ABA 3: GRÁFICOS -->
+            <!-- ABA DE GRÁFICOS -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <h5>Resumo da Semana</h5>
+                <button id="expandirSemana" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrows-fullscreen"></i> Tela cheia
+                </button>
+            </div>
+            <div class="grafico-wrapper position-relative text-center">
+                <canvas id="graficoSemana"></canvas>
+                <button class="btn btn-sm btn-danger btn-fullscreen-close">✕ Sair</button>
+            </div>
 
-        <!-- 📊 ABA 3: GRÁFICOS -->
-        <!-- ABA DE GRÁFICOS -->
-        <h5 class="mt-4">Resumo da Semana</h5>
-        <div class="grafico-wrapper position-relative text-center">
-            <canvas id="graficoSemana"></canvas>
-            <button id="expandirSemana" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 me-2 mt-1">
-                <i class="bi bi-arrows-fullscreen"></i> Tela cheia
-            </button>
-            <button class="btn btn-sm btn-danger btn-fullscreen-close">✕ Sair</button>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <h5>Resumo do Mês</h5>
+                <button id="expandirMes" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrows-fullscreen"></i> Tela cheia
+                </button>
+            </div>
+            <div class="grafico-wrapper position-relative text-center">
+                <canvas id="graficoMes"></canvas>
+                <button class="btn btn-sm btn-danger btn-fullscreen-close">✕ Sair</button>
+            </div>
         </div>
 
-        <h5 class="mt-4">Resumo do Mês</h5>
-        <div class="grafico-wrapper position-relative text-center">
-            <canvas id="graficoMes"></canvas>
-            <button id="expandirMes" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 me-2 mt-1">
-                <i class="bi bi-arrows-fullscreen"></i> Tela cheia
-            </button>
-            <button class="btn btn-sm btn-danger btn-fullscreen-close">✕ Sair</button>
-        </div>
     </div>
 </div>
 
 <script src="Bootstrap/js/bootstrap.bundle.js"></script>
 <script>
     let graficoSemana = null;
-let graficoMes = null;
+    let graficoMes = null;
 
-// CARREGA PRODUTOS
-function carregarProdutosDoBanco() {
-    if (typeof Android === "undefined") return;
-    const produtosJson = Android.getProdutosCartazista();
-    let produtos = JSON.parse(produtosJson);
 
-    const listaDiv = document.getElementById('listaProdutos');
-    listaDiv.innerHTML = '';
+    // Lista de produtos cujo preço já é por embalagem
+   const produtosPrecoJaEmbalagem = [
+    142220, // GRAMPO ROCAMA 106/6
+    497924, // FEIXE DE MADEIRA P/ CARTAZ 1M
+    145971, // ABRAÇADEIRA NYLON 10 X 2,5
+    145980, // ABRAÇADEIRA NYLON 15 X 3,4
+    571725, // ABRAÇADEIRA NYLON 30 X 3,6
+    434051  // PAPEL CARTAO AMARELO 66X96
+];
 
-    produtos.forEach(prod => {
-        const qtdEmb = Number(prod.qtd_por_embalagem) || 1;
-        const precoUnitario = Number(prod.preco) || 0;
-        const precoPorEmbalagem = precoUnitario * qtdEmb;
+    // CARREGA PRODUTOS
+    function carregarProdutosDoBanco() {
+        if (typeof Android === "undefined") return;
+        const produtosJson = Android.getProdutosCartazista();
+        console.log("produtosJson:", produtosJson);
+        let produtos = JSON.parse(produtosJson);
 
-        const div = document.createElement('div');
-        div.className = "card mb-2 p-2 shadow-sm";
-        div.dataset.precoEmbalagem = precoPorEmbalagem.toFixed(4);
-        div.dataset.qtdPorEmbalagem = qtdEmb;
+        const listaDiv = document.getElementById('listaProdutos');
+        listaDiv.innerHTML = '';
 
-        div.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>${prod.descricao}</strong><br>
-                    <small class="codigo">Código: ${prod.codigo}</small><br>
-                    <small>Embalagem: ${prod.embalagem}</small><br>
-                    <small>Qtd por embalagem: ${qtdEmb}</small><br>
-                    <small>Preço unitário: R$ ${precoUnitario.toFixed(2)}</small><br>
-                    <small>Preço por embalagem: R$ ${precoPorEmbalagem.toFixed(2)}</small>
+        produtos.forEach(prod => {
+            const qtdEmb = Number(prod.qtd_por_embalagem) || 1;
+            const precoUnitario = Number(prod.preco) || 0;
+            const precoPorEmbalagem = produtosPrecoJaEmbalagem.includes(prod.codigo)
+                ? precoUnitario
+                : precoUnitario * qtdEmb;
+
+            const div = document.createElement('div');
+            div.className = "card mb-2 p-2 shadow-sm";
+            div.dataset.precoEmbalagem = precoPorEmbalagem.toFixed(4);
+            div.dataset.qtdPorEmbalagem = qtdEmb;
+
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${prod.descricao}</strong><br>
+                        <small class="codigo">Código: ${prod.codigo}</small><br>
+                        <small>Embalagem: ${prod.embalagem}</small><br>
+                        <small>Qtd por embalagem: ${qtdEmb}</small><br>
+                        <small>Preço unitário: R$ ${precoUnitario.toFixed(2)}</small><br>
+                        <small>Preço por embalagem: R$ ${precoPorEmbalagem.toFixed(2)}</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary btn-sm me-1" type="button">-</button>
+                        <input type="number" class="form-control form-control-sm text-center me-1" value="0" min="0" style="width: 70px;">
+                        <button class="btn btn-outline-secondary btn-sm me-2" type="button">+</button>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center">
-                    <button class="btn btn-outline-secondary btn-sm me-1" type="button">-</button>
-                    <input type="number" class="form-control form-control-sm text-center me-1" value="0" min="0" style="width: 70px;">
-                    <button class="btn btn-outline-secondary btn-sm me-2" type="button">+</button>
-                </div>
-            </div>
-        `;
-        listaDiv.appendChild(div);
+            `;
+            listaDiv.appendChild(div);
 
-        const input = div.querySelector('input');
-        const btnMais = div.querySelectorAll('button')[1];
-        const btnMenos = div.querySelectorAll('button')[0];
+            const input = div.querySelector('input');
+            const btnMais = div.querySelectorAll('button')[1];
+            const btnMenos = div.querySelectorAll('button')[0];
 
-        btnMais.addEventListener('click', () => input.value = parseInt(input.value) + 1);
-        btnMenos.addEventListener('click', () => { if (parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
-    });
-}
+            btnMais.addEventListener('click', () => input.value = parseInt(input.value) + 1);
+            btnMenos.addEventListener('click', () => { if (parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
+        });
+    }
 
-// FINALIZAR PEDIDOS
-document.getElementById("finalizarPedidos").addEventListener("click", () => {
+    // FINALIZAR PEDIDOS
+   document.getElementById("finalizarPedidos").addEventListener("click", () => {
     const cards = document.querySelectorAll("#listaProdutos .card");
+    const produtos = [];
+
     cards.forEach(card => {
         const input = card.querySelector("input");
         const qtdEmbalagens = parseInt(input.value) || 0;
         if (qtdEmbalagens > 0) {
             const codigo = parseInt(card.querySelector(".codigo").innerText.split(":")[1].trim());
-            const precoUnitario = parseFloat(card.querySelector("small:nth-of-type(5)").innerText.split("R$")[1]) || 0;
             const qtdPorEmb = parseInt(card.dataset.qtdPorEmbalagem) || 1;
-            const precoPorEmbalagem = precoUnitario * qtdPorEmb;
+            const precoPorEmbalagem = parseFloat(card.dataset.precoEmbalagem) || 0;
 
-            Android.finalizarPedido(codigo, qtdEmbalagens, precoPorEmbalagem);
+            produtos.push({ codigo, quantidade: qtdEmbalagens, preco: precoPorEmbalagem });
             input.value = 0;
         }
     });
+
+    if (produtos.length > 0) {
+    produtos.forEach(p => {
+        Android.finalizarPedido(p.codigo, p.quantidade, p.preco);
+    });
+}
 
     carregarPedidosDaSemana();
     carregarResumoSemanal();
     carregarResumoMensal();
 });
 
-// TABELA SEMANAL
-function carregarPedidosDaSemana() {
+
+    // TABELA SEMANAL
+   function carregarPedidosDaSemana() {
     if (typeof Android === "undefined") return;
-    let pedidos = JSON.parse(Android.getPedidosDaSemana());
-    let tbody = document.querySelector("#tabelaEstoque tbody");
+
+    const pedidos = JSON.parse(Android.getPedidosDaSemana());
+    const tbody = document.querySelector("#tabelaEstoque tbody");
     tbody.innerHTML = "";
 
     let totalSemana = 0;
-    pedidos.forEach(p => {
-        const qtdEmb = Number(p.qtd_por_embalagem) || 1;
-        const precoPorEmbalagem = Number(p.preco) || 0;
-        const precoUnitario = precoPorEmbalagem / qtdEmb;
-        const precoTotalLinha = precoPorEmbalagem * Number(p.quantidade);
+    let pedidoAtual = null; // id_pedido atual sendo exibido
+    let contadorPedido = 0; // contador visual de pedidos na semana
 
+    pedidos.forEach(p => {
+        const dataPedido = p.data_pedido; // yyyy-MM-dd
+        const codigo = p.codigo_produto;
+        const qtdEmb = Number(p.qtd_por_embalagem) || 1;
+        const precoUnitarioOriginal = Number(p.preco) || 0;
+
+        const precoPorEmbalagem = precoUnitarioOriginal; // já vem correto do app
+        const precoUnitario = precoPorEmbalagem / qtdEmb;
+
+        const precoTotalLinha = precoPorEmbalagem * Number(p.quantidade);
         totalSemana += precoTotalLinha;
 
-        let tr = document.createElement("tr");
+        // 🔹 Cria separador apenas se for um pedido novo
+        if (p.id_pedido !== pedidoAtual) {
+            pedidoAtual = p.id_pedido;
+            contadorPedido++;
+
+            const separador = document.createElement("tr");
+            separador.innerHTML = `
+                <td colspan="7" class="table-info text-center fw-bold">
+                    🧾 Pedido ${contadorPedido} - ${dataPedido}
+                </td>
+            `;
+            tbody.appendChild(separador);
+        }
+
+        // 🔹 Linha do produto
+        const tr = document.createElement("tr");
         tr.innerHTML = `
-            <td>${p.codigo_produto}</td>
+            <td>${codigo}</td>
             <td>${p.descricao}</td>
             <td>${p.embalagem ?? '-'}</td>
             <td>${p.quantidade}</td>
             <td>R$ ${precoUnitario.toFixed(2)}</td>
             <td>R$ ${precoTotalLinha.toFixed(2)}</td>
-            <td>${p.data_pedido}</td>
+            <td>${dataPedido}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -190,81 +242,100 @@ function carregarPedidosDaSemana() {
     document.getElementById("totalSemana").innerText = "R$ " + totalSemana.toFixed(2);
 }
 
-// GRÁFICOS
-function carregarResumoSemanal() {
-    if (typeof Android === "undefined") return;
-    const pedidos = JSON.parse(Android.getPedidosDaSemana());
-    const ctx = document.getElementById('graficoSemana').getContext('2d');
 
-    const totaisPorProduto = {};
-    pedidos.forEach(p => {
-        const codigo = p.codigo_produto || "N/A";
-        const valor = (Number(p.preco) || 0) * (Number(p.quantidade) || 0);
-        totaisPorProduto[codigo] = (totaisPorProduto[codigo] || 0) + valor;
-    });
-
-    const labels = Object.keys(totaisPorProduto);
-    const valores = Object.values(totaisPorProduto);
-
-    if (graficoSemana) graficoSemana.destroy();
-
-    graficoSemana = new Chart(ctx, {
-        type: 'bar',
-        data: { labels, datasets: [{ label: 'Gasto por Produto (R$)', data: valores, backgroundColor: 'rgba(75, 192, 192, 0.7)' }] },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { callbacks: { label: ctx => "R$ " + ctx.parsed.y.toFixed(2) } }
-            },
-            scales: { x: { ticks: { font: { size: 8 } } }, y: { beginAtZero: true, ticks: { font: { size: 10 } } } }
-        }
-    });
+// função para calcular número da semana do ano
+function getNumeroDaSemana(dataStr) {
+    const data = new Date(dataStr);
+    const primeiroDiaDoAno = new Date(data.getFullYear(), 0, 1);
+    const pastDaysOfYear = (data - primeiroDiaDoAno) / 86400000;
+    return Math.ceil((pastDaysOfYear + primeiroDiaDoAno.getDay() + 1) / 7);
 }
 
-function carregarResumoMensal() {
-    if (typeof Android === "undefined") return;
-    const pedidos = JSON.parse(Android.getPedidosDoMes());
-    const ctx = document.getElementById('graficoMes').getContext('2d');
 
-    const totaisPorDia = {};
-    pedidos.forEach(p => {
-        const dia = p.data_pedido.split(" ")[0];
-        const valor = (Number(p.preco) || 0) * (Number(p.quantidade) || 0);
-        totaisPorDia[dia] = (totaisPorDia[dia] || 0) + valor;
-    });
+    // GRÁFICOS
+    function carregarResumoSemanal() {
+        if (typeof Android === "undefined") return;
+        const pedidos = JSON.parse(Android.getPedidosDaSemana());
+        const ctx = document.getElementById('graficoSemana').getContext('2d');
 
-    const labels = Object.keys(totaisPorDia);
-    const valores = Object.values(totaisPorDia);
+        const totaisPorProduto = {};
+        pedidos.forEach(p => {
+            const codigo = p.codigo_produto || "N/A";
+            const qtdEmb = Number(p.qtd_por_embalagem) || 1;
+            const quantidade = Number(p.quantidade) || 0;
+            const precoUnitario = Number(p.preco) || 0;
 
-    if (graficoMes) graficoMes.destroy();
+            const precoPorEmbalagem = precoUnitario;
 
-    graficoMes = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets: [{ label: 'Gasto Total Diário (R$)', data: valores, borderColor: 'rgba(255, 99, 132, 0.7)', fill: false, tension: 0.3 }] },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => "R$ " + ctx.parsed.y.toFixed(2) } } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-}
+            totaisPorProduto[codigo] = (totaisPorProduto[codigo] || 0) + precoPorEmbalagem * quantidade;
+        });
 
-// FULLSCREEN SIMPLES DEITADO (toggle)
-function toggleFullscreenDeitado(canvas) {
+        const labels = Object.keys(totaisPorProduto);
+        const valores = Object.values(totaisPorProduto);
+
+        if (graficoSemana) graficoSemana.destroy();
+
+        graficoSemana = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Gasto por Produto (R$)', data: valores, backgroundColor: 'rgba(75, 192, 192, 0.7)' }] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => "R$ " + ctx.parsed.y.toFixed(2) } }
+                },
+                scales: { x: { ticks: { font: { size: 8 } } }, y: { beginAtZero: true, ticks: { font: { size: 10 } } } }
+            }
+        });
+    }
+
+    function carregarResumoMensal() {
+        if (typeof Android === "undefined") return;
+        const pedidos = JSON.parse(Android.getPedidosDoMes());
+        const ctx = document.getElementById('graficoMes').getContext('2d');
+
+        const totaisPorDia = {};
+        pedidos.forEach(p => {
+            const codigo = p.codigo_produto;
+            const dia = (p.data_pedido ? p.data_pedido.split(" ")[0] : "Sem data");
+            const qtdEmb = Number(p.qtd_por_embalagem) || 1;
+            const quantidade = Number(p.quantidade) || 0;
+            const precoUnitario = Number(p.preco) || 0;
+
+           const precoPorEmbalagem = precoUnitario;
+
+            totaisPorDia[dia] = (totaisPorDia[dia] || 0) + precoPorEmbalagem * quantidade;
+        });
+
+        const labels = Object.keys(totaisPorDia);
+        const valores = Object.values(totaisPorDia);
+
+        if (graficoMes) graficoMes.destroy();
+
+        graficoMes = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets: [{ label: 'Gasto Total Diário (R$)', data: valores, borderColor: 'rgba(255, 99, 132, 0.7)', fill: false, tension: 0.3 }] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => "R$ " + ctx.parsed.y.toFixed(2) } } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // FULLSCREEN SIMPLES DEITADO (toggle)
+    function toggleFullscreenDeitado(canvas) {
     const wrapper = canvas.parentElement;
     wrapper.classList.toggle('fullscreen-simulado');
 
-    // Gira o gráfico se fullscreen, volta ao normal se não
     canvas.style.transform = wrapper.classList.contains('fullscreen-simulado') ? 'rotate(90deg)' : 'rotate(0deg)';
 
-    // Mostra ou esconde o botão de fechar
+    // Botão sair dentro do mesmo wrapper
     const btn = wrapper.querySelector('.btn-fullscreen-close');
-    btn.style.display = wrapper.classList.contains('fullscreen-simulado') ? 'block' : 'none';
+    if (btn) btn.style.display = wrapper.classList.contains('fullscreen-simulado') ? 'block' : 'none';
 
-    // Redesenha gráfico
     if (graficoSemana && canvas.id === 'graficoSemana') graficoSemana.resize();
     if (graficoMes && canvas.id === 'graficoMes') graficoMes.resize();
 }
@@ -289,18 +360,15 @@ document.querySelectorAll('.btn-fullscreen-close').forEach(btn => {
     });
 });
 
-// INICIALIZAÇÃO
-document.addEventListener("DOMContentLoaded", () => {
-    carregarProdutosDoBanco();
-    carregarPedidosDaSemana();
-    carregarResumoSemanal();
-    carregarResumoMensal();
-});
 
+    // INICIALIZAÇÃO
+    document.addEventListener("DOMContentLoaded", () => {
+        carregarProdutosDoBanco();
+        carregarPedidosDaSemana();
+        carregarResumoSemanal();
+        carregarResumoMensal();
+    });
 </script>
-
-
-
 
 </body>
 </html>
