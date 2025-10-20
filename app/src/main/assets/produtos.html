@@ -39,6 +39,21 @@
         <!-- Aba 2: Estoque -->
         <div class="tab-pane fade" id="estoque" role="tabpanel">
             <h4>Estoque / Consumo</h4>
+
+            <h5>📦 Estoque Atual</h5>
+            <table class="table table-bordered table-striped table-sm" id="tabelaEstoqueAtual">
+                <thead class="table-dark">
+                <tr>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Embalagem</th>
+                    <th>Qtd Atual</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+
             <table class="table table-bordered table-striped" id="tabelaEstoque">
                 <thead class="table-dark">
                 <tr>
@@ -88,6 +103,31 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- MODAL DE OPÇÕES -->
+<div class="modal fade" id="modalFinalizar" tabindex="-1" aria-labelledby="modalFinalizarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalFinalizarLabel">
+                    Escolha uma ação
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Deseja apenas finalizar o pedido ou também atualizar o estoque atual?</p>
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <button id="btnFinalizarPedido" class="btn btn-success w-100">
+                        <i class="bi bi-check-circle me-1"></i> Finalizar Pedido
+                    </button>
+                    <button id="btnAtualizarEstoque" class="btn btn-warning w-100">
+                        <i class="bi bi-box-seam me-1"></i> Atualizar Estoque
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -158,7 +198,7 @@
     }
 
     // FINALIZAR PEDIDOS
-   document.getElementById("finalizarPedidos").addEventListener("click", () => {
+function finalizarPedidos() {
     const cards = document.querySelectorAll("#listaProdutos .card");
     const produtos = [];
 
@@ -169,22 +209,62 @@
             const codigo = parseInt(card.querySelector(".codigo").innerText.split(":")[1].trim());
             const qtdPorEmb = parseInt(card.dataset.qtdPorEmbalagem) || 1;
             const precoPorEmbalagem = parseFloat(card.dataset.precoEmbalagem) || 0;
-
             produtos.push({ codigo, quantidade: qtdEmbalagens, preco: precoPorEmbalagem });
             input.value = 0;
         }
     });
 
     if (produtos.length > 0) {
-    produtos.forEach(p => {
-        Android.finalizarPedido(p.codigo, p.quantidade, p.preco);
-    });
-}
+        produtos.forEach(p => {
+            Android.finalizarPedido(p.codigo, p.quantidade, p.preco);
+        });
+    }
 
     carregarPedidosDaSemana();
     carregarResumoSemanal();
     carregarResumoMensal();
-});
+    carregarEstoqueAtual();
+}
+
+function carregarEstoqueAtual() {
+    if (typeof Android === "undefined") return;
+
+    const raw = Android.getEstoque() || "[]";
+    console.log("RAW ESTOQUE:", raw); // <-- log do que veio do Android
+
+    let estoque;
+    try {
+        estoque = JSON.parse(raw);
+    } catch (e) {
+        console.error("Erro ao parsear JSON do estoque:", e);
+        estoque = [];
+    }
+
+    console.log("JSON ESTOQUE PARSEADO:", estoque); // <-- log do array parseado
+
+    const tbody = document.querySelector("#tabelaEstoqueAtual tbody");
+    tbody.innerHTML = "";
+
+    estoque.forEach(item => {
+        console.log("Item do estoque:", item); // <-- log de cada item
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${item.codigo_produto}</td>
+            <td>${item.descricao}</td>
+            <td>${item.embalagem ?? "-"}</td>
+            <td>${Number(item.quantidade_atual || 0)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    if (estoque.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="4" class="text-center text-muted">Sem dados de estoque</td>`;
+        tbody.appendChild(tr);
+    }
+}
+
+
 
 
     // TABELA SEMANAL
@@ -360,6 +440,164 @@ document.querySelectorAll('.btn-fullscreen-close').forEach(btn => {
     });
 });
 
+function abrirTelaAtualizacaoEstoque() {
+    if (typeof Android === "undefined") return;
+
+    const produtosJson = Android.getProdutosCartazista();
+    console.log("Produtos recebidos:", produtosJson);
+    const produtos = JSON.parse(produtosJson);
+
+    let html = `
+        <p><b>Por favor, informe a quantidade de cada item que você tem no estoque hoje:</b></p>
+        <div class="d-flex flex-wrap gap-2" style="max-height: 400px; overflow-y: auto;">`;
+
+    produtos.forEach(prod => {
+        html += `
+    <div class="card p-1 shadow-sm" style="flex: 0 0 48%; font-size: 0.8rem;">
+        <div>
+            <strong>${prod.descricao}</strong><br>
+            <small>Código: ${prod.codigo}</small><br>
+            <small>Embalagem: ${prod.embalagem}</small><br>
+            <small>Qtd/embalagem: ${prod.qtd_por_embalagem}</small>
+        </div>
+        <input type="number" min="0" step="0.1" class="form-control form-control-sm mt-1"
+            id="qtd_${prod.codigo}" placeholder="0">
+    </div>
+`;
+    });
+
+    html += `</div>
+        <button class="btn btn-primary mt-3 w-100" onclick="abrirResumoComparativo()">Continuar</button>`;
+
+    const modalDiv = document.createElement("div");
+    modalDiv.className = "modal fade show";
+    modalDiv.style.display = "block";
+    modalDiv.id = "modalEstoqueAtual";
+    modalDiv.innerHTML = `
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Informar Estoque Atual</h5>
+                </div>
+                <div class="modal-body">${html}</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Fechar</button>
+                </div>
+            </div>
+        </div>`;
+
+    document.body.appendChild(modalDiv);
+}
+
+
+
+function abrirResumoComparativo() {
+    if (typeof Android === "undefined") return;
+
+    // Captura os valores digitados no primeiro modal
+    const estoqueAtualManual = {};
+    document.querySelectorAll("input[id^='qtd_']").forEach(input => {
+        const codigo = input.id.replace("qtd_", "");
+        const valor = parseFloat(input.value) || 0; // validação: se vazio, usa 0
+        estoqueAtualManual[codigo] = valor;
+    });
+
+    // Fecha o primeiro modal
+    document.getElementById("modalEstoqueAtual").remove();
+
+    // Busca os dados do banco (estoque atual) e os pedidos
+    const estoqueBanco = JSON.parse(Android.getEstoque() || "[]"); // estoque atual do banco
+    const pedidos = JSON.parse(Android.getPedidosDaSemana() || "[]"); // pedidos da semana
+
+    // Mapear pedidos por código para facilitar cálculo
+    const pedidosMap = {};
+    pedidos.forEach(p => {
+        const cod = p.codigo_produto;
+        pedidosMap[cod] = (pedidosMap[cod] || 0) + Number(p.quantidade || 0);
+    });
+
+    // Montar tabela comparativa
+    let html = `<table class="table table-bordered table-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Produto</th>
+                <th>Estoque Banco</th>
+                <th>Pedido Novo</th>
+                <th>Estoque Atual (digitado)</th>
+                <th>Uso Real</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    let estoqueZerado = true;
+
+    estoqueBanco.forEach(p => {
+        const cod = p.codigo_produto;
+        const banco = Number(p.quantidade_atual || 0);
+        const pedidoNovo = Number(pedidosMap[cod] || 0);
+        const atual = Number(estoqueAtualManual[cod] || 0);
+
+        if (banco !== 0) estoqueZerado = false;
+
+        const usoReal = (banco + pedidoNovo - atual).toFixed(1);
+
+        html += `<tr>
+            <td>${p.descricao}</td>
+            <td>${banco}</td>
+            <td>${pedidoNovo}</td>
+            <td>${atual}</td>
+            <td>${usoReal}</td>
+        </tr>`;
+    });
+
+    // Se estoque todo era zero, colocar aviso
+    if (estoqueZerado) {
+        html += `<tr>
+            <td colspan="5" class="text-center text-danger">
+                Atenção! Todo o estoque estava zerado, usamos tudo que tinha 😅
+            </td>
+        </tr>`;
+    }
+
+    html += `</tbody></table>
+        <button class="btn btn-success mt-3 w-100" onclick="salvarEstoqueFinal()">Salvar Estoques</button>`;
+
+    // Criar modal
+    const modalDiv = document.createElement("div");
+    modalDiv.className = "modal fade show";
+    modalDiv.style.display = "block";
+    modalDiv.id = "modalResumoEstoque";
+    modalDiv.innerHTML = `
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Resumo de Atualização do Estoque</h5></div>
+                <div class="modal-body">${html}</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Fechar</button>
+                </div>
+            </div>
+        </div>`;
+
+    document.body.appendChild(modalDiv);
+
+    // Salvar temporariamente os valores para uso posterior
+    window.__estoqueAtualInformado = estoqueAtualManual;
+}
+
+
+
+function salvarEstoqueFinal() {
+    if (!window.__estoqueAtualInformado) return;
+
+    Object.entries(window.__estoqueAtualInformado).forEach(([codigo, qtd]) => {
+        Android.setEstoque(parseInt(codigo), parseFloat(qtd));
+    });
+
+    alert("Estoque atualizado com sucesso!");
+    carregarEstoqueAtual();
+    document.getElementById("modalResumoEstoque").remove();
+}
+
 
     // INICIALIZAÇÃO
     document.addEventListener("DOMContentLoaded", () => {
@@ -367,6 +605,27 @@ document.querySelectorAll('.btn-fullscreen-close').forEach(btn => {
         carregarPedidosDaSemana();
         carregarResumoSemanal();
         carregarResumoMensal();
+        carregarEstoqueAtual();
+
+        // FINALIZAR PEDIDOS
+    document.getElementById("finalizarPedidos").addEventListener("click", () => {
+        const modal = new bootstrap.Modal(document.getElementById("modalFinalizar"));
+        modal.show();
+    });
+
+    // Botão "Finalizar Pedido" — fluxo atual
+    document.getElementById("btnFinalizarPedido").addEventListener("click", () => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalFinalizar"));
+        modal.hide();
+        finalizarPedidos(); // Função separada com o fluxo atual
+    });
+
+    // Botão "Atualizar Estoque" — novo fluxo
+    document.getElementById("btnAtualizarEstoque").addEventListener("click", () => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById("modalFinalizar"));
+        modal.hide();
+        abrirTelaAtualizacaoEstoque(); // Nova função que você vai criar
+    });
     });
 </script>
 

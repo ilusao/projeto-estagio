@@ -497,9 +497,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-
-
     @JavascriptInterface
         public void exportarFaixas() {
             runOnUiThread(() -> {

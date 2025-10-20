@@ -911,6 +911,66 @@ public class Bancodedados extends SQLiteOpenHelper {
     }
 
 
+    public void criarTabelaEstoque(SQLiteDatabase db) {
+        String createTableEstoque = "CREATE TABLE IF NOT EXISTS estoque_atual (" +
+                "codigo_produto INTEGER PRIMARY KEY, " +
+                "quantidade REAL NOT NULL, " +
+                "FOREIGN KEY (codigo_produto) REFERENCES produtos_cartazista(codigo)" +
+                ")";
+        db.execSQL(createTableEstoque);
+    }
+
+    public void inicializarEstoque(SQLiteDatabase db) {
+        List<Produto> produtos = listarProdutosCartazistaComoLista();
+        for (Produto p : produtos) {
+            ContentValues values = new ContentValues();
+            values.put("codigo_produto", p.getCodigo());
+            values.put("quantidade", 0); // começa com 0 ou quantidade inicial se quiser
+            db.insertWithOnConflict("estoque_atual", null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        }
+    }
+
+    public void atualizarEstoque(int codigoProduto, double novaQuantidade) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("quantidade", novaQuantidade);
+        db.update("estoque_atual", values, "codigo_produto = ?", new String[]{String.valueOf(codigoProduto)});
+    }
+
+    // Listar estoque completo
+    public JSONArray listarEstoque() {
+        JSONArray array = new JSONArray();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT e.codigo_produto, p.descricao, p.embalagem, e.quantidade " +
+                        "FROM estoque_atual e " +
+                        "INNER JOIN produtos_cartazista p ON e.codigo_produto = p.codigo " +
+                        "ORDER BY p.descricao ASC", null);
+
+        Log.d("Bancodedados", "Cursor estoque possui " + cursor.getCount() + " registros"); // <- log
+
+        if (cursor.moveToFirst()) {
+            do {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("codigo_produto", cursor.getInt(cursor.getColumnIndexOrThrow("codigo_produto")));
+                    obj.put("descricao", cursor.getString(cursor.getColumnIndexOrThrow("descricao")));
+                    obj.put("embalagem", cursor.getString(cursor.getColumnIndexOrThrow("embalagem")));
+                    obj.put("quantidade_atual", cursor.getDouble(cursor.getColumnIndexOrThrow("quantidade")));
+                    obj.put("media_semanal", 0);
+                    array.put(obj);
+                    Log.d("Bancodedados", "Item do estoque: " + obj.toString()); // <- log de cada item
+                } catch (Exception e) {
+                    Log.e("Bancodedados", "Erro ao criar JSON do estoque", e);
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return array;
+    }
+
+
+
 
 
 

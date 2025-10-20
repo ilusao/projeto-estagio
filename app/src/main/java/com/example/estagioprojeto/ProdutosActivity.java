@@ -28,6 +28,11 @@ public class ProdutosActivity extends AppCompatActivity {
 
         dbHelper = new Bancodedados(this);
 
+        // Abre o banco e cria/inicializa a tabela de estoque
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        dbHelper.criarTabelaEstoque(db);   // cria a tabela se não existir
+        dbHelper.inicializarEstoque(db);
+
         webView = findViewById(R.id.webViewProdutos);
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -79,6 +84,23 @@ public class ProdutosActivity extends AppCompatActivity {
             @JavascriptInterface
             public String getPedidosDaSemana() {
                 return ProdutosActivity.this.getPedidosDaSemana();
+            }
+
+            @JavascriptInterface
+            public String getEstoque() {
+                try {
+                    JSONArray estoque = dbHelper.listarEstoque();
+                    Log.d("ProdutosActivity", "JSON do estoque: " + estoque.toString()); // <- log
+                    return estoque.toString();
+                } catch (Exception e) {
+                    Log.e("ProdutosActivity", "Erro ao listar estoque", e);
+                    return "[]";
+                }
+            }
+
+            @JavascriptInterface
+            public void setEstoque(int codigoProduto, double novaQuantidade) {
+                dbHelper.atualizarEstoque(codigoProduto, novaQuantidade);
             }
 
             @JavascriptInterface
