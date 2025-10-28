@@ -78,7 +78,8 @@ public class ProdutosActivity extends AppCompatActivity {
             @JavascriptInterface
             public void finalizarPedido(int codigo, int quantidade, double preco) {
                 dbHelper.inserirPedido(novoIdPedido, codigo, quantidade, preco);
-                Log.d("ProdutosActivity", "Pedido inserido: " + codigo + " x" + quantidade + " (id_pedido: " + novoIdPedido + ")");
+                dbHelper.atualizarEstoqueAposPedido(codigo, quantidade);
+                Log.d("ProdutosActivity", "Pedido inserido e estoque atualizado: " + codigo + " x" + quantidade + " (id_pedido: " + novoIdPedido + ")");
             }
 
             @JavascriptInterface
@@ -101,6 +102,7 @@ public class ProdutosActivity extends AppCompatActivity {
             @JavascriptInterface
             public void setEstoque(int codigoProduto, double novaQuantidade) {
                 dbHelper.atualizarEstoque(codigoProduto, novaQuantidade);
+
             }
 
             @JavascriptInterface
@@ -188,4 +190,6 @@ public class ProdutosActivity extends AppCompatActivity {
         cursor.close();
         return array.toString();
     }
+
+
 }

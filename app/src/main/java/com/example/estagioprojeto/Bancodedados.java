@@ -921,14 +921,31 @@ public class Bancodedados extends SQLiteOpenHelper {
     }
 
     public void inicializarEstoque(SQLiteDatabase db) {
-        List<Produto> produtos = listarProdutosCartazistaComoLista();
-        for (Produto p : produtos) {
-            ContentValues values = new ContentValues();
-            values.put("codigo_produto", p.getCodigo());
-            values.put("quantidade", 0); // começa com 0 ou quantidade inicial se quiser
-            db.insertWithOnConflict("estoque_atual", null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        // Verifica se a tabela estoque_atual já tem dados
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM estoque_atual", null);
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+
+        if (count > 0) {
+            Log.d("BancoDeDados", "Estoque já inicializado — nada a fazer.");
+            return; // Sai sem recriar nada
         }
+
+        Log.d("BancoDeDados", "Inicializando estoque pela primeira vez...");
+
+        // Pega todos os produtos da tabela produtos_cartazista e cria o estoque inicial
+        Cursor produtos = db.rawQuery("SELECT codigo FROM produtos_cartazista", null);
+        if (produtos.moveToFirst()) {
+            do {
+                int codigo = produtos.getInt(0);
+                db.execSQL("INSERT OR IGNORE INTO estoque_atual (codigo_produto, quantidade) VALUES (?, ?)",
+                        new Object[]{codigo, 0});
+            } while (produtos.moveToNext());
+        }
+        produtos.close();
     }
+
 
     public void atualizarEstoque(int codigoProduto, double novaQuantidade) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -969,6 +986,11 @@ public class Bancodedados extends SQLiteOpenHelper {
         return array;
     }
 
+    public void atualizarEstoqueAposPedido(int codigoProduto, double quantidadeAdicional) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE estoque_atual SET quantidade = quantidade + ? WHERE codigo_produto = ?",
+                new Object[]{quantidadeAdicional, codigoProduto});
+    }
 
 
 
