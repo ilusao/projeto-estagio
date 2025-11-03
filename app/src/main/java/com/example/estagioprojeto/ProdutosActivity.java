@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import java.util.List;
+import org.json.JSONException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,6 +33,8 @@ public class ProdutosActivity extends AppCompatActivity {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         dbHelper.criarTabelaEstoque(db);   // cria a tabela se não existir
         dbHelper.inicializarEstoque(db);
+        JSONArray dadosUso = dbHelper.getDadosUsoProdutos();
+        String script = "javascript:atualizarGraficoUso(" + dadosUso.toString() + ")";
 
         webView = findViewById(R.id.webViewProdutos);
         WebSettings webSettings = webView.getSettings();
@@ -83,6 +86,66 @@ public class ProdutosActivity extends AppCompatActivity {
             }
 
             @JavascriptInterface
+            public String getDadosUsoProdutos() {
+                JSONArray jsonArray = new JSONArray();
+                SQLiteDatabase db = dbHelper.getReadableDatabase();
+                Log.d("DEBUG_GRAFICO", "Entrou em getDadosUsoProdutos()");
+                Cursor cursor = db.rawQuery("SELECT codigo, descricao FROM produtos_cartazista", null);
+                Log.d("DEBUG_GRAFICO", "Total de produtos: " + cursor.getCount());
+
+                if (cursor.moveToFirst()) {
+                    do {
+                        int codigo = cursor.getInt(0);
+                        String nome = cursor.getString(1);
+
+                        // Uso diário
+                        double totalUso = 0;
+                        Cursor cUso = db.rawQuery("SELECT SUM(quantidade_usada) FROM uso_produtos WHERE codigo_produto=? AND tipo='uso'",
+                                new String[]{String.valueOf(codigo)});
+                        if (cUso.moveToFirst()) totalUso = cUso.isNull(0) ? 0 : cUso.getDouble(0);
+                        cUso.close();
+
+// Pedido do mês
+                        double totalPedido = 0;
+                        Cursor cPedido = db.rawQuery("SELECT SUM(quantidade_usada) FROM uso_produtos WHERE codigo_produto=? AND tipo='pedido_mes'",
+                                new String[]{String.valueOf(codigo)});
+                        if (cPedido.moveToFirst()) totalPedido = cPedido.isNull(0) ? 0 : cPedido.getDouble(0);
+                        cPedido.close();
+
+                        // Adiciona uso
+                        try {
+                            JSONObject objUso = new JSONObject();
+                            objUso.put("nome", nome);
+                            objUso.put("total", totalUso);
+                            objUso.put("tipo", "uso");
+                            jsonArray.put(objUso);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Adiciona pedido do mês
+                        try {
+                            JSONObject objPedido = new JSONObject();
+                            objPedido.put("nome", nome);
+                            objPedido.put("total", totalPedido);
+                            objPedido.put("tipo", "pedido_mes");
+                            jsonArray.put(objPedido);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+
+                return jsonArray.toString();
+
+            }
+
+
+
+            @JavascriptInterface
             public String getPedidosDaSemana() {
                 return ProdutosActivity.this.getPedidosDaSemana();
             }
@@ -99,16 +162,63 @@ public class ProdutosActivity extends AppCompatActivity {
                 }
             }
 
+
+
             @JavascriptInterface
             public void setEstoque(int codigoProduto, double novaQuantidade) {
-                dbHelper.atualizarEstoque(codigoProduto, novaQuantidade);
+                try {
+                    double estoqueAnterior = dbHelper.getQuantidadeEstoque(codigoProduto);
+                    dbHelper.atualizarEstoque(codigoProduto, novaQuantidade);
 
+                    double quantidadeUsada = estoqueAnterior - novaQuantidade;
+
+                    if (quantidadeUsada > 0) {
+                        // 🔹 Registrar uso já com tipo 'uso'
+                        dbHelper.registrarUsoProduto(codigoProduto, quantidadeUsada, "uso");
+
+                        Log.d("ProdutosActivity", "Uso registrado: produto=" + codigoProduto + ", qtd=" + quantidadeUsada);
+
+                        // 🔹 Atualiza gráfico imediatamente, garantindo pegar todos os dados
+                        runOnUiThread(() -> {
+                            JSONArray dadosUso = new JSONArray();
+                            try {
+                                dadosUso = new JSONArray(dbHelper.getDadosUsoProdutos());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            final String script = "javascript:atualizarGraficoUso(" + dadosUso.toString() + ")";
+                            webView.evaluateJavascript(script, null);
+                        });
+                    } else {
+                        Log.d("ProdutosActivity", "Nenhum uso registrado (estoque aumentou ou manteve igual)");
+                    }
+
+                } catch (Exception e) {
+                    Log.e("ProdutosActivity", "Erro ao atualizar estoque e registrar uso", e);
+                }
+            }
+
+
+
+            public double getEstoqueAtual(int codigoProduto) {
+                SQLiteDatabase db = dbHelper.getReadableDatabase();
+                double quantidade = 0;
+
+                Cursor cursor = db.rawQuery("SELECT quantidade FROM estoque_atual WHERE codigo_produto = ?", new String[]{String.valueOf(codigoProduto)});
+                if (cursor.moveToFirst()) {
+                    quantidade = cursor.getDouble(0);
+                }
+                cursor.close();
+                return quantidade;
             }
 
             @JavascriptInterface
             public String getPedidosDoMes() {
                 return ProdutosActivity.this.getPedidosDoMes();
             }
+
+
+
         }, "Android");
 
         webView.loadUrl("file:///android_asset/produtos.html");
@@ -190,6 +300,7 @@ public class ProdutosActivity extends AppCompatActivity {
         cursor.close();
         return array.toString();
     }
+
 
 
 }

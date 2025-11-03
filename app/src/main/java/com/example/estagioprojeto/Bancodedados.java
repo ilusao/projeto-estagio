@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,7 +29,7 @@ import java.io.BufferedWriter;
 public class Bancodedados extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "cartazista.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String TABLE_FAIXAS = "faixas";
 
@@ -63,6 +64,7 @@ public class Bancodedados extends SQLiteOpenHelper {
         criarTabelaProdutosCartazista(db);
         popularProdutosCartazista(db);
         criarTabelaPedidos(db);
+        criarTabelaUsoProdutos(db);
     }
 
     @Override
@@ -992,8 +994,78 @@ public class Bancodedados extends SQLiteOpenHelper {
                 new Object[]{quantidadeAdicional, codigoProduto});
     }
 
+    // Retorna a quantidade atual do estoque de um produto
+    public double getQuantidadeEstoque(int codigoProduto) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double quantidade = 0;
+        Cursor cursor = db.rawQuery(
+                "SELECT quantidade FROM estoque_atual WHERE codigo_produto = ?",
+                new String[]{String.valueOf(codigoProduto)}
+        );
+
+        if (cursor.moveToFirst()) {
+            quantidade = cursor.getDouble(cursor.getColumnIndexOrThrow("quantidade"));
+        }
+
+        cursor.close();
+        return quantidade;
+    }
 
 
+
+    private void criarTabelaUsoProdutos(SQLiteDatabase db) {
+        String createTableUso = "CREATE TABLE IF NOT EXISTS uso_produtos (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "codigo_produto INTEGER NOT NULL, " +
+                "quantidade_usada REAL NOT NULL, " +
+                "data_registro TEXT DEFAULT (datetime('now','localtime')), " +
+                "tipo TEXT DEFAULT 'uso', " + // 'uso' = uso diário, 'pedido_mes' = pedido do mês
+                "FOREIGN KEY (codigo_produto) REFERENCES produtos_cartazista(codigo)" +
+                ")";
+        db.execSQL(createTableUso);
+    }
+
+
+    public void registrarUsoProduto(int codigoProduto, double quantidadeUsada, String tipo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("codigo_produto", codigoProduto);
+        values.put("quantidade_usada", quantidadeUsada);
+        values.put("tipo", tipo);
+        db.insert("uso_produtos", null, values);
+    }
+
+
+    public JSONArray getDadosUsoProdutos() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        JSONArray jsonArray = new JSONArray();
+
+        String query = "SELECT p.descricao, SUM(u.quantidade_usada) AS total_usado, u.tipo " +
+                "FROM uso_produtos u " +
+                "JOIN produtos_cartazista p ON u.codigo_produto = p.codigo " +
+                "GROUP BY p.descricao, u.tipo " +
+                "ORDER BY total_usado DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("nome", cursor.getString(0));
+                    obj.put("total", cursor.getDouble(1));
+                    obj.put("tipo", cursor.getString(2));
+                    jsonArray.put(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return jsonArray;
+    }
 
 
 
